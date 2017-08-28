@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  api:
+    image: node:8.4.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "4040:4040"
+    command: ["npm", "run", "dev"]
+    env_file:
+      - .env
+    depends_on:
+      - mongodbconfig
+    environment:
+      - MONGO_HOST=mongodb://mongo:27017/status-page-components-service
+  mongodbconfig:
+    image: "mongo:3.4"
+    volumes:
+      - ./mongodata:/data/db
+    ports:
+      - 4041:27017

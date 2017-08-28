@@ -1,0 +1,62 @@
+{
+  "name": "components-service",
+  "version": "1.0.0",
+  "description": "components-service",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=4.8.0",
+    "npm": ">=2.15.11"
+  },
+  "bin": {
+    "gulp": "./node_modules/.bin/gulp",
+    "eslint": "./node_modules/.bin/eslint"
+  },
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp",
+    "lint": "eslint 'src/**/*.js'",
+    "flow": "flow"
+  },
+  "keywords": [
+    "express",
+    "node",
+    "node.js",
+    "es6",
+    "REST",
+    "API"
+  ],
+  "author": "Kartikay Gupta <kartikayg@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "del": "^3.0.0",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb-base": "^11.3.2",
+    "eslint-plugin-import": "^2.7.0",
+    "flow-bin": "^0.53.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-file-cache": "0.0.1",
+    "gulp-newer": "^1.3.0",
+    "gulp-nodemon": "^2.2.1",
+    "run-sequence": "^2.1.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-2",
+      "flow"
+    ],
+    "plugins": [
+      "add-module-exports"
+    ]
+  }
+}
