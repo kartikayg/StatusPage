@@ -1,12 +1,12 @@
 const gulp = require('gulp')
   , nodemon = require('gulp-nodemon')
   , babel = require('gulp-babel')
-  , newer = require('gulp-newer')
   , Cache = require('gulp-file-cache')
   , del   = require('del')
   , runSequence = require('run-sequence')
   , path  = require('path');
 
+// cache for file changes
 const cache = new Cache();
 
 const paths = {
@@ -14,7 +14,7 @@ const paths = {
   nonJs: ['./package.json', './.gitignore', './.env']
 };
 
-// Clean up dist and coverage directory
+// Clean up dist and cache
 gulp.task('clean', () => {
   del.sync(['dist/**', 'dist/.*', '!dist'])
   cache.clear();
@@ -24,7 +24,8 @@ gulp.task('clean', () => {
 // Copy non-js files to dist
 gulp.task('copy', () =>
   gulp.src(paths.nonJs)
-    .pipe(newer('dist'))
+    .pipe(cache.filter())
+    .pipe(cache.cache())
     .pipe(gulp.dest('dist'))
 );
 
@@ -43,7 +44,7 @@ gulp.task('compile', () =>
 gulp.task('nodemon', ['copy', 'compile'], () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
-    ext: 'js',
+    ext: 'js json env',
     ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'gulpfile.js'],
     tasks: ['compile']
   })
