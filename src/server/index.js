@@ -1,20 +1,20 @@
-// load express
+// // load express
 
-// parse body params and attache them to req.body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// // parse body params and attache them to req.body
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(cookieParser());
-app.use(compress());
-app.use(methodOverride());
+// // app.use(cookieParser());
+// app.use(compress());
+// app.use(methodOverride());
 
-// secure apps by setting various HTTP headers
-app.use(helmet());
+// // secure apps by setting various HTTP headers
+// app.use(helmet());
 
-// enable CORS - Cross Origin Resource Sharing
-app.use(cors());
+// // enable CORS - Cross Origin Resource Sharing
+// app.use(cors());
 
 
-// load routes
+// // load routes
 
-// unhandled exceptions
+// // unhandled exceptions

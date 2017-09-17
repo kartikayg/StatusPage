@@ -1,3 +1,11 @@
 {
-    "extends": "airbnb-base"
+  "rules": {
+    "comma-dangle": ["error", "never"],
+    "padded-blocks": 0,
+    "object-curly-spacing": 0
+  },
+  "extends": [
+    "eslint:recommended",
+    "airbnb-base"
+  ]
 }

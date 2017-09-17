@@ -26,3 +26,6 @@ mongodata
 
 # Babel ES6 compiles files
 dist
+
+# Coverage directory used by tools like istanbul
+coverage

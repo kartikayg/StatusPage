@@ -10,7 +10,7 @@ const gulp = require('gulp')
 const cache = new Cache();
 
 const paths = {
-  js: ['./src/**/*.js', '!dist/**', '!node_modules/**'],
+  js: ['./src/**/*.js', '!./src/**/*.spec.js', '!dist/**', '!node_modules/**'],
   nonJs: ['./package.json', './.gitignore', './.env']
 };
 
@@ -45,7 +45,7 @@ gulp.task('nodemon', ['copy', 'compile'], () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
     ext: 'js json env',
-    ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'gulpfile.js'],
+    ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'src/**/*.spec.js', 'gulpfile.js'],
     tasks: ['compile']
   })
 );

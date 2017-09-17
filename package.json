@@ -9,13 +9,17 @@
   },
   "bin": {
     "gulp": "./node_modules/.bin/gulp",
-    "eslint": "./node_modules/.bin/eslint"
+    "eslint": "./node_modules/.bin/eslint",
+    "mocha": "./node_modules/.bin/mocha",
+    "istanbul": "./node_modules/.bin/istanbul"
   },
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp",
     "lint": "eslint 'src/**/*.js'",
-    "flow": "flow"
+    "flow": "flow",
+    "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
   },
   "keywords": [
     "express",
@@ -37,10 +41,12 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
+    "cross-env": "^5.0.5",
     "del": "^3.0.0",
     "eslint": "^4.6.1",
     "eslint-config-airbnb-base": "^11.3.2",
@@ -50,14 +56,21 @@
     "gulp-babel": "^7.0.0",
     "gulp-file-cache": "0.0.1",
     "gulp-nodemon": "^2.2.1",
-    "istanbul": "^0.4.5",
+    "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.5.3",
-    "run-sequence": "^2.1.0"
+    "run-sequence": "^2.1.0",
+    "sinon": "^3.2.1"
   },
   "babel": {
     "presets": [
-      "es2015",
-      "stage-2",
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
       "flow"
     ],
     "plugins": [
