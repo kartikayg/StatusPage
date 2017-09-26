@@ -1,4 +1,8 @@
 {
+  "parser": "babel-eslint",
+  "plugins": [
+    "flowtype"
+  ],
   "rules": {
     "comma-dangle": ["error", "never"],
     "padded-blocks": 0,

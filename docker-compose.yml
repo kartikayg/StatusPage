@@ -13,8 +13,6 @@ services:
       - .env
     depends_on:
       - mongodbconfig
-    environment:
-      - MONGO_HOST=mongodb://mongo:27017/status-page-components-service
   mongodbconfig:
     image: "mongo:3.4"
     volumes:

@@ -35,11 +35,14 @@
     "debug": "^3.0.1",
     "dotenv": "^4.0.0",
     "express": "^4.15.4",
-    "joi": "^10.6.0"
+    "joi": "^10.6.0",
+    "mongodb": "^2.2.31",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
@@ -50,6 +53,7 @@
     "del": "^3.0.0",
     "eslint": "^4.6.1",
     "eslint-config-airbnb-base": "^11.3.2",
+    "eslint-plugin-flowtype": "^2.35.1",
     "eslint-plugin-import": "^2.7.0",
     "flow-bin": "^0.53.1",
     "gulp": "^3.9.1",

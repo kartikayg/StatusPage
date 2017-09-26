@@ -8,17 +8,18 @@ describe('config/server', function() {
     PORT: 1234
   };
 
-  it('throws exception when no port is defined', function() {
-    assert.throws(() => server.load(), Error, /"PORT" is required/);
-  });
-
-  it('should return a proper object on success', function() {
+   it('should return a proper object on success', function() {
 
     const conf = server.load(envVars);
 
-    assert.typeOf(conf, 'object');
-    assert.typeOf(conf.server, 'object');
+    assert.isObject(conf);
+    assert.isObject(conf.server);
+    assert.isNumber(conf.server.port);
 
+  });
+
+  it('should throw exception when no port is defined', function() {
+    assert.throws(() => server.load(), Error, /"PORT" is required/);
   });
 
   it('should return the correct PORT number', function() {
