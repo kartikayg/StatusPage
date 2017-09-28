@@ -18,18 +18,6 @@ const SERVER_PARAMS = {
   }
 };
 
-const REPLSET_PARAMS = {
-  replicaSet: 'rs1',
-  ha: true,
-  haInterval: 10000,
-  poolSize: 10,
-  socketoptions: {
-    keepAlive: 300,
-    connectTimeoutMS: 30000,
-    socketTimeoutMS: 30000
-  }
-};
-
 /**
  * Creates a Mongo DB connection
  * @param {object} conf - DB config object
@@ -44,8 +32,7 @@ const connect = (conf = {}, doInitialSetup = false) => {
 
     MongoClient.connect(conf.mongo_url, {
       db: DB_PARAMS,
-      server: SERVER_PARAMS,
-      replSet: REPLSET_PARAMS
+      server: SERVER_PARAMS
     }, function(err, db) {
       
       if (err) {

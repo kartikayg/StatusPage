@@ -21,9 +21,9 @@ const init = async () => {
   const db = await dbAdapter.connect(conf.db);
 
   // init logger
-  logger.init(conf.logger);
+  logger.init(conf.logger, db);
 
-  logger.info(conf);
+  logger.error('here there');
 
   // load repositories
 

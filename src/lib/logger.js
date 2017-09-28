@@ -3,12 +3,16 @@
  */
 
 import winston from 'winston';
+import * as winstonmongodb from 'winston-mongodb';
 
 /**
  * Initializes the logger.
- * @param {object} conf
+ * @param {object} conf - Configuration to setup the logger
+ *  - isEnabled
+ *  - level
+ * @param {object} db - Database connection
  */
-function init(conf = {}) {
+function init(conf = {}, db) {
 
   // remove all default transporters
   winston.configure({
@@ -28,6 +32,14 @@ function init(conf = {}) {
       timestamp: true,
       json: true,
       stringify: true
+    });
+
+    winston.add(winston.transports.MongoDB, {
+      level: 'warn',
+      db: db,
+      storeHost: true,
+      capped: true,
+      cappedMax: 100000
     });
 
   }
