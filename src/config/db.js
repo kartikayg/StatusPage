@@ -5,11 +5,9 @@
  */
 export const schema = (joi) => {
   return joi.object({
-    LOG_LEVEL: joi.string()
-      .only(['error', 'warn', 'info', 'debug'])
-      .default('info'),
-    LOGGING_ENABLED: joi.boolean()
-      .default(true)
+    MONGO_ENDPOINT: joi.string()
+      .uri({ scheme: ['mongodb'] })
+      .required()
   });
 };
 
@@ -20,9 +18,8 @@ export const schema = (joi) => {
  */
 export const extract = (env = {}) => {
   return {
-    logger: {
-      level: env.LOG_LEVEL,
-      isEnabled: env.LOGGING_ENABLED
+    db: {
+      mongo_url: env.MONGO_ENDPOINT
     }
   };
 };

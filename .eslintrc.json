@@ -6,7 +6,8 @@
   "rules": {
     "comma-dangle": ["error", "never"],
     "padded-blocks": 0,
-    "object-curly-spacing": 0
+    "object-curly-spacing": 0,
+    "arrow-body-style": ["error", "always"]
   },
   "extends": [
     "eslint:recommended",

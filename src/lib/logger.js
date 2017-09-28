@@ -1,5 +1,3 @@
-// @flow
-
 /**
  * Using wiston library as the logger.
  */
@@ -10,7 +8,7 @@ import winston from 'winston';
  * Initializes the logger.
  * @param {object} conf
  */
-function init(conf: {isEnabled: boolean, level: string}) {
+function init(conf = {}) {
 
   // remove all default transporters
   winston.configure({

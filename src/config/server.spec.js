@@ -1,41 +1,54 @@
 import {assert} from 'chai';
-import server from './server';
+import Joi from 'joi';
 
-describe('config/server', function() {  
-  
-  // default env variables
-  const envVars = {
-    PORT: 1234
-  };
+import * as server from './server';
 
-   it('should return a proper object on success', function() {
+const validate = (data = {}) => server.schema(Joi).validate(data);
 
-    const conf = server.load(envVars);
+describe('config/server', function() {
 
-    assert.isObject(conf);
-    assert.isObject(conf.server);
-    assert.isNumber(conf.server.port);
+  describe('config/server/schema', function() {
 
-  });
+    it('should return a joi object', function() {
+      const schema = server.schema(Joi);
+      assert.isObject(schema);
+    });
 
-  it('should throw exception when no port is defined', function() {
-    assert.throws(() => server.load(), Error, /"PORT" is required/);
-  });
+    it('should validate the conf object', function() {
 
-  it('should return the correct PORT number', function() {
-    const conf = server.load(envVars);
-    assert.strictEqual(conf.server.port, envVars.PORT);
-  });
+      const expectedResult = {PORT: 1234};
 
-  it('should ignore extra vars', function() {
+      const {error, value} = validate({ PORT: 1234 });
+
+      assert.deepEqual(value, expectedResult);
+      assert.isNull(error);
     
-    const extraVars = Object.assign({extra: 123}, envVars);
+    });
 
-    const conf = server.load(extraVars);
+    it('should throw exception on missing/invalid PORT number', function() {
+      
+      const validate1 = validate();
+      assert.match(validate1.error.message, /\"PORT\" is required/);
 
-    assert.typeOf(conf, 'object');
-    assert.typeOf(conf.server, 'object');
-    assert.strictEqual(conf.server.port, envVars.PORT);   
+      const validate2 = validate({PORT: "test"});
+      assert.match(validate2.error.message, /\"PORT\" must be a number/);
+
+    });
+
+  });
+
+  describe('config/server/extract', function() {
+
+    it('should return the conf object', function() {
+      
+      const expectedResult = {server: {port: 1234}};
+
+      const {error, value} = validate({ PORT: 1234 });
+      const config = server.extract(value);
+
+      assert.deepEqual(config, expectedResult);
+
+    });
 
   });
 

@@ -7,15 +7,15 @@ services:
       - .:/app
     working_dir: /app
     ports:
-      - "4040:4040"
+      - "6040:6040"
     command: ["npm", "run", "dev"]
     env_file:
       - .env
     depends_on:
-      - mongodbconfig
-  mongodbconfig:
+      - db
+  db:
     image: "mongo:3.4"
     volumes:
       - ./mongodata:/data/db
     ports:
-      - 4041:27017
+      - 6041:27017
