@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
  * @extends Error
  */
 class APIError extends Error {
-  
+
   /**
    * Creates an API error.
    * @param {string} message - Error message.

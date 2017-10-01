@@ -18,7 +18,7 @@ const init = async () => {
   const conf = config.load(process.env);
 
   // load mongodb
-  const db = await dbAdapter.connect(conf.db);
+  const db = await dbAdapter.connect(conf.db, true);
 
   // init logger
   logger.init(conf.logger, db);
@@ -28,7 +28,7 @@ const init = async () => {
   // load repositories
 
   // start the server
-  
+
 };
 
 init()

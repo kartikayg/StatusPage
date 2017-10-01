@@ -7,7 +7,7 @@ const validate = data => logger.schema(Joi).validate(data);
 
 describe('config/logger', function() {
 
-  describe('config/logger/schema', function() {
+  describe('schema', function() {
 
     it('should return a joi object', function() {
       const schema = logger.schema(Joi);
@@ -53,7 +53,7 @@ describe('config/logger', function() {
 
   });
 
-  describe('config/logger/extract', function() {
+  describe('extract', function() {
 
     it('should return the conf object', function() {
       

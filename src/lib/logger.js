@@ -3,7 +3,7 @@
  */
 
 import winston from 'winston';
-import * as winstonmongodb from 'winston-mongodb';
+import {MongoDB as winstonmongodb} from 'winston-mongodb';
 
 /**
  * Initializes the logger.
@@ -34,9 +34,9 @@ function init(conf = {}, db) {
       stringify: true
     });
 
-    winston.add(winston.transports.MongoDB, {
+    winston.add(winstonmongodb, {
       level: 'warn',
-      db: db,
+      db,
       storeHost: true,
       capped: true,
       cappedMax: 100000

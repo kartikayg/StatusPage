@@ -4,6 +4,7 @@ import * as server from './server';
 import * as logger from './logger';
 import * as db from './db';
 
+
 const components = [server, logger, db];
 
 const load = (envVars = {}) => {

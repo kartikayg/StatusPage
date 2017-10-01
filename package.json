@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp",
+    "linttest": "gulp lint",
     "lint": "eslint 'src/**/*.js'",
     "flow": "flow",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
@@ -60,12 +61,13 @@
     "flow-bin": "^0.53.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^7.0.0",
+    "gulp-eslint": "^4.0.0",
     "gulp-file-cache": "0.0.1",
     "gulp-nodemon": "^2.2.1",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.5.3",
     "run-sequence": "^2.1.0",
-    "sinon": "^3.2.1"
+    "sinon": "^3.3.0"
   },
   "babel": {
     "presets": [

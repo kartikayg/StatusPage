@@ -4,7 +4,8 @@ const gulp = require('gulp')
   , Cache = require('gulp-file-cache')
   , del   = require('del')
   , runSequence = require('run-sequence')
-  , path  = require('path');
+  , path  = require('path')
+  , eslint = require('gulp-eslint');
 
 // cache for file changes
 const cache = new Cache();
@@ -20,6 +21,13 @@ gulp.task('clean', () => {
   cache.clear();
   return;
 });
+
+gulp.task('lint', () => 
+  gulp.src(paths.js)
+    .pipe(eslint())
+    .pipe(eslint.format()) 
+    .pipe(eslint.failOnError())
+);
 
 // Copy non-js files to dist
 gulp.task('copy', () =>
@@ -39,14 +47,13 @@ gulp.task('compile', () =>
     .pipe(gulp.dest('dist')) // write them 
 );
 
-
 // Start server with restart on file changes
-gulp.task('nodemon', ['copy', 'compile'], () =>
+gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
     ext: 'js json env',
     ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'src/**/*.spec.js', 'gulpfile.js'],
-    tasks: ['compile']
+    tasks: ['lint', 'compile']
   })
 );
 
@@ -56,6 +63,8 @@ gulp.task('dev', () => runSequence('nodemon'));
 // default task: clean dist, compile js files and copy non-js files.
 gulp.task('default', () => {
   runSequence(
-    ['clean', 'copy', 'compile']
+    'lint',
+    'clean',
+     ['copy', 'compile']
   );
 });

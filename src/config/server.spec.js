@@ -7,7 +7,7 @@ const validate = (data = {}) => server.schema(Joi).validate(data);
 
 describe('config/server', function() {
 
-  describe('config/server/schema', function() {
+  describe('schema', function() {
 
     it('should return a joi object', function() {
       const schema = server.schema(Joi);
@@ -37,7 +37,7 @@ describe('config/server', function() {
 
   });
 
-  describe('config/server/extract', function() {
+  describe('extract', function() {
 
     it('should return the conf object', function() {
       

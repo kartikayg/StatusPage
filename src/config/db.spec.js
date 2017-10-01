@@ -8,7 +8,7 @@ const testMongoUrl = 'mongodb://dave:password@localhost:27017/myproject';
 
 describe('config/db', function() {
 
-  describe('config/db/schema', function() {
+  describe('schema', function() {
 
     it('should return a joi object', function() {
       const schema = db.schema(Joi);
@@ -41,7 +41,7 @@ describe('config/db', function() {
 
   });
 
-  describe('config/db/extract', function() {
+  describe('extract', function() {
 
     it('should return the conf object', function() {
       
