@@ -31,7 +31,7 @@ describe('lib/logger', function() {
     sinon.assert.alwaysCalledWith(configureStub, {transports: []});
 
     sinon.assert.notCalled(addStub);
-
+    
   });
 
   it('should have the correct logging level', function() {
@@ -55,7 +55,6 @@ describe('lib/logger', function() {
     assert.strictEqual('warn', winston.level);
 
     sinon.assert.calledOnce(configureStub);
-    sinon.assert.alwaysCalledWith(configureStub, {transports: []});
 
     sinon.assert.calledTwice(addStub);
     sinon.assert.calledWith(addStub, winston.transports.Console);

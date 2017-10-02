@@ -1,15 +1,21 @@
+/**
+ * Entry point for the microservice/
+ */
+
 // npm packges
 import dotenv from 'dotenv';
 
 // internal packages
 import config from './config';
 import logger from './lib/logger';
-import dbAdapter from './lib/db-adapter';
+import dbAdapter from './lib/db';
 
 /**
- * Initalizes the service. Here are the main steps in this function:
+ * Initalizes the microservice. Here are the main steps in this function:
  *  Load config
+ *  Load Db adapter
  *  Initialize logger
+ *  
  */
 const init = async () => {
 
@@ -23,15 +29,14 @@ const init = async () => {
   // init logger
   logger.init(conf.logger, db);
 
-  logger.error('here there');
-
   // load repositories
 
   // start the server
 
 };
 
+
 init()
   .catch((e) => {
-    console.error(`Problem initializing the app: ${e}`);
+    console.error(`Problem initializing the app: ${e}`); // eslint-disable-line no-console
   });

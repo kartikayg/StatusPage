@@ -12,7 +12,7 @@ export const schema = (joi) => {
 };
 
 /**
- * Extracts the logger configuration
+ * Extracts the configuration
  * @param {object} env - object from joi validation on environment variables
  * @returns {object} 
  */

@@ -2,7 +2,6 @@ import httpStatus from 'http-status';
 
 /**
  * Class representing an API error.
- * @extends Error
  */
 class APIError extends Error {
 

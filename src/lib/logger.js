@@ -14,18 +14,27 @@ import {MongoDB as winstonmongodb} from 'winston-mongodb';
  */
 function init(conf = {}, db) {
 
-  // remove all default transporters
-  winston.configure({
-    transports: []
-  });
-
   // if not disabled
   if (conf.isEnabled !== false) {
 
     winston.level = conf.level || 'debug';
 
-    // add transporters
+    /* eslint-disable no-param-reassign */
 
+    // rewriter to add extra info to the meta
+    const metaRewriter = (level, msg, meta) => {
+      meta.url = '123';
+      return meta;
+    };
+
+    /* eslint-enable no-param-reassign */
+
+    // configure with no transporter and a rewriters
+    winston.configure({
+      rewriters: [metaRewriter]
+    });
+
+    // add transporters now: console & db
     winston.add(winston.transports.Console, {
       level: 'debug',
       colorize: true,
@@ -42,6 +51,13 @@ function init(conf = {}, db) {
       cappedMax: 100000
     });
 
+  }
+  else {
+
+    // remove all default transporters, so nothing will be logged
+    winston.configure({
+      transports: []
+    });
   }
 
 }
