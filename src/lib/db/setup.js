@@ -1,5 +1,5 @@
 /**
- * Setup tables schema and constraints in the Db
+ * @fileoverview Setup tables schema and constraints in the Db
  */
 
 export default async function (db) {

@@ -1,5 +1,5 @@
 /**
- * MongoDb adapter to use in this microservice.
+ * @fileoverview MongoDb adapter to use in this microservice.
  */
 
 import MongoClient from 'mongodb';

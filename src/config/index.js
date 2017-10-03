@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Entry point to load all of the configuration
+ */
+
 import * as server from './server';
 import * as logger from './logger';
 import * as db from './db';
