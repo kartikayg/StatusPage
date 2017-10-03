@@ -38,6 +38,7 @@
     "http-status": "^1.0.1",
     "joi": "^10.6.0",
     "mongodb": "^2.2.31",
+    "shortid": "^2.2.8",
     "winston": "^2.3.1",
     "winston-mongodb": "^3.0.1"
   },
