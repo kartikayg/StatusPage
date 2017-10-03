@@ -1,13 +1,13 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
 
-import dbAdapter from './db';
+import mongodb from './mongo';
 
-describe('lib/db', function() {
+describe('lib/db/mongo', function() {
 
   it('should return a db connection', async function() {
 
-    const db = await dbAdapter.connect({
+    const db = await mongodb.connect({
       mongo_url: 'mongodb://db/componentservice'
     });
 
@@ -20,7 +20,7 @@ describe('lib/db', function() {
 
   it('should throw Error exception if invalid mongo connection string', function(done) {
     
-    dbAdapter.connect({mongo_url: 'invalid_url'})
+    mongodb.connect({mongo_url: 'invalid_url'})
       .catch(e => {
         assert.equal(e.name, 'Error');
         done();
@@ -30,7 +30,7 @@ describe('lib/db', function() {
 
   it('should throw MongoError exception if invalid mongo connection string', function(done) {
     
-    dbAdapter.connect({mongo_url: 'mongodb://invalid/123'})
+    mongodb.connect({mongo_url: 'mongodb://invalid/123'})
       .catch(e => {
         assert.equal(e.name, 'MongoError');
         done();

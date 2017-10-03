@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 // internal packages
 import config from './config';
 import logger from './lib/logger';
-import dbAdapter from './lib/db';
+import mongodb from './lib/db/mongo';
+import dbsetup from './lib/db/setup';
 
 /**
  * Initalizes the microservice. Here are the main steps in this function:
@@ -23,13 +24,15 @@ const init = async () => {
   dotenv.config();
   const conf = config.load(process.env);
 
-  // load mongodb
-  const db = await dbAdapter.connect(conf.db, true);
+  // load mongodb and setup tables
+  const db = await mongodb.connect(conf.db);
+  await dbsetup(db);
 
   // init logger
   logger.init(conf.logger, db);
 
   // load repositories
+
 
   // start the server
 

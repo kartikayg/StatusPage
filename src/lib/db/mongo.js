@@ -1,6 +1,5 @@
 /**
- * Db adapter to use in this microservice. Its using MongoDB as the
- * backend service.
+ * MongoDb adapter to use in this microservice.
  */
 
 import MongoClient from 'mongodb';
@@ -25,12 +24,10 @@ const DB_PARAMS = {
  * Creates a Mongo DB connection
  * @param {object} conf - DB config object
  *   - mongo_url - connection string. e.g.: mongodb://db/componentservice
- * @param {boolean} doInitialSetup
- *    pass true to setup tables and constraints
  * @return {Promise} promise object that resolves to a 
  * db connection object.
  */
-const connect = (conf = {}, doInitialSetup = false) => {
+const connect = (conf = {}) => {
 
   return new Promise((resolve, reject) => {
 
@@ -38,17 +35,6 @@ const connect = (conf = {}, doInitialSetup = false) => {
 
       if (err) {
         reject(err);
-      }
-      else if (doInitialSetup === true) {
-
-        doInitialSetup(db)
-          .then(() => {
-            resolve(db);
-          })
-          .catch(err2 => {
-            reject(err2);
-          });
-
       }
       else {
         resolve(db);
@@ -60,18 +46,5 @@ const connect = (conf = {}, doInitialSetup = false) => {
 
 };
 
-/**
- * Initial setup of the tables and constraint in the database.
- * @param {object} db connection
- * @return {Promise}
- */
-const doInitialSetup = (db) => {
+export default Object.create({ connect });
 
-  return new Promise((resolve, reject) => {
-    resolve(db);
-    reject();
-  });
-
-};
-
-export default Object.create({ connect, doInitialSetup });
