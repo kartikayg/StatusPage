@@ -1,14 +1,19 @@
 /**
- * Returns a joi schema for the logger config
- * @param {object} joi
- * @returns {object}
+ * @fileoverview Logger configuration setup
  */
-export const schema = (joi) => {
-  return joi.object({
-    LOG_LEVEL: joi.string()
+
+import Joi from 'joi';
+
+/**
+ * Returns a joi schema for the logger config
+ * @returns {object} Joi schema object
+ */
+export const schema = () => {
+  return Joi.object({
+    LOG_LEVEL: Joi.string()
       .only(['error', 'warn', 'info', 'debug'])
       .default('info'),
-    LOGGING_ENABLED: joi.boolean()
+    LOGGING_ENABLED: Joi.boolean()
       .default(true)
   });
 };

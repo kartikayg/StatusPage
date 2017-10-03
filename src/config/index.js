@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import * as server from './server';
 import * as logger from './logger';
 import * as db from './db';
@@ -19,7 +17,7 @@ const load = (envVars = {}) => {
   // foreach component, validate against the schema and then extract the config
   components.forEach(c => {
 
-    const {error, value: conf} = c.schema(Joi).validate(
+    const {error, value: conf} = c.schema().validate(
       envVars, { allowUnknown: true, abortEarly: false }
     );
 

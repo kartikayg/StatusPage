@@ -1,11 +1,16 @@
 /**
- * Returns a joi schema for the logger config
- * @param {object} joi
- * @returns {object}
+ * @fileoverview DB configuration setup
  */
-export const schema = (joi) => {
-  return joi.object({
-    MONGO_ENDPOINT: joi.string()
+
+import Joi from 'joi';
+
+/**
+ * Returns a joi schema for the logger config
+ * @returns {object} Joi schema obbject
+ */
+export const schema = () => {
+  return Joi.object({
+    MONGO_ENDPOINT: Joi.string()
       .uri({ scheme: ['mongodb'] })
       .required()
   });
