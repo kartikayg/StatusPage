@@ -5,8 +5,8 @@ describe('config', function() {
 
   const testEnv = {
     PORT: 1234,
-    LOGGING_ENABLED: true,
-    LOG_LEVEL: 'info',
+    CONSOLE_LOG_LEVEL: 'info',
+    DB_LOG_LEVEL: 'error',
     MONGO_ENDPOINT: 'mongodb://dave:password@localhost:27017/myproject'
   };
 
@@ -17,8 +17,8 @@ describe('config', function() {
         port: testEnv.PORT
       },
       logger: {
-        level: testEnv.LOG_LEVEL,
-        isEnabled: testEnv.LOGGING_ENABLED
+        console: testEnv.CONSOLE_LOG_LEVEL,
+        db: testEnv.DB_LOG_LEVEL
       },
       db: {
         mongo_url: testEnv.MONGO_ENDPOINT

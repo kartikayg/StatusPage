@@ -21,30 +21,36 @@ describe('config/logger', function() {
 
       joiassert.equal(
         loggerSchema,
-        { LOG_LEVEL: 'warn', LOGGING_ENABLED: false },
-        { LOG_LEVEL: 'warn', LOGGING_ENABLED: false }
+        { CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' },
+        { CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' }
       );
 
     });
 
-    it('should honor the default values', function() {
+    it('should honor the optional flag', function() {
 
       joiassert.equal(
         loggerSchema,
-        {},
-        { LOG_LEVEL: 'info', LOGGING_ENABLED: true }
+        { CONSOLE_LOG_LEVEL: 'warn' },
+        { CONSOLE_LOG_LEVEL: 'warn' }
       );
-    
+
+      joiassert.equal(
+        loggerSchema,
+        { DB_LOG_LEVEL: 'warn' },
+        { DB_LOG_LEVEL: 'warn' }
+      );
+
     });
 
     it ('should throw error on invalid data', function() {
 
       joiassert.error(
         loggerSchema,
-        {LOG_LEVEL: 'test', LOGGING_ENABLED: 'test'},
+        { CONSOLE_LOG_LEVEL: 'yes', DB_LOG_LEVEL: 'no' },
         [
-          '"LOG_LEVEL" must be one of [error, warn, info, debug]',
-          '"LOGGING_ENABLED" must be a boolean'
+          '"CONSOLE_LOG_LEVEL" must be one of [error, warn, info, debug]',
+          '"DB_LOG_LEVEL" must be one of [error, warn, info, debug]'
         ]
       );
 
@@ -56,8 +62,8 @@ describe('config/logger', function() {
 
     it('should return the conf object', function() {
       
-      const expectedResult = {logger: {level: 'warn', isEnabled: false}};
-      const config = logger.extract({ LOG_LEVEL: 'warn', LOGGING_ENABLED: false });
+      const expectedResult = {logger: {console: 'warn', db: 'error'}};
+      const config = logger.extract({ CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' });
 
       assert.deepEqual(config, expectedResult);
 

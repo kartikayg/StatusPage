@@ -28,8 +28,14 @@ const init = async () => {
   const db = await mongodb.connect(conf.db);
   await dbsetup(db);
 
-  // init logger
-  logger.configure(conf.logger, db);
+  // configure logger
+  if (conf.logger.console) {
+    logger.addConsoleWriter(conf.logger.console);
+  }
+
+  if (conf.logger.db) {
+    logger.addDbWriter(conf.logger.db, db);
+  }
 
   // load repositories
 

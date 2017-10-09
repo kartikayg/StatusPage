@@ -10,11 +10,12 @@ import Joi from 'joi';
  */
 export const schema = () => {
   return Joi.object({
-    LOG_LEVEL: Joi.string()
+    CONSOLE_LOG_LEVEL: Joi.string()
       .only(['error', 'warn', 'info', 'debug'])
-      .default('info'),
-    LOGGING_ENABLED: Joi.boolean()
-      .default(true)
+      .optional(),
+    DB_LOG_LEVEL: Joi.string()
+      .only(['error', 'warn', 'info', 'debug'])
+      .optional()
   });
 };
 
@@ -26,8 +27,8 @@ export const schema = () => {
 export const extract = (env = {}) => {
   return {
     logger: {
-      level: env.LOG_LEVEL,
-      isEnabled: env.LOGGING_ENABLED
+      console: env.CONSOLE_LOG_LEVEL,
+      db: env.DB_LOG_LEVEL
     }
   };
 };

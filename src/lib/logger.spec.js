@@ -6,59 +6,135 @@ import {MongoDB as winstonmongodb} from 'winston-mongodb';
 import logger from './logger';
 
 describe('lib/logger', function() {
-  
-  var configureStub;
-  var addStub;
 
-  beforeEach(function() {
-     configureStub = sinon.stub(winston, 'configure');
-     addStub = sinon.stub(winston, 'add');
+  describe('log level', function() {
+
+    it('should have the default level as debug', function() {
+      assert.strictEqual(logger.level, 'debug');
+    });
+
+    it('should update the level if set', function() {
+      
+      logger.level = 'warn';
+      assert.strictEqual(logger.level, 'warn');
+
+      logger.level = 'debug'; // revert back
+
+    });
+
   });
 
-  afterEach(function() {
-    configureStub.restore();
-    addStub.restore();
-  });
+  describe('writers', function() {
 
-  it('when logging is disabled', function() {
+    var addWriterStub;
 
-    logger.init({
-       isEnabled: false,
-       level: 'error'
-    }, {});
+    beforeEach(function() {
+       addWriterStub = sinon.stub(winston, 'add');
+    });
 
-    sinon.assert.calledOnce(configureStub);
-    sinon.assert.alwaysCalledWith(configureStub, {transports: []});
+    afterEach(function() {
+      addWriterStub.restore();
+    });
 
-    sinon.assert.notCalled(addStub);
+
+    it('should add the console writer', function() {
     
+      logger.addConsoleWriter('warn');
+
+      sinon.assert.calledOnce(addWriterStub);
+      sinon.assert.calledWith(
+        addWriterStub,
+        winston.transports.Console, 
+        {
+          level: 'warn',
+          colorize: true,
+          timestamp: true,
+          json: true,
+          stringify: true
+        }
+      );
+
+    });
+
+    it('should add the db writer', function() {
+      
+      const db = {};
+      logger.addDbWriter('warn', db);
+
+      sinon.assert.calledOnce(addWriterStub);
+      sinon.assert.calledWith(
+        addWriterStub,
+        winstonmongodb, 
+        {
+          level: 'warn',
+          db,
+          storeHost: true,
+          capped: true,
+          cappedMax: 100000
+        }
+      );
+
+    });
+
   });
 
-  it('should have the correct logging level', function() {
+  describe('log methods', function() {
 
-    logger.init({
-       isEnabled: true,
-       level: 'error'
-    }, {});
+    it('should call debug() on winston', function() {
 
-    assert.strictEqual('error', winston.level);
+      const debugStub = sinon.stub(winston, 'debug');
+      const message = 'test123';
 
-  });
+      logger.debug(message);
 
-  it('should setup correct transporters when logging is enabled', function() {
+      sinon.assert.calledOnce(debugStub);
+      sinon.assert.calledWith(debugStub, message);
 
-    logger.init({
-       isEnabled: true,
-       level: 'warn'
-    }, {});
+      debugStub.restore();
 
-    assert.strictEqual('warn', winston.level);
+    });
 
-    sinon.assert.calledOnce(configureStub);
+    it('should call info() on winston', function() {
 
-    sinon.assert.calledTwice(addStub);
-    sinon.assert.calledWith(addStub, winston.transports.Console);
-    sinon.assert.calledWith(addStub, winstonmongodb);
+      const infoStub = sinon.stub(winston, 'info');
+      const message = 'test123';
+
+      logger.info(message);
+
+      sinon.assert.calledOnce(infoStub);
+      sinon.assert.calledWith(infoStub, message);
+
+      infoStub.restore();
+
+    });
+
+    it('should call warn() on winston', function() {
+
+      const warnStub = sinon.stub(winston, 'warn');
+      const message = 'test123';
+
+      logger.warn(message);
+
+      sinon.assert.calledOnce(warnStub);
+      sinon.assert.calledWith(warnStub, message);
+
+      warnStub.restore();
+
+    });
+
+     it('should call error() on winston', function() {
+
+      const errorStub = sinon.stub(winston, 'error');
+      const message = 'test123';
+
+      logger.error(message);
+
+      sinon.assert.calledOnce(errorStub);
+      sinon.assert.calledWith(errorStub, message);
+
+      errorStub.restore();
+
+    });
 
   });
 
