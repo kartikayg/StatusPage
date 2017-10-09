@@ -1,18 +1,20 @@
 /**
- * Using wiston library as the logger.
+ * Using wiston library as the logger. By default, the logger
+ * is enabled with Console transporter. Use the configure fn
+ * to change it.
  */
 
 import winston from 'winston';
 import {MongoDB as winstonmongodb} from 'winston-mongodb';
 
 /**
- * Initializes the logger.
+ * Change logger configuration.
  * @param {object} conf - Configuration to setup the logger
  *  - isEnabled
  *  - level
- * @param {object} db - Database connection
+ * @param {object} db - Database connection. Used in Db transporter.
  */
-function init(conf = {}, db) {
+function configure(conf = {}, db) {
 
   // if not disabled
   if (conf.isEnabled !== false) {
@@ -63,7 +65,7 @@ function init(conf = {}, db) {
 }
 
 export default Object.create({
-  init,
+  configure,
   error: winston.error,
   warn: winston.warn,
   info: winston.info,

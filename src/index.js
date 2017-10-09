@@ -29,7 +29,7 @@ const init = async () => {
   await dbsetup(db);
 
   // init logger
-  logger.init(conf.logger, db);
+  logger.configure(conf.logger, db);
 
   // load repositories
 
