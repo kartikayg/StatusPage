@@ -31,18 +31,22 @@ describe('config/db', function() {
 
     it('should throw exception on missing/invalid MONGO_ENDPOINT', function() {
       
-      joiassert.error(dbSchema, {}, /\"MONGO_ENDPOINT\" is required/);
+      joiassert.error(
+        dbSchema,
+        {},
+        '"MONGO_ENDPOINT" is required'
+      );
 
       joiassert.error(
         dbSchema, 
         { MONGO_ENDPOINT: 1234 },
-        /\"MONGO_ENDPOINT\" must be a string/
+        '"MONGO_ENDPOINT" must be a string'
       );
 
       joiassert.error(
         dbSchema, 
         { MONGO_ENDPOINT: "mongodb" },
-        /\"MONGO_ENDPOINT" must be a valid uri with a scheme matching the mongodb/
+        '"MONGO_ENDPOINT" must be a valid uri with a scheme matching the mongodb pattern'
       );
 
     });

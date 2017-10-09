@@ -25,8 +25,17 @@ describe('config/server', function() {
 
     it('should throw exception on missing/invalid PORT number', function() {
       
-      joiassert.error(serverSchema, {}, /\"PORT\" is required/);
-      joiassert.error(serverSchema, { PORT: "test" }, /\"PORT\" must be a number/);
+      joiassert.error(
+        serverSchema, 
+        {}, 
+        '"PORT" is required'
+      );
+
+      joiassert.error(
+        serverSchema, 
+        { PORT: "test" },
+        '"PORT" must be a number'
+      );
 
     });
 

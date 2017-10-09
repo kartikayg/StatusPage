@@ -37,32 +37,19 @@ describe('config/logger', function() {
     
     });
 
-    it('should throw exception on invalid LOG_LEVEL', function() {
-      
+    it ('should throw error on invalid data', function() {
+
       joiassert.error(
         loggerSchema,
         {LOG_LEVEL: 'test', LOGGING_ENABLED: 'test'},
-        /\"LOG_LEVEL\" fails/
-      );
-
-      joiassert.error(
-        loggerSchema,
-        {LOG_LEVEL: true, LOGGING_ENABLED: 'test'},
-        /\"LOG_LEVEL\" fails/
+        [
+          '"LOG_LEVEL" must be one of [error, warn, info, debug]',
+          '"LOGGING_ENABLED" must be a boolean'
+        ]
       );
 
     });
-
-    it('should throw exception on invalid LOGGING_ENABLED', function() {
-      
-      joiassert.error(
-        loggerSchema,
-        { LOGGING_ENABLED: 'test' },
-        /\"LOGGING_ENABLED\" fails/
-      );
-
-    });
-
+    
   });
 
   describe('extract', function() {
