@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
 
-import componentgroup from './component-group';
+import componentGroup from './component-group';
 
 describe('models/component-group', function() {
 
@@ -15,7 +15,7 @@ describe('models/component-group', function() {
       is_active: true,
     };
 
-    joiassert.equal(componentgroup.schema, data, data);
+    joiassert.equal(componentGroup.schema, data, data);
 
   });
 
@@ -32,13 +32,13 @@ describe('models/component-group', function() {
       is_active: true
     };
 
-    joiassert.equal(componentgroup.schema, data, expected);
+    joiassert.equal(componentGroup.schema, data, expected);
 
   });
 
   it('should throw an error on invalid data', function() {
 
-    joiassert.error(componentgroup.schema, {}, '"name" is required', { abortEarly: true });
+    joiassert.error(componentGroup.schema, {}, '"name" is required', { abortEarly: true });
 
     const data = {
       name: 'API-asdkasdnlkasdnlas-asdasdjasd-qqwqwsadasd',
@@ -53,12 +53,12 @@ describe('models/component-group', function() {
       '"sort_order" must be a number'
     ];
 
-    joiassert.error(componentgroup.schema, data, expectedErrors);
+    joiassert.error(componentGroup.schema, data, expectedErrors);
 
   });
 
   it('should return a prefix', function() {
-    assert.strictEqual(componentgroup.prefix, 'CG');
+    assert.strictEqual(componentGroup.prefix, 'CG');
   });
 
 });

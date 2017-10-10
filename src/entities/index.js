@@ -7,11 +7,11 @@
 import Joi from 'joi';
 
 import component from './component';
-import componentgroup from './component-group';
+import componentGroup from './component-group';
 
 import entityId from '../lib/entityid';
 
-const entities = Object.create({ component, componentgroup });
+const entities = Object.create({ component, componentGroup });
 
 /**
  * Validates data against an entity schema.
@@ -65,7 +65,8 @@ const getEntityId = (entityType) => {
  */
 const entity = {
 
-  type: undefined,
+  // must be defined when creating object from this prototype
+  type: undefined, 
 
   validate(data) {
     return schemaValidator(this.type, data);

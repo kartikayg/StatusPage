@@ -14,8 +14,8 @@ import dbsetup from './lib/db/setup';
 /**
  * Initalizes the microservice. Here are the main steps in this function:
  *  Load config
- *  Load Db adapter
- *  Initialize logger
+ *  Init Db adapter
+ *  Setup logger writers
  *  
  */
 const init = async () => {
