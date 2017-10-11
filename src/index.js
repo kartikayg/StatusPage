@@ -10,13 +10,15 @@ import config from './config';
 import logger from './lib/logger';
 import mongodb from './lib/db/mongo';
 import dbsetup from './lib/db/setup';
+import respository from './repositories';
+import server from './server';
 
 /**
  * Initalizes the microservice. Here are the main steps in this function:
  *  Load config
  *  Init Db adapter
  *  Setup logger writers
- *  
+ *  Load Repos
  */
 const init = async () => {
 
@@ -38,9 +40,10 @@ const init = async () => {
   }
 
   // load repositories
-
+  const repos = respository.init(db);
 
   // start the server
+  server.start();
 
 };
 

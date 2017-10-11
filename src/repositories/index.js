@@ -11,7 +11,7 @@ const init = (db) => {
   const componentGroupRepo = componentGroup.init(db);
   const componentRepo = component.init(db, componentGroupRepo);
 
-  return Object.create({
+  return Object.assign({}, {
     component: componentRepo,
     group: componentGroupRepo
   });
