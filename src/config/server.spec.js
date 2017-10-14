@@ -1,54 +1,39 @@
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
 
-import * as server from './server';
+import {schema} from './server';
 
 describe('config/server', function() {
 
   describe('schema', function() {
 
-    let serverSchema;
-
-    before(function() {
-      serverSchema = server.schema();
-    });
-
     it('should return a joi object', function() {
-      assert.isObject(serverSchema);
+      assert.isObject(schema);
     });
 
     it('should validate the conf object', function() {
 
-      joiassert.equal(serverSchema, { PORT: 1234 }, { PORT: 1234 });
+      joiassert.equal(
+        schema, 
+        { PORT: 1234, NODE_ENV: 'development' },
+        { PORT: 1234, NODE_ENV: 'development' }
+      );
 
     });
 
     it('should throw exception on missing/invalid PORT number', function() {
       
       joiassert.error(
-        serverSchema, 
-        {}, 
-        '"PORT" is required'
+        schema, 
+        {},
+        ['"NODE_ENV" is required', '"PORT" is required']
       );
 
       joiassert.error(
-        serverSchema, 
-        { PORT: "test" },
+        schema, 
+        { PORT: "test", NODE_ENV: 'production' },
         '"PORT" must be a number'
       );
-
-    });
-
-  });
-
-  describe('extract', function() {
-
-    it('should return the conf object', function() {
-      
-      const expectedResult = {server: {port: 1234}};
-      const config = server.extract({ PORT: 1234 });
-
-      assert.deepEqual(config, expectedResult);
 
     });
 

@@ -31,7 +31,7 @@ const connect = (conf = {}) => {
 
   return new Promise((resolve, reject) => {
 
-    MongoClient.connect(conf.mongo_url, DB_PARAMS, (err, db) => {
+    MongoClient.connect(conf.MONGO_ENDPOINT, DB_PARAMS, (err, db) => {
 
       if (err) {
         reject(err);

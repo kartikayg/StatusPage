@@ -1,28 +1,22 @@
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
 
-import * as logger from './logger';
+import {schema} from './logger';
 
 describe('config/logger', function() {
 
   describe('schema', function() {
 
-    let loggerSchema;
-
-    before(function() {
-      loggerSchema = logger.schema();
-    });
-
     it('should return a joi object', function() {
-      assert.isObject(loggerSchema);
+      assert.isObject(schema);
     });
 
     it('should validate the conf object', function() {
 
       joiassert.equal(
-        loggerSchema,
-        { CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' },
-        { CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' }
+        schema,
+        { LOG_CONSOLE_LEVEL: 'warn', LOG_DB_LEVEL: 'error', LOG_FILE_LEVEL: 'info', LOG_FILE_DIRNAME: 'dir', LOG_FILE_PREFIX: 'log' },
+        { LOG_CONSOLE_LEVEL: 'warn', LOG_DB_LEVEL: 'error', LOG_FILE_LEVEL: 'info', LOG_FILE_DIRNAME: 'dir', LOG_FILE_PREFIX: 'log' }
       );
 
     });
@@ -30,15 +24,15 @@ describe('config/logger', function() {
     it('should honor the optional flag', function() {
 
       joiassert.equal(
-        loggerSchema,
-        { CONSOLE_LOG_LEVEL: 'warn' },
-        { CONSOLE_LOG_LEVEL: 'warn' }
+        schema,
+        { LOG_CONSOLE_LEVEL: 'warn' },
+        { LOG_CONSOLE_LEVEL: 'warn', LOG_FILE_PREFIX: 'log' }
       );
 
       joiassert.equal(
-        loggerSchema,
-        { DB_LOG_LEVEL: 'warn' },
-        { DB_LOG_LEVEL: 'warn' }
+        schema,
+        { LOG_DB_LEVEL: 'warn' },
+        { LOG_DB_LEVEL: 'warn', LOG_FILE_PREFIX: 'log' }
       );
 
     });
@@ -46,29 +40,22 @@ describe('config/logger', function() {
     it ('should throw error on invalid data', function() {
 
       joiassert.error(
-        loggerSchema,
-        { CONSOLE_LOG_LEVEL: 'yes', DB_LOG_LEVEL: 'no' },
+        schema,
+        { LOG_CONSOLE_LEVEL: 'yes', LOG_DB_LEVEL: 'no' },
         [
-          '"CONSOLE_LOG_LEVEL" must be one of [error, warn, info, debug]',
-          '"DB_LOG_LEVEL" must be one of [error, warn, info, debug]'
+          '"LOG_CONSOLE_LEVEL" must be one of [error, warn, info, debug]',
+          '"LOG_DB_LEVEL" must be one of [error, warn, info, debug]'
         ]
+      );
+
+      joiassert.error(
+        schema,
+        { LOG_FILE_LEVEL: 'warn' },
+        '"LOG_FILE_LEVEL" missing required peer "LOG_FILE_DIRNAME"'
       );
 
     });
     
-  });
-
-  describe('extract', function() {
-
-    it('should return the conf object', function() {
-      
-      const expectedResult = {logger: {console: 'warn', db: 'error'}};
-      const config = logger.extract({ CONSOLE_LOG_LEVEL: 'warn', DB_LOG_LEVEL: 'error' });
-
-      assert.deepEqual(config, expectedResult);
-
-    });
-
   });
 
 });

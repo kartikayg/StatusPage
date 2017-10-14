@@ -4,9 +4,12 @@ import base from './index';
 describe('config', function() {
 
   const testEnv = {
+    NODE_ENV: 'development',
     PORT: 1234,
-    CONSOLE_LOG_LEVEL: 'info',
-    DB_LOG_LEVEL: 'error',
+    LOG_CONSOLE_LEVEL: 'info',
+    LOG_DB_LEVEL: 'error',
+    LOG_FILE_LEVEL: 'warn',
+    LOG_FILE_DIRNAME: 'logs/',
     MONGO_ENDPOINT: 'mongodb://dave:password@localhost:27017/myproject'
   };
 
@@ -14,14 +17,18 @@ describe('config', function() {
     
     const expectedConfig = {
       server: {
-        port: testEnv.PORT
+        PORT: testEnv.PORT,
+        NODE_ENV: testEnv.NODE_ENV
       },
       logger: {
-        console: testEnv.CONSOLE_LOG_LEVEL,
-        db: testEnv.DB_LOG_LEVEL
+        LOG_CONSOLE_LEVEL: testEnv.LOG_CONSOLE_LEVEL,
+        LOG_DB_LEVEL: testEnv.LOG_DB_LEVEL,
+        LOG_FILE_LEVEL: testEnv.LOG_FILE_LEVEL,
+        LOG_FILE_DIRNAME: testEnv.LOG_FILE_DIRNAME,
+        LOG_FILE_PREFIX: 'log'
       },
       db: {
-        mongo_url: testEnv.MONGO_ENDPOINT
+        MONGO_ENDPOINT: testEnv.MONGO_ENDPOINT
       }
     };
 

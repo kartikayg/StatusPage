@@ -8,7 +8,7 @@ describe('lib/db/mongo', function() {
   it('should return a db connection', async function() {
 
     const db = await mongodb.connect({
-      mongo_url: 'mongodb://db/componentservice'
+      MONGO_ENDPOINT: 'mongodb://db/componentservice'
     });
 
     assert.isObject(db);
@@ -20,7 +20,7 @@ describe('lib/db/mongo', function() {
 
   it('should throw Error exception if invalid mongo connection string', function(done) {
     
-    mongodb.connect({mongo_url: 'invalid_url'})
+    mongodb.connect({MONGO_ENDPOINT: 'invalid_url'})
       .catch(e => {
         assert.equal(e.name, 'Error');
         done();
@@ -30,7 +30,7 @@ describe('lib/db/mongo', function() {
 
   it('should throw MongoError exception if invalid mongo connection string', function(done) {
     
-    mongodb.connect({mongo_url: 'mongodb://invalid/123'})
+    mongodb.connect({MONGO_ENDPOINT: 'mongodb://invalid/123'})
       .catch(e => {
         assert.equal(e.name, 'MongoError');
         done();

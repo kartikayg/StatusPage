@@ -66,7 +66,7 @@ const getEntityId = (entityType) => {
 const entity = {
 
   // must be defined when creating object from this prototype
-  type: undefined, 
+  type: undefined,
 
   validate(data) {
     return schemaValidator(this.type, data);

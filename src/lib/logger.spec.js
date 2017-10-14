@@ -1,138 +1,93 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
 import winston from 'winston';
-import {MongoDB as winstonmongodb} from 'winston-mongodb';
+import 'winston-mongodb';
 
-import logger from './logger';
+import * as logger from './logger';
 
 describe('lib/logger', function() {
 
-  describe('log level', function() {
+  describe('log methods', function() {
 
-    it('should have the default level as debug', function() {
-      assert.strictEqual(logger.level, 'debug');
-    });
-
-    it('should update the level if set', function() {
-      
-      logger.level = 'warn';
-      assert.strictEqual(logger.level, 'warn');
-
-      logger.level = 'debug'; // revert back
-
-    });
-
-  });
-
-  describe('writers', function() {
-
-    var addWriterStub;
+    let logStub;
 
     beforeEach(function() {
-       addWriterStub = sinon.stub(winston, 'add');
+      logStub = sinon.stub(winston, 'log');
     });
 
     afterEach(function() {
-      addWriterStub.restore();
+      logStub.restore();
     });
 
+    it('log()', function() {
 
-    it('should add the console writer', function() {
-    
-      logger.addConsoleWriter('warn');
-
-      sinon.assert.calledOnce(addWriterStub);
-      sinon.assert.calledWith(
-        addWriterStub,
-        winston.transports.Console, 
-        {
-          level: 'warn',
-          colorize: true,
-          timestamp: true,
-          json: true,
-          stringify: true
-        }
-      );
-
-    });
-
-    it('should add the db writer', function() {
-      
-      const db = {};
-      logger.addDbWriter('warn', db);
-
-      sinon.assert.calledOnce(addWriterStub);
-      sinon.assert.calledWith(
-        addWriterStub,
-        winstonmongodb, 
-        {
-          level: 'warn',
-          db,
-          storeHost: true,
-          capped: true,
-          cappedMax: 100000
-        }
-      );
-
-    });
-
-  });
-
-  describe('log methods', function() {
-
-    it('should call debug() on winston', function() {
-
-      const debugStub = sinon.stub(winston, 'debug');
       const message = 'test123';
 
-      logger.debug(message);
-
-      sinon.assert.calledOnce(debugStub);
-      sinon.assert.calledWith(debugStub, message);
-
-      debugStub.restore();
+      logger.log('warn', message);
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'warn', message, {});
 
     });
 
-    it('should call info() on winston', function() {
+    it('log error', function() {
 
-      const infoStub = sinon.stub(winston, 'info');
+      const e = new Error('test123');
+
+      const meta = {
+        stack: e.stack,
+        code: 500,
+        name: e.name,
+        isError: true,
+        test: 'hello'
+      };
+
+      logger.log('error', e, {test: 'hello'});
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'error', 'test123', meta);
+
+    });
+
+    it('debug()', function() {
+
+      const message = 'test123';
+
+      logger.debug(message, {test: 'hello'});
+
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'debug', message, {test: 'hello'});
+
+    });
+
+    it('info()', function() {
+
       const message = 'test123';
 
       logger.info(message);
 
-      sinon.assert.calledOnce(infoStub);
-      sinon.assert.calledWith(infoStub, message);
-
-      infoStub.restore();
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'info', message, {});
 
     });
 
-    it('should call warn() on winston', function() {
+    it('warn()', function() {
 
-      const warnStub = sinon.stub(winston, 'warn');
       const message = 'test123';
 
       logger.warn(message);
 
-      sinon.assert.calledOnce(warnStub);
-      sinon.assert.calledWith(warnStub, message);
-
-      warnStub.restore();
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'warn', message, {});
 
     });
 
-     it('should call error() on winston', function() {
+     it('error()', function() {
 
-      const errorStub = sinon.stub(winston, 'error');
       const message = 'test123';
 
       logger.error(message);
 
-      sinon.assert.calledOnce(errorStub);
-      sinon.assert.calledWith(errorStub, message);
-
-      errorStub.restore();
+      sinon.assert.calledOnce(logStub);
+      sinon.assert.calledWith(logStub, 'error', message, {});
 
     });
 

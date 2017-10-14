@@ -18,8 +18,8 @@
     "build": "gulp",
     "lint": "eslint 'src/**/*.js'",
     "flow": "flow",
-    "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
-    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
+    "test": "cross-env NODE_ENV=test LOG_CONSOLE_LEVEL=debug mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "cross-env NODE_ENV=test istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
   },
   "keywords": [
     "express",
@@ -42,10 +42,13 @@
     "http-status": "^1.0.1",
     "joi": "^10.6.0",
     "lodash": "^4.17.4",
+    "logform": "^1.2.1",
     "method-override": "^2.3.10",
     "mongodb": "^2.2.31",
+    "morgan": "^1.9.0",
     "shortid": "^2.2.8",
-    "winston": "^2.3.1",
+    "winston": "^2.4.0",
+    "winston-daily-rotate-file": "^1.7.2",
     "winston-mongodb": "^3.0.1"
   },
   "devDependencies": {

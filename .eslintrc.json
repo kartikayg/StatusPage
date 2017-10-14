@@ -12,6 +12,7 @@
     "no-underscore-dangle": 0,
     "arrow-parens": 0,
     "brace-style": ["error", "stroustrup"],
+    "import/prefer-default-export": "off",
     "lodash-fp/consistent-compose": "off",
     "lodash-fp/consistent-name": [
       "error",
