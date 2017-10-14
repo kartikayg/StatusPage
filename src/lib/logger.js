@@ -78,24 +78,27 @@ export const initWriters = (conf = {}, options = {}) => {
   winston.clear();
 
   if (conf.LOG_CONSOLE_LEVEL) {
-    addConsoleWriter({ logger: winston, level: conf.LOG_CONSOLE_LEVEL }); // eslint-disable-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define
+    addConsoleWriter({ logger: winston, level: conf.LOG_CONSOLE_LEVEL });
   }
 
   if (conf.LOG_FILE_LEVEL) {
+    // eslint-disable-next-line no-use-before-define
     addFileWriter({
       logger: winston,
       level: conf.LOG_FILE_LEVEL,
       dirName: conf.LOG_FILE_DIRNAME,
       prefix: conf.LOG_FILE_PREFIX
-    }); // eslint-disable-line no-use-before-define
+    });
   }
 
   if (conf.LOG_DB_LEVEL && options.db) {
+    // eslint-disable-next-line no-use-before-define
     addDbWriter({
-      logger: winston, 
-      level: conf.LOG_DB_LEVEL, 
+      logger: winston,
+      level: conf.LOG_DB_LEVEL,
       db: options.db
-    }); // eslint-disable-line no-use-before-define
+    });
   }
 
 };

@@ -55,7 +55,7 @@ const init = async () => {
   const repos = respository.init(db);
 
   // start the server
-  server.start(repos);
+  await server.start(conf.server, { repos });
 
 };
 
