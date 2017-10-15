@@ -10,6 +10,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import httpStatus from 'http-status';
 
+import routes from '../routes';
 import {error as logError} from '../lib/logger';
 import APIError from '../lib/error';
 
@@ -41,7 +42,7 @@ const start = (conf = {}, options = {}) => {
 
 
     // setup routes
-
+    app.use('/api', routes(options.repos));
 
     // if error is not an instanceOf APIError, convert it.
     app.use((err, req, res, next) => {
