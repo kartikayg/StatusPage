@@ -10,7 +10,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import httpStatus from 'http-status';
 
-import routes from '../routes';
+import routes from './routes';
 import {error as logError} from '../lib/logger';
 import APIError from '../lib/error';
 
