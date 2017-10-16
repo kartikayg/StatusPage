@@ -13,6 +13,7 @@ import httpStatus from 'http-status';
 import routes from './routes';
 import {error as logError} from '../lib/logger';
 import APIError from '../lib/error';
+import logRequest from './middleware/log-request';
 
 /**
  * Starts the express server
@@ -38,8 +39,7 @@ const start = (conf = {}, options = {}) => {
     app.use(cors());
 
     // log the call
-    // app.use(logRequest(conf.LOG_HTTP_REQUEST_WRITER));
-
+    app.use(logRequest(conf));
 
     // setup routes
     app.use('/api', routes(options.repos));

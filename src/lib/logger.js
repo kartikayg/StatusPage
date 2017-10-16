@@ -7,8 +7,6 @@
  */
 
 import winston from 'winston';
-import 'winston-mongodb';
-import 'winston-daily-rotate-file';
 
 
 // Log levels supported
@@ -148,6 +146,8 @@ function addConsoleWriter({ logger, level }) {
  */
 function addDbWriter({ logger, level, db }) {
 
+  require('winston-mongodb'); // eslint-disable-line global-require
+
   logger.add(winston.transports.MongoDB, {
     level,
     db,
@@ -164,6 +164,8 @@ function addDbWriter({ logger, level, db }) {
  * @param {string} level
  */
 function addFileWriter({ logger, level, dirName, prefix }) {
+
+  require('winston-daily-rotate-file'); // eslint-disable-line global-require
 
   logger.add(winston.transports.DailyRotateFile, {
     level,
