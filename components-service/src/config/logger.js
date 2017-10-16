@@ -13,15 +13,11 @@ import {logLevels} from '../lib/logger';
 export const schema =
   Joi.object().keys({
     LOG_CONSOLE_LEVEL: Joi.string()
-      .only(logLevels)
-      .optional(),
+      .only(logLevels),
     LOG_DB_LEVEL: Joi.string()
-      .only(logLevels)
-      .optional(),
+      .only(logLevels),
     LOG_FILE_LEVEL: Joi.string()
-      .only(logLevels)
-      .optional(),
+      .only(logLevels),
     LOG_FILE_DIRNAME: Joi.string(),
     LOG_FILE_PREFIX: Joi.string()
-      .default('log')
   }).with('LOG_FILE_LEVEL', 'LOG_FILE_DIRNAME');

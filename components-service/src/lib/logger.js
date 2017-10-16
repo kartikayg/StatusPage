@@ -16,14 +16,13 @@ export const logLevels = ['error', 'warn', 'info', 'debug'];
 /**
  * Logs a message using winston library
  *
- * @param {object} conf
- *  - level
- *  - message preferably a string. Otherwise:
+ * @param {string} level
+ * @param {string} message preferably a string. Otherwise:
  *    object - json.stringify()
  *    Error  - Error.message
- *  - meta any information to add the log
+ * @param {object} meta any information to add to the log
  */
-export const log = ({ level, message, meta }) => {
+export const log = (level, message, meta) => {
 
   let logMessage = message;
   let logMeta = Object.assign({}, meta || {});
@@ -59,7 +58,7 @@ export const log = ({ level, message, meta }) => {
  */
 logLevels.forEach(level => {
   exports[level] = (message, meta) => {
-    return log({ level, message, meta });
+    return log(level, message, meta);
   };
 });
 
@@ -76,27 +75,15 @@ export const initWriters = (conf = {}, options = {}) => {
   winston.clear();
 
   if (conf.LOG_CONSOLE_LEVEL) {
-    // eslint-disable-next-line no-use-before-define
-    addConsoleWriter({ logger: winston, level: conf.LOG_CONSOLE_LEVEL });
+    addConsoleWriter(winston, conf.LOG_CONSOLE_LEVEL); // eslint-disable-line no-use-before-define
   }
 
   if (conf.LOG_FILE_LEVEL) {
-    // eslint-disable-next-line no-use-before-define
-    addFileWriter({
-      logger: winston,
-      level: conf.LOG_FILE_LEVEL,
-      dirName: conf.LOG_FILE_DIRNAME,
-      prefix: conf.LOG_FILE_PREFIX
-    });
+    addFileWriter(winston, conf.LOG_FILE_LEVEL, conf); // eslint-disable-line no-use-before-define
   }
 
   if (conf.LOG_DB_LEVEL && options.db) {
-    // eslint-disable-next-line no-use-before-define
-    addDbWriter({
-      logger: winston,
-      level: conf.LOG_DB_LEVEL,
-      db: options.db
-    });
+    addDbWriter(winston, conf.LOG_DB_LEVEL, options.db); // eslint-disable-line no-use-before-define
   }
 
 };
@@ -107,7 +94,7 @@ export const initWriters = (conf = {}, options = {}) => {
  * @param {object} logger
  * @param {string} level.
  */
-function addConsoleWriter({ logger, level }) {
+function addConsoleWriter(logger, level) {
 
   logger.add(winston.transports.Console, {
     level,
@@ -144,7 +131,7 @@ function addConsoleWriter({ logger, level }) {
  * @param {string} level.
  * @param {object} mongo db connection
  */
-function addDbWriter({ logger, level, db }) {
+function addDbWriter(logger, level, db) {
 
   require('winston-mongodb'); // eslint-disable-line global-require
 
@@ -162,15 +149,16 @@ function addDbWriter({ logger, level, db }) {
  * Add File writer for this logger
  * @param {object} logger
  * @param {string} level
+ * @param {object} conf
  */
-function addFileWriter({ logger, level, dirName, prefix }) {
+function addFileWriter(logger, level, conf = {}) {
 
   require('winston-daily-rotate-file'); // eslint-disable-line global-require
 
   logger.add(winston.transports.DailyRotateFile, {
     level,
-    dirname: dirName,
-    filename: prefix,
+    dirname: conf.LOG_FILE_DIRNAME,
+    filename: conf.LOG_FILE_PREFIX || 'log',
     datePattern: '-yyyy-MM-dd.log',
     maxDays: 7,
     json: false,
@@ -178,15 +166,16 @@ function addFileWriter({ logger, level, dirName, prefix }) {
 
       const output = Object.assign(
         {},
-        {level: options.level},
-        {timestamp: (new Date()).toISOString()},
-        {message: options.message},
-        {meta: options.meta || {}}
+        { level: options.level },
+        { timestamp: (new Date()).toISOString() },
+        { message: options.message },
+        { meta: options.meta || {} }
       );
 
       return JSON.stringify(output);
 
     }
+
   });
 
 }

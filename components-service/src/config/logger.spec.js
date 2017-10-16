@@ -13,27 +13,35 @@ describe('config/logger', function() {
 
     it('should validate the conf object', function() {
 
-      joiassert.equal(
-        schema,
-        { LOG_CONSOLE_LEVEL: 'warn', LOG_DB_LEVEL: 'error', LOG_FILE_LEVEL: 'info', LOG_FILE_DIRNAME: 'dir', LOG_FILE_PREFIX: 'log' },
-        { LOG_CONSOLE_LEVEL: 'warn', LOG_DB_LEVEL: 'error', LOG_FILE_LEVEL: 'info', LOG_FILE_DIRNAME: 'dir', LOG_FILE_PREFIX: 'log' }
-      );
+      const obj1 = {
+        LOG_CONSOLE_LEVEL: 'warn', 
+        LOG_DB_LEVEL: 'error',
+        LOG_FILE_LEVEL: 'info',
+        LOG_FILE_DIRNAME: 'dir',
+        LOG_FILE_PREFIX: 'log'
+      };
+
+      joiassert.equal(schema, obj1, obj1);
 
     });
 
     it('should honor the optional flag', function() {
 
-      joiassert.equal(
-        schema,
-        { LOG_CONSOLE_LEVEL: 'warn' },
-        { LOG_CONSOLE_LEVEL: 'warn', LOG_FILE_PREFIX: 'log' }
-      );
+      const obj1 = {
+        LOG_CONSOLE_LEVEL: 'warn', 
+        LOG_DB_LEVEL: 'error',
 
-      joiassert.equal(
-        schema,
-        { LOG_DB_LEVEL: 'warn' },
-        { LOG_DB_LEVEL: 'warn', LOG_FILE_PREFIX: 'log' }
-      );
+      };
+
+      joiassert.equal(schema, obj1, obj1);
+
+      const obj2 = {
+        LOG_FILE_LEVEL: 'info',
+        LOG_FILE_DIRNAME: 'dir',
+        LOG_FILE_PREFIX: 'log'
+      };
+
+      joiassert.equal(schema, obj2, obj2);
 
     });
 

@@ -24,8 +24,7 @@ describe('config', function() {
         LOG_CONSOLE_LEVEL: testEnv.LOG_CONSOLE_LEVEL,
         LOG_DB_LEVEL: testEnv.LOG_DB_LEVEL,
         LOG_FILE_LEVEL: testEnv.LOG_FILE_LEVEL,
-        LOG_FILE_DIRNAME: testEnv.LOG_FILE_DIRNAME,
-        LOG_FILE_PREFIX: 'log'
+        LOG_FILE_DIRNAME: testEnv.LOG_FILE_DIRNAME
       },
       db: {
         MONGO_ENDPOINT: testEnv.MONGO_ENDPOINT

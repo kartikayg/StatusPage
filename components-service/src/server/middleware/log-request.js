@@ -35,7 +35,7 @@ export default (conf = {}) => {
       logger.add(winston.transports.DailyRotateFile, {
         level: 'info',
         dirname: conf.LOG_HTTP_REQUEST_DIRNAME,
-        filename: conf.LOG_HTTP_REQUEST_PREFIX,
+        filename: conf.LOG_HTTP_REQUEST_PREFIX || 'request',
         datePattern: '-yyyy-MM-dd.log',
         maxDays: 7,
         json: false,
