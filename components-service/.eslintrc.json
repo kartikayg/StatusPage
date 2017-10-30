@@ -13,6 +13,9 @@
     "arrow-parens": 0,
     "brace-style": ["error", "stroustrup"],
     "import/prefer-default-export": "off",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+    "no-use-before-define": ["error", { "functions": false }],
+
     "lodash-fp/consistent-compose": "off",
     "lodash-fp/consistent-name": [
       "error",

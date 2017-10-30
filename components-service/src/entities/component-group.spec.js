@@ -12,7 +12,7 @@ describe('models/component-group', function() {
       description: 'group',
       status: 'operational',
       sort_order: 3,
-      is_active: true,
+      active: true,
     };
 
     joiassert.equal(componentGroup.schema, data, data);
@@ -29,7 +29,7 @@ describe('models/component-group', function() {
       name: 'API-Group',
       status: 'operational',
       sort_order: 0,
-      is_active: true
+      active: true
     };
 
     joiassert.equal(componentGroup.schema, data, expected);

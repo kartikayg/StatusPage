@@ -11,7 +11,7 @@ import componentGroup from './component-group';
 
 import entityId from '../lib/entityid';
 
-const entities = Object.create({ component, componentGroup });
+const entities = { component, componentGroup };
 
 /**
  * Validates data against an entity schema.
@@ -55,7 +55,7 @@ const getEntityId = (entityType) => {
     throw new Error('No avaiable entry for the entity type.');
   }
 
-  return entityId.generate(entities[entityType].prefix);
+  return entityId(entities[entityType].prefix);
 
 };
 

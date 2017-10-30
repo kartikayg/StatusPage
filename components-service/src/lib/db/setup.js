@@ -9,14 +9,15 @@ export default async function (db) {
   // components collection
   const componentValidator = {
     $and: [
-      { _id:                { $exists: true, $type: 'string' } },
+      { created_at:         { $exists: true, $type: 'timestamp' } },
+      { id:                 { $exists: true, $type: 'string' } },
       { name:               { $exists: true, $type: 'string' } },
       { help_text:          { $type: 'string' } },
       { status:             { $exists: true, $type: 'string' } },
       { sort_order:         { $exists: true, $type: 'int' } },
-      { is_active:          { $exists: true, $type: 'bool' } },
+      { active:             { $exists: true, $type: 'bool' } },
       { group_id:           { $type: 'string' } },
-      { last_modified:      { $type: 'timestamp' } }
+      { updated_at:         { $exists: true, $type: 'timestamp' } }
     ]
   };
 
@@ -24,23 +25,28 @@ export default async function (db) {
     validator: componentValidator
   });
 
+  db.collection('components').createIndex({ id: 1 }, { unique: true });
+
 
   // component groups collection
   const componentGroupsValidator = {
     $and: [
-      { _id:                  { $exists: true, $type: 'string' } },
+      { created_at:           { $exists: true, $type: 'timestamp' } },
+      { id:                   { $exists: true, $type: 'string' } },
       { name:                 { $exists: true, $type: 'string' } },
       { help_text:            { $type: 'string' } },
       { status:               { $exists: true, $type: 'string' } },
       { sort_order:           { $exists: true, $type: 'int' } },
-      { is_active:            { $exists: true, $type: 'bool' } },
-      { last_modified:        { $type: 'timestamp' } }
+      { active:               { $exists: true, $type: 'bool' } },
+      { updated_at:           { $exists: true, $type: 'timestamp' } }
     ]
   };
 
-  await db.createCollection('component_groups', {
+  await db.createCollection('componentgroups', {
     validator: componentGroupsValidator
   });
+
+  db.collection('componentgroups').createIndex({ id: 1 }, { unique: true });
 
   /* eslint-enable key-spacing */
 

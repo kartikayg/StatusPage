@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 // internal packages
 import config from './config';
 import {initWriters as initLogWriters} from './lib/logger';
-import mongodb from './lib/db/mongo';
+import {connect as dbConnect} from './lib/db/mongo';
 import dbsetup from './lib/db/setup';
 import respository from './repositories';
 import server from './server';
@@ -24,6 +24,10 @@ import server from './server';
 // process.on('uncaughtRejection', (err, promise) => {
 //   console.error('Unhandled Rejection', err)
 // })
+
+// log.fatal({ err }, 'uncaught exception')
+
+//     process.nextTick(_ => process.exit(1))
 
 // process.on('warning', (warning) => {
 //   console.warn(warning.name);    // Print the warning name
@@ -45,7 +49,7 @@ const init = async () => {
   const conf = config.load(process.env);
 
   // load mongodb and setup tables
-  const db = await mongodb.connect(conf.db);
+  const db = await dbConnect(conf.db);
   await dbsetup(db);
 
   // configure logger writers
@@ -64,4 +68,5 @@ init()
   .catch((e) => {
     console.error('Problem initializing the app'); // eslint-disable-line no-console
     console.error(e); // eslint-disable-line no-console
+    process.exit(1);
   });

@@ -14,7 +14,7 @@ describe('models/component', function() {
       description: 'api',
       status: 'operational',
       sort_order: 3,
-      is_active: true,
+      active: true,
       group_id: 'CG-123'
     };
 
@@ -32,7 +32,7 @@ describe('models/component', function() {
       name: 'API',
       status: 'operational',
       sort_order: 0,
-      is_active: true
+      active: true
     };
 
     joiassert.equal(component.schema, data, expected);
@@ -46,7 +46,7 @@ describe('models/component', function() {
     const data = {
       name: 'API-asdkasdnlkasdnlas-asdasdjasd-qqwqwsadasd',
       group_id: false,
-      is_active: 'true',
+      active: 'true',
       sort_order: 'error',
       status: 'not operational'
     };

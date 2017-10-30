@@ -16,7 +16,7 @@ const schema = {
     .integer()
     .min(0)
     .default(0),
-  is_active: Joi.boolean()
+  active: Joi.boolean()
     .default(true)
 };
 

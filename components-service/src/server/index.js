@@ -12,8 +12,8 @@ import httpStatus from 'http-status';
 
 import routes from './routes';
 import {error as logError} from '../lib/logger';
-import APIError from '../lib/error';
 import logRequest from './middleware/log-request';
+import {request as sanitizeRequest} from './middleware/sanitize';
 
 /**
  * Starts the express server
@@ -41,26 +41,22 @@ const start = (conf = {}, options = {}) => {
     // log the call
     app.use(logRequest(conf));
 
+    // sanitize req data
+    app.use(sanitizeRequest());
+
     // setup routes
     app.use('/api', routes(options.repos));
 
-    // if error is not an instanceOf APIError, convert it.
-    app.use((err, req, res, next) => {
-
-      if (!(err instanceof APIError)) {
-        const apiError = new APIError(err.message, httpStatus.INTERNAL_SERVER_ERROR, false);
-        return next(apiError);
-      }
-
-      return next(err);
-
-    });
-
-    // log error
+    // if there is an error at this point, it means it is unexpected like db
+    // or some system error and should be logged.
     app.use((err, req, res, next) => {
 
       try {
-        logError(err);
+        logError(err, {
+          url: req.originalUrl || req.url,
+          method: req.method,
+          referrer: req.headers.referer || req.headers.referrer
+        });
       }
       catch (e) {
         console.error(e); // eslint-disable-line no-console
@@ -72,17 +68,24 @@ const start = (conf = {}, options = {}) => {
 
     // catch 404 and forward to error handler
     app.use((req, res, next) => {
-      const err = new APIError('API route not found', httpStatus.NOT_FOUND);
+      const err = new Error('API route not found.');
+      err.httpStatus = httpStatus.NOT_FOUND;
       return next(err);
     });
 
-    // return an error response
+    // unexpected error. return an error response
     app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 
-      res.status(err.status || 500).json({
-        message: err.isPublic ? err.message : httpStatus[err.status],
-        stack: conf.NODE_ENV === 'development' ? err.stack : {}
-      });
+      const status = err.httpStatus || httpStatus.INTERNAL_SERVER_ERROR;
+
+      const errRes = {};
+      errRes.message = httpStatus[status];
+
+      if (conf.NODE_ENV === 'development') {
+        errRes.stack = err.stack;
+      }
+
+      res.status(status).json(errRes);
 
     });
 

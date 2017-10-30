@@ -22,13 +22,12 @@ gulp.task('clean', () => {
   return;
 });
 
-gulp.task('lint', () => {
-return; 
+gulp.task('lint', () =>
   gulp.src(paths.js)
     .pipe(eslint())
     .pipe(eslint.format()) 
     .pipe(eslint.failOnError())
-});
+);
 
 // Copy non-js files to dist
 gulp.task('copy', () =>

@@ -30,12 +30,14 @@ export const log = (level, message, meta) => {
   // if the message is an error
   if (message instanceof Error) {
 
-    logMessage = message.message;
+    const err = message;
+
+    logMessage = err.message;
 
     logMeta = Object.assign(logMeta, {
-      stack: message.stack,
-      code: message.code || message.status || 500,
-      name: message.name,
+      stack: err.stack,
+      code: err.code || err.status || 500,
+      name: err.name,
       isError: true
     });
 

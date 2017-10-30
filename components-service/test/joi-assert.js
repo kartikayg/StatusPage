@@ -22,9 +22,6 @@ const error = (schema, data, errors, options = {}) => {
 
   const errorsReturned = _.map(e => e.message)(error.details);
 
-  // console.log(errorsToCheck);
-  // console.log(errorsReturned);
-
   assert.deepEqual(errorsToCheck, errorsReturned);
 
 }

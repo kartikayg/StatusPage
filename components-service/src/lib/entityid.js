@@ -3,7 +3,7 @@
  * used in this microservice.
  */
 
-import shortid from 'shortid';
+import uniqid from 'uniqid';
 
 /**
  * Generates an alphanumeric ID. 
@@ -11,9 +11,6 @@ import shortid from 'shortid';
  *  the resulting ID would be {prefix}-{generated-id}, otherwise it is {generated-id}
  * @return {string}
  */
-const generate = (entityPrefix = '') => {
-  const id = shortid.generate();
-  return entityPrefix ? `${entityPrefix}-${id}` : id;
+export default (entityPrefix = '') => {
+  return uniqid.process(entityPrefix);
 };
-
-export default Object.create({ generate });

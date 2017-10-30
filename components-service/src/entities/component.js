@@ -14,9 +14,9 @@ const schema = {
     .default('operational'),
   sort_order: Joi.number()
     .integer()
-    .min(0)
-    .default(0),
-  is_active: Joi.boolean()
+    .min(1)
+    .default(1),
+  active: Joi.boolean()
     .default(true),
   group_id: Joi.string()
 };
