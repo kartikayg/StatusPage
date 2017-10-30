@@ -8,8 +8,7 @@ import dotenv from 'dotenv';
 // internal packages
 import config from './config';
 import {initWriters as initLogWriters} from './lib/logger';
-import {connect as dbConnect} from './lib/db/mongo';
-import dbsetup from './lib/db/setup';
+import {connect as dbConnect, initialSetup as dbSetup} from './lib/db/mongo';
 import respository from './repositories';
 import server from './server';
 
@@ -50,7 +49,7 @@ const init = async () => {
 
   // load mongodb and setup tables
   const db = await dbConnect(conf.db);
-  await dbsetup(db);
+  await dbSetup(db);
 
   // configure logger writers
   initLogWriters(conf.logger, { db });

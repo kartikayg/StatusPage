@@ -41,6 +41,58 @@ export const connect = (conf = {}) => {
 };
 
 /**
+ * Setup tables schema and constraints in the Db
+ * @param {object} MongoDb connection
+ */
+export const initialSetup = async (db) => {
+
+  /* eslint-disable key-spacing */
+
+  // components collection
+  const componentValidator = {
+    $and: [
+      { created_at:         { $exists: true, $type: 'timestamp' } },
+      { id:                 { $exists: true, $type: 'string' } },
+      { name:               { $exists: true, $type: 'string' } },
+      { help_text:          { $type: 'string' } },
+      { status:             { $exists: true, $type: 'string' } },
+      { sort_order:         { $exists: true, $type: 'int' } },
+      { active:             { $exists: true, $type: 'bool' } },
+      { group_id:           { $type: 'string' } },
+      { updated_at:         { $exists: true, $type: 'timestamp' } }
+    ]
+  };
+
+  await db.createCollection('components', {
+    validator: componentValidator
+  });
+
+  db.collection('components').createIndex({ id: 1 }, { unique: true });
+
+
+  // component groups collection
+  const componentGroupsValidator = {
+    $and: [
+      { created_at:           { $exists: true, $type: 'timestamp' } },
+      { id:                   { $exists: true, $type: 'string' } },
+      { name:                 { $exists: true, $type: 'string' } },
+      { help_text:            { $type: 'string' } },
+      { status:               { $exists: true, $type: 'string' } },
+      { sort_order:           { $exists: true, $type: 'int' } },
+      { active:               { $exists: true, $type: 'bool' } },
+      { updated_at:           { $exists: true, $type: 'timestamp' } }
+    ]
+  };
+
+  await db.createCollection('componentgroups', {
+    validator: componentGroupsValidator
+  });
+
+  db.collection('componentgroups').createIndex({ id: 1 }, { unique: true });
+
+};
+
+/**
  * Returns a DAO for a collection in the mongo db
  * @param {object} Mongo db connection
  * @param {string} collectionName collection name in mongo
@@ -50,9 +102,13 @@ export const getDao = (db, collectionName) => {
 
   const dbCollection = db.collection(collectionName);
 
-
   /**
-   *
+   * Find records in a collection
+   * @param {object} pred - Predicate for find
+   * @param {object} sort - Sort opiton
+   * @return {Promise} promise
+   *   on success - array of records
+   *   on failure - Db error
    */
   const find = (pred = {}, sort = {}) => {
     return new Promise((resolve, reject) => {
@@ -68,9 +124,13 @@ export const getDao = (db, collectionName) => {
   };
 
   /**
-   *
+   * Count records in a collection
+   * @param {object} pred - Predicate for count
+   * @return {Promise} promise
+   *   on success - count
+   *   on failure - Db error
    */
-  const count = (pred) => {
+  const count = (pred = {}) => {
     return new Promise((resolve, reject) => {
       dbCollection.count(pred, (err, cnt) => {
         if (err) {
@@ -85,7 +145,11 @@ export const getDao = (db, collectionName) => {
 
 
   /**
-   *
+   * Insert a single record in a collection
+   * @param {object} data - Data to insert
+   * @return {Promise} promise
+   *   on success - inserted record
+   *   on failure - Db error
    */
   const insert = (data) => {
 
@@ -105,7 +169,12 @@ export const getDao = (db, collectionName) => {
   };
 
   /**
-   *
+   * Update a record in a collection
+   * @param {object} data - Data to be set on the record
+   * @param {object} pred - Predicate to find record to update
+   * @return {Promise} promise
+   *   on success - update result
+   *   on failure - Db error
    */
   const update = (data, pred) => {
 
@@ -125,7 +194,11 @@ export const getDao = (db, collectionName) => {
   };
 
   /**
-   *
+   * Delete record(s) from a collection
+   * @param {object} pred - Predicate to find records to delete
+   * @return {Promise} promise
+   *   on success - # of records deleted
+   *   on failure - Db error
    */
   const remove = (pred = {}) => {
     return new Promise((resolve, reject) => {
@@ -150,4 +223,3 @@ export const getDao = (db, collectionName) => {
   });
 
 };
-
