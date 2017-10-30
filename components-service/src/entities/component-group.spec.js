@@ -3,7 +3,7 @@ import joiassert from '../../test/joi-assert';
 
 import componentGroup from './component-group';
 
-describe('models/component-group', function() {
+describe('entity/component-group', function() {
 
   it('should validate the object', function() {
 
@@ -42,7 +42,7 @@ describe('models/component-group', function() {
 
     const data = {
       name: 'API-asdkasdnlkasdnlas-asdasdjasd-qqwqwsadasd',
-      is_active: 'true',
+      active: 'true',
       sort_order: 'error',
       status: 'not operational'
     };

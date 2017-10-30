@@ -5,7 +5,7 @@ import component from './component';
 
 import Joi from 'joi';
 
-describe('models/component', function() {
+describe('entity/component', function() {
 
   it('should validate the object', function() {
 
@@ -31,7 +31,7 @@ describe('models/component', function() {
     const expected = {
       name: 'API',
       status: 'operational',
-      sort_order: 0,
+      sort_order: 1,
       active: true
     };
 
