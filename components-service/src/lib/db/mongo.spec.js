@@ -19,8 +19,8 @@ describe('lib/db/mongo', function() {
       else callback(new Error('error'));
     },
 
-    update(pred, data, callback) {
-      if (data.id) callback(null, data);
+    update(pred, data, options, callback) {
+      if (data.id) callback(null, {result: {nModified: 2}});
       else callback(new Error('error'));
     },
 
@@ -111,8 +111,11 @@ describe('lib/db/mongo', function() {
       const countSpy = sinon.spy(testCollectionDb, 'count');
 
       // get count
-      const count = await dao.count({id: 123});
+      const pred = {id: 123};
+      const count = await dao.count(pred);
+      
       assert.strictEqual(count, 1);
+      sinon.assert.calledWith(countSpy, pred);
 
       // error check
       let isError = false;
@@ -121,12 +124,11 @@ describe('lib/db/mongo', function() {
       }
       catch (e) {
         assert.strictEqual(e.message, 'error');
+        sinon.assert.calledWith(countSpy, {});
         isError = true;
       }
 
       assert.isTrue(isError);
-
-      sinon.assert.calledTwice(countSpy);
 
       countSpy.restore();
 
@@ -139,7 +141,9 @@ describe('lib/db/mongo', function() {
       // do insert
       const data = {id: 'test', name: 'test'};
       const res = await dao.insert(data);
+      
       assert.deepEqual(res, data);
+      sinon.assert.calledWith(insertSpy, data);
 
       // error check
       let isError = false;
@@ -153,8 +157,6 @@ describe('lib/db/mongo', function() {
 
       assert.isTrue(isError);
 
-      sinon.assert.calledTwice(insertSpy);
-
       insertSpy.restore();
 
     });
@@ -165,9 +167,11 @@ describe('lib/db/mongo', function() {
 
       // do update
       const data = {id: 'test', name: 'test'};
-      const res = await dao.update(data, {id: 'test'});
+      const pred = {id: 'test'};
+      const res = await dao.update(data, pred);
 
-      assert.deepEqual(res, data);
+      assert.strictEqual(res, 2);
+      sinon.assert.calledWith(updateSpy, pred, data);
 
       // error check
       let isError = false;
@@ -181,8 +185,6 @@ describe('lib/db/mongo', function() {
 
       assert.isTrue(isError);
 
-      sinon.assert.calledTwice(updateSpy);
-
       updateSpy.restore();
 
     });
@@ -192,8 +194,12 @@ describe('lib/db/mongo', function() {
       const removeSpy = sinon.spy(testCollectionDb, 'deleteMany');
 
       // do remove
-      const cnt = await dao.remove({id: 1});
+      const pred = {id: 1};
+      const cnt = await dao.remove(pred);
+
       assert.strictEqual(cnt, 2);
+      sinon.assert.calledWith(removeSpy, pred);
+
 
       // error check
       let isError = false;
@@ -206,8 +212,6 @@ describe('lib/db/mongo', function() {
       }
 
       assert.isTrue(isError);
-
-      sinon.assert.calledTwice(removeSpy);
 
       removeSpy.restore();
 

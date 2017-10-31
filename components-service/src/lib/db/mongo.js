@@ -46,48 +46,13 @@ export const connect = (conf = {}) => {
  */
 export const initialSetup = async (db) => {
 
-  /* eslint-disable key-spacing */
-
   // components collection
-  const componentValidator = {
-    $and: [
-      { created_at:         { $exists: true, $type: 'timestamp' } },
-      { id:                 { $exists: true, $type: 'string' } },
-      { name:               { $exists: true, $type: 'string' } },
-      { help_text:          { $type: 'string' } },
-      { status:             { $exists: true, $type: 'string' } },
-      { sort_order:         { $exists: true, $type: 'int' } },
-      { active:             { $exists: true, $type: 'bool' } },
-      { group_id:           { $type: 'string' } },
-      { updated_at:         { $exists: true, $type: 'timestamp' } }
-    ]
-  };
-
-  await db.createCollection('components', {
-    validator: componentValidator
-  });
-
+  await db.createCollection('components');
   db.collection('components').createIndex({ id: 1 }, { unique: true });
 
 
   // component groups collection
-  const componentGroupsValidator = {
-    $and: [
-      { created_at:           { $exists: true, $type: 'timestamp' } },
-      { id:                   { $exists: true, $type: 'string' } },
-      { name:                 { $exists: true, $type: 'string' } },
-      { help_text:            { $type: 'string' } },
-      { status:               { $exists: true, $type: 'string' } },
-      { sort_order:           { $exists: true, $type: 'int' } },
-      { active:               { $exists: true, $type: 'bool' } },
-      { updated_at:           { $exists: true, $type: 'timestamp' } }
-    ]
-  };
-
-  await db.createCollection('componentgroups', {
-    validator: componentGroupsValidator
-  });
-
+  await db.createCollection('componentgroups');
   db.collection('componentgroups').createIndex({ id: 1 }, { unique: true });
 
 };
@@ -182,12 +147,12 @@ export const getDao = (db, collectionName) => {
     const d = Object.assign({}, data);
 
     return new Promise((resolve, reject) => {
-      dbCollection.update(pred, d, (err, res) => {
+      dbCollection.update(pred, d, { fullResult: true }, (err, res) => {
         if (err) {
           reject(err);
         }
         else {
-          resolve(res);
+          resolve(res.result.nModified);
         }
       });
     });
