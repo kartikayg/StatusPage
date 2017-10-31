@@ -13,8 +13,29 @@ export default (repo) => {
     throw new Error(`Invalid repo passed to this router. Passed repo name: ${repo.name}`);
   }
 
+  /**
+   *
+   */
+  const format = (components) => {
+
+    const fmt = (c) => {
+      const cmp = Object.assign({}, c);
+      delete cmp._id;
+      return cmp;
+    };
+
+    if (Array.isArray(components)) {
+      return components.map(fmt);
+    }
+
+    return fmt(components);
+
+  };
+
+  // 
   const router = express.Router();
 
+  // build routes
   router.route('/')
 
     // GET - Get list of components
@@ -27,7 +48,7 @@ export default (repo) => {
       }
 
       repo.list(query).then(components => {
-        res.json(components);
+        res.json(format(components));
       }).catch(next);
 
     })

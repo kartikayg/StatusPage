@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Repository to manage components
  */
 
 import pick from 'lodash/fp/pick';
@@ -8,7 +8,10 @@ import {component as componentEntity} from '../entities/index';
 import {IdNotFoundError} from './errors';
 
 /**
- * 
+ * @param {object} dao - database access object 
+ *  for components collection
+ * @param {repo} groupRepo - component group repo
+ * @return {object}
  */
 const init = (dao, groupRepo) => {
 
@@ -20,8 +23,8 @@ const init = (dao, groupRepo) => {
    * Validates a component data before saving it.
    * @param {object} data to validate
    * @return {Promise} 
-   *  if fulfilled, validated component data
-   *  if rejected, Error
+   *  if fulfilled, {object} validated component data
+   *  if rejected, {Error} Error
    */
   const validateData = async (data) => {
 
@@ -41,16 +44,11 @@ const init = (dao, groupRepo) => {
   };
 
   /**
-   *
-   */
-  const format = (component) => {
-    const cmp = Object.assign({}, component);
-    delete cmp._id;
-    return cmp;
-  };
-
-  /**
-   *
+   * Loads a component.
+   * @param {string} id - component id
+   * @return {Promise}
+   *  if fulfilled, {object} component data
+   *  if rejected, {Error} error
    */
   const load = async (id) => {
 
@@ -60,34 +58,38 @@ const init = (dao, groupRepo) => {
       throw new IdNotFoundError(`Invalid component id passed: ${id}.`);
     }
 
-    return format(data[0]);
+    return data[0];
 
   };
 
   /**
-   *
+   * Returns a list of components based on query
+   * @param {object} filter
+   *   fields: active, status, group_id
+   * @return {Promise}
+   *  if fulfilled, {array} array of components
+   *  if rejected, {Error} error
    */
-  const list = async (query = {}) => {
+  const list = async (filter = {}) => {
 
     // sort by group and then the sort order and then id. in
     // case sort_order is same, it will order by creation (_id)
     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
     // build predicate
-    const pred = pick(['active', 'group_id', 'status'])(query);
+    const pred = pick(['active', 'group_id', 'status'])(filter);
 
     const components = await dao.find(pred, sortBy);
-
-    return components.map(format);
+    return components;
 
   };
 
   /**
    * Creates a new component.
    * @param {object} data
-   * @return {promise} 
-   *  on success: component object with id
-   *  on failure: Error
+   * @return {Promise} 
+   *  if fulfilled, {object} component object
+   *  if rejected, {Error} error
    */
   const create = async (data) => {
 
@@ -98,22 +100,22 @@ const init = (dao, groupRepo) => {
     component.created_at = (new Date()).toISOString();
     component.updated_at = (new Date()).toISOString();
 
-    await dao.insert(component);
+    const componentIns = await dao.insert(component);
 
-    return format(component);
+    return componentIns;
 
   };
 
   /**
    * Updates a component.
-   * @param {string} componentId
+   * @param {string} id - component id
    * @param {object} newData - New Data for the component. This should be the
    *  entire the component data set.
-   * @return {promise} 
-   *  on success: component object
-   *  on failure: Error
+   * @return {Promise} 
+   *  if fulfilled, {object} component object
+   *  if rejected, {Error} error
    */
-  const update = async (id, newData) => {
+  const update = async (id, newData = {}) => {
 
     // load the component
     const currentCmp = await load(id);
@@ -126,8 +128,7 @@ const init = (dao, groupRepo) => {
 
     await dao.update(updComponent, { id });
 
-    // format the data and return
-    return format(updComponent);
+    return updComponent;
 
   };
 
@@ -151,6 +152,7 @@ const init = (dao, groupRepo) => {
     delete newComponent.created_at;
     delete newComponent.updated_at;
     delete newComponent.id;
+    delete newComponent._id;
 
     // update the component
     const res = await update(id, newComponent);
@@ -159,7 +161,11 @@ const init = (dao, groupRepo) => {
   };
 
   /**
-   *
+   * Removes a component.
+   * @param {string} id - component id
+   * @return {Promise} 
+   *  if fulfilled, void
+   *  if rejected, {Error} error
    */
   const remove = async (id) => {
 
