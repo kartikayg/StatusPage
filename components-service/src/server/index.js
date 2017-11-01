@@ -13,7 +13,6 @@ import httpStatus from 'http-status';
 import routes from './routes';
 import {error as logError} from '../lib/logger';
 import logRequest from './middleware/log-request';
-import {request as sanitizeRequest} from './middleware/sanitize';
 
 /**
  * Starts the express server
@@ -40,9 +39,6 @@ const start = (conf = {}, options = {}) => {
 
     // log the call
     app.use(logRequest(conf));
-
-    // sanitize req data
-    app.use(sanitizeRequest());
 
     // setup routes
     app.use('/api', routes(options.repos));
@@ -89,8 +85,8 @@ const start = (conf = {}, options = {}) => {
 
     });
 
-    const server = app.listen(conf.PORT, () => {
-      return resolve(server);
+    app.listen(conf.PORT, () => {
+      return resolve(app);
     });
 
   });

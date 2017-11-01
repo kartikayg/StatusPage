@@ -5,6 +5,7 @@
 import express from 'express';
 import httpStatus from 'http-status';
 
+import {request as sanitizeRequest} from '../middleware/sanitize';
 import componentRoutes from './component';
 import componentGroupRoutes from './component-group';
 
@@ -14,6 +15,9 @@ import componentGroupRoutes from './component-group';
 export default (repos = {}) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
+
+  // sanitize req data
+  router.use(sanitizeRequest());
 
   /** GET /health-check - Check service health */
   router.get('/health-check', (req, res) => {

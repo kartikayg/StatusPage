@@ -1,5 +1,5 @@
 /**
- * @fileoverview Return component routes
+ * @fileoverview  Component routes
  */
 
 import express from 'express';
@@ -7,6 +7,10 @@ import boolean from 'boolean';
 
 import {params as sanitizeParams} from '../middleware/sanitize';
 
+/**
+ * @param {object} repo - component repo
+ * @return {object} router
+ */
 export default (repo) => {
 
   if (repo.name !== 'components') {
@@ -14,7 +18,9 @@ export default (repo) => {
   }
 
   /**
-   *
+   * Formats the component(s) before returning tthe response.
+   * @param {object|array} components - component(s) to format
+   * @return {object|array} formatted component(s)
    */
   const format = (components) => {
 
