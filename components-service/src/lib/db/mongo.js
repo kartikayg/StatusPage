@@ -127,7 +127,7 @@ export const getDao = (db, collectionName) => {
           reject(err);
         }
         else {
-          resolve(res);
+          resolve(res.ops[0]);
         }
       });
     });

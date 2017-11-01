@@ -383,13 +383,5 @@ describe('routes/component', function() {
 
   });
 
-  after(function() {
-
-  });
-
 });
-
-
-
-
 

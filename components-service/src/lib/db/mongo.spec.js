@@ -15,17 +15,17 @@ describe('lib/db/mongo', function() {
     },
 
     insert(data, callback) {
-      if (data.id) callback(null, data);
+      if (data.id) callback(null, {ops: [data]});
       else callback(new Error('error'));
     },
 
     update(pred, data, options, callback) {
-      if (data.id) callback(null, {result: {nModified: 2}});
+      if (data.id) callback(null, {result: {nModified: 1}});
       else callback(new Error('error'));
     },
 
     deleteMany(pred, callback) {
-      if (pred.id) callback(null, {deletedCount: 2});
+      if (pred.id) callback(null, {deletedCount: 1});
       else callback(new Error('error'));
     }
 
@@ -106,114 +106,142 @@ describe('lib/db/mongo', function() {
 
     let dao = mongo.getDao(testDb, 'components');
 
-    it('count', async function() {
+    describe('count', function() {
 
       const countSpy = sinon.spy(testCollectionDb, 'count');
 
-      // get count
-      const pred = {id: 123};
-      const count = await dao.count(pred);
-      
-      assert.strictEqual(count, 1);
-      sinon.assert.calledWith(countSpy, pred);
+      beforeEach(function() {
+        countSpy.reset();
+      });
 
-      // error check
-      let isError = false;
-      try {
-        await dao.count({});
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'error');
-        sinon.assert.calledWith(countSpy, {});
-        isError = true;
-      }
+      after(function() {
+        countSpy.restore();
+      });
 
-      assert.isTrue(isError);
+      it('should return the count from db collection', async function() {
 
-      countSpy.restore();
+        // get count
+        const pred = {id: 123};
+        const count = await dao.count(pred);
+        
+        assert.strictEqual(count, 1);
+        sinon.assert.calledOnce(countSpy);
+        sinon.assert.calledWith(countSpy, pred);
+
+      });
+
+      it('should return error', function(done) {
+
+        dao.count({}).catch(e => {
+          assert.strictEqual(e.message, 'error');
+          sinon.assert.calledWith(countSpy, {});
+          done();
+        });
+
+      });
 
     });
 
-    it('insert', async function() {
+    describe('insert', function() {
 
       const insertSpy = sinon.spy(testCollectionDb, 'insert');
 
-      // do insert
-      const data = {id: 'test', name: 'test'};
-      const res = await dao.insert(data);
-      
-      assert.deepEqual(res, data);
-      sinon.assert.calledWith(insertSpy, data);
+      beforeEach(function() {
+        insertSpy.reset();
+      });
 
-      // error check
-      let isError = false;
-      try {
-        await dao.insert();
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'error');
-        isError = true;
-      }
+      after(function() {
+        insertSpy.restore();
+      });
 
-      assert.isTrue(isError);
+      it ('should return from the db collection', async function() {
 
-      insertSpy.restore();
+        // do insert
+        const data = {id: 'test', name: 'test'};
+        const res = await dao.insert(data);
+        
+        assert.deepEqual(res, data);
+        sinon.assert.calledOnce(insertSpy);
+        sinon.assert.calledWith(insertSpy, data);
+
+      });
+
+      it ('should return the error', function(done) {
+        dao.insert().catch(e => {
+          assert.strictEqual(e.message, 'error');
+          sinon.assert.calledOnce(insertSpy);
+          done();
+        });
+      })
 
     });
 
-    it('update', async function() {
+    describe('update', function() {
 
       const updateSpy = sinon.spy(testCollectionDb, 'update');
 
-      // do update
-      const data = {id: 'test', name: 'test'};
-      const pred = {id: 'test'};
-      const res = await dao.update(data, pred);
+      beforeEach(function() {
+        updateSpy.reset();
+      });
 
-      assert.strictEqual(res, 2);
-      sinon.assert.calledWith(updateSpy, pred, data);
+      after(function() {
+        updateSpy.restore();
+      });
 
-      // error check
-      let isError = false;
-      try {
-        await dao.update();
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'error');
-        isError = true;
-      }
+      if ('should return the updated count from db collection', async function() {
 
-      assert.isTrue(isError);
+        // do update
+        const data = {id: 'test', name: 'test'};
+        const pred = {id: 'test'};
+        const res = await dao.update(data, pred);
 
-      updateSpy.restore();
+        assert.strictEqual(res, 1);
+        sinon.assert.calledOnce(updateSpy);
+        sinon.assert.calledWith(updateSpy, pred, data);
+
+      });
+
+      it ('should return the error', function(done) {
+        dao.update().catch(e => {
+          assert.strictEqual(e.message, 'error');
+          sinon.assert.calledOnce(updateSpy);
+          done();
+        });
+      });
 
     });
 
-    it('remove', async function() {
+    describe('remove', function() {
 
       const removeSpy = sinon.spy(testCollectionDb, 'deleteMany');
 
-      // do remove
-      const pred = {id: 1};
-      const cnt = await dao.remove(pred);
+      beforeEach(function() {
+        removeSpy.reset();
+      });
 
-      assert.strictEqual(cnt, 2);
-      sinon.assert.calledWith(removeSpy, pred);
+      after(function() {
+        removeSpy.restore();
+      });
 
+      it ('should return the count after delete', async function() {
 
-      // error check
-      let isError = false;
-      try {
-        await dao.remove();
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'error');
-        isError = true;
-      }
+        // do remove
+        const pred = {id: 1};
+        const cnt = await dao.remove(pred);
 
-      assert.isTrue(isError);
+        assert.strictEqual(cnt, 1);
+        sinon.assert.calledOnce(removeSpy);
+        sinon.assert.calledWith(removeSpy, pred);
 
-      removeSpy.restore();
+      });
+
+      it ('should return the error from db collection', function(done) {
+        dao.remove().catch(e => {
+          assert.strictEqual(e.message, 'error');
+          sinon.assert.calledOnce(removeSpy);
+          done();
+        });
+      });
 
     });
 

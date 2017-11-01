@@ -44,6 +44,15 @@ const init = (dao, groupRepo) => {
   };
 
   /**
+   *
+   */
+  const format = (component) => {
+    const cmp = Object.assign({}, component);
+    delete cmp._id;
+    return cmp;
+  };
+
+  /**
    * Loads a component.
    * @param {string} id - component id
    * @return {Promise}
@@ -58,7 +67,7 @@ const init = (dao, groupRepo) => {
       throw new IdNotFoundError(`Invalid component id passed: ${id}.`);
     }
 
-    return data[0];
+    return format(data[0]);
 
   };
 
@@ -80,7 +89,7 @@ const init = (dao, groupRepo) => {
     const pred = pick(['active', 'group_id', 'status'])(filter);
 
     const components = await dao.find(pred, sortBy);
-    return components;
+    return components.map(format);
 
   };
 
@@ -102,7 +111,7 @@ const init = (dao, groupRepo) => {
 
     const componentIns = await dao.insert(component);
 
-    return componentIns;
+    return format(componentIns);
 
   };
 

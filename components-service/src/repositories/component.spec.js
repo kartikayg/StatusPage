@@ -27,6 +27,9 @@ describe('repo/component', function() {
     active: true
   }, newCmp);
 
+  const existingCmpWithoutId = Object.assign({}, existingCmp);
+  delete existingCmpWithoutId._id;
+
   const testDao = {
     
     name: 'components',
@@ -74,7 +77,7 @@ describe('repo/component', function() {
 
     sinon.assert.calledOnce(findSpy);
     sinon.assert.calledWith(findSpy, pred, sortBy);
-    assert.deepEqual(components, [existingCmp]);
+    assert.deepEqual(components, [existingCmpWithoutId]);
 
     findSpy.restore();
 
@@ -92,7 +95,7 @@ describe('repo/component', function() {
 
     sinon.assert.calledOnce(findSpy);
     sinon.assert.calledWith(findSpy, pred, sortBy);
-    assert.deepEqual(components, [existingCmp]);
+    assert.deepEqual(components, [existingCmpWithoutId]);
 
     findSpy.restore();
 
@@ -110,7 +113,7 @@ describe('repo/component', function() {
 
     sinon.assert.calledOnce(findSpy);
     sinon.assert.calledWith(findSpy, {active: true}, sortBy);
-    assert.deepEqual(components, [existingCmp]);
+    assert.deepEqual(components, [existingCmpWithoutId]);
 
     findSpy.restore();
 
@@ -134,6 +137,27 @@ describe('repo/component', function() {
 
   });
 
+  it ('find with db error', function(done) {
+
+    const findStub = sinon.stub(testDao, 'find').callsFake((pred, sortBy) => {
+      throw new Error('db error');
+    });
+
+    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+    const pred = { active: false, group_id: 'group', status: 'operational'};
+    
+    repo.list(pred).catch(e => {
+
+      assert.strictEqual(e.message, 'db error');
+      sinon.assert.calledOnce(findStub);
+      sinon.assert.calledWith(findStub, pred, sortBy);
+
+      findStub.restore();
+      done();
+    });
+
+  });
+
 
   it ('load', async function() {
 
@@ -146,7 +170,7 @@ describe('repo/component', function() {
     // returning the stuff from dao.
     sinon.assert.calledOnce(findSpy);
     sinon.assert.calledWith(findSpy, { id: testCmpId });
-    assert.deepEqual(component, existingCmp);
+    assert.deepEqual(component, existingCmpWithoutId);
 
     findSpy.restore();
 
@@ -193,7 +217,7 @@ describe('repo/component', function() {
 
 
     // returning the res from dao insert
-    assert.deepEqual(component, existingCmp);
+    assert.deepEqual(component, existingCmpWithoutId);
 
     insertSpy.restore();
     genIdStub.restore();
@@ -224,7 +248,7 @@ describe('repo/component', function() {
 
     // dao called using the new data
     const updateArg = updateSpy.args[0][0];
-    const updateExpected = Object.assign({}, existingCmp, updated, {updated_at: updateArg.updated_at});
+    const updateExpected = Object.assign({}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
     assert.deepEqual(updateExpected, updateArg);
 
     // calling update dao

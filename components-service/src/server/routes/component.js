@@ -17,26 +17,6 @@ export default (repo) => {
     throw new Error(`Invalid repo passed to this router. Passed repo name: ${repo.name}`);
   }
 
-  /**
-   * Formats the component(s) before returning tthe response.
-   * @param {object|array} components - component(s) to format
-   * @return {object|array} formatted component(s)
-   */
-  const format = (components) => {
-
-    const fmt = (c) => {
-      const cmp = Object.assign({}, c);
-      delete cmp._id;
-      return cmp;
-    };
-
-    if (Array.isArray(components)) {
-      return components.map(fmt);
-    }
-
-    return fmt(components);
-
-  };
 
   // 
   const router = express.Router();
@@ -54,7 +34,7 @@ export default (repo) => {
       }
 
       repo.list(query).then(components => {
-        res.json(format(components));
+        res.json(components);
       }).catch(next);
 
     })
