@@ -84,7 +84,7 @@ export const initWriters = (conf = {}, options = {}) => {
     addFileWriter(winston, conf.LOG_FILE_LEVEL, conf); // eslint-disable-line no-use-before-define
   }
 
-  if (conf.LOG_DB_LEVEL && options.db) {
+  if (conf.LOG_DB_LEVEL) {
     addDbWriter(winston, conf.LOG_DB_LEVEL, options.db); // eslint-disable-line no-use-before-define
   }
 
@@ -135,6 +135,10 @@ function addConsoleWriter(logger, level) {
  */
 function addDbWriter(logger, level, db) {
 
+  if (!db) {
+    throw new Error('A Db object is required to setup this writer.');
+  }
+
   require('winston-mongodb'); // eslint-disable-line global-require
 
   logger.add(winston.transports.MongoDB, {
@@ -154,6 +158,10 @@ function addDbWriter(logger, level, db) {
  * @param {object} conf
  */
 function addFileWriter(logger, level, conf = {}) {
+
+  if (!conf.LOG_FILE_DIRNAME) {
+    throw new Error('A file directory is required to setup this writer.');
+  }
 
   require('winston-daily-rotate-file'); // eslint-disable-line global-require
 

@@ -18,7 +18,7 @@
     "build": "gulp",
     "lint": "eslint 'src/**/*.js'",
     "test": "cross-env NODE_ENV=test LOG_CONSOLE_LEVEL=debug mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
-    "test:coverage": "cross-env NODE_ENV=test istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
+    "test:coverage": "cross-env NODE_ENV=test LOG_CONSOLE_LEVEL=debug istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
   },
   "keywords": [
     "express",
