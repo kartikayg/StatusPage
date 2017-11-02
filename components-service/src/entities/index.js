@@ -25,14 +25,6 @@ const schemaValidator = (entityType, data) => {
 
   return new Promise((resolve, reject) => {
 
-    if (!data) {
-      reject(new Error('Data to validate is not provided.'));
-    }
-
-    if (!entityType || !entities[entityType]) {
-      reject(new Error('No schema avaiable for the entity type.'));
-    }
-
     const {error, value} = Joi.validate(data, entities[entityType].schema);
 
     if (error) {
@@ -52,13 +44,7 @@ const schemaValidator = (entityType, data) => {
  * @return {string}
  */
 const getEntityId = (entityType) => {
-
-  if (!entityType || !entities[entityType]) {
-    throw new Error('No avaiable entry for the entity type.');
-  }
-
   return entityId(entities[entityType].prefix);
-
 };
 
 

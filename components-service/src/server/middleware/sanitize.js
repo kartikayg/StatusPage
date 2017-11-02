@@ -19,15 +19,8 @@ import striptags from 'striptags';
  */
 const sanitizeString = (str) => {
 
-  const type = typeof str;
-
-  // if not a string ..
-  if (type !== 'string') {
-    return str;
-  }
-
   // if empty, make it null
-  if (str === '') {
+  if (str.trim() === '') {
     return null;
   }
 
@@ -51,9 +44,6 @@ const sanitizeObject = (obj) => {
   }
   else if (typeof obj === 'object') {
     sanitized = {};
-  }
-  else {
-    return obj;
   }
 
   // loop and sanitize each val
