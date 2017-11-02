@@ -22,7 +22,7 @@ describe('lib/logger', function() {
 
 
     it ('should clear all writers initially', function() {
-      logger.initWriters();
+      logger.initWriters({}, {});
       sinon.assert.calledOnce(clearStub);
     });
 
@@ -64,7 +64,7 @@ describe('lib/logger', function() {
     it ('should error out when no db is passed for db writer setup', function(done) {
 
       try {
-        logger.initWriters({ LOG_DB_LEVEL: 'error' });
+        logger.initWriters({ LOG_DB_LEVEL: 'error' }, {});
       }
       catch (e) {
         sinon.assert.notCalled(addStub);

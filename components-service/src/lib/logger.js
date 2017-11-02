@@ -68,10 +68,16 @@ logLevels.forEach(level => {
 /**
  * Add writers for logging. Based on the configuration, it will
  * add the respective writer for the log.
- * @param {object} conf
+ * @param {object} conf - Configuration for writers
+ *  LOG_CONSOLE_LEVEL
+ *  LOG_FILE_LEVEL
+ *  LOG_DB_LEVEL
+ *  LOG_FILE_DIRNME
+ *  LOG_FILE_PREFIX
  * @param {object} options
+ *  db - Db object for db writer
  */
-export const initWriters = (conf = {}, options = {}) => {
+export const initWriters = (conf, options) => {
 
   // remove any writers (transporters)
   winston.clear();
@@ -93,8 +99,8 @@ export const initWriters = (conf = {}, options = {}) => {
 
 /**
  * Add console writer for this logger.
- * @param {object} logger
- * @param {string} level.
+ * @param {object} logger - logger to add the writer to
+ * @param {string} level - level for the writer
  */
 function addConsoleWriter(logger, level) {
 
@@ -129,9 +135,9 @@ function addConsoleWriter(logger, level) {
 
 /**
  * Add db writer for this logger
- * @param {object} logger
- * @param {string} level.
- * @param {object} mongo db connection
+ * @param {object} logger - logger to add writer to
+ * @param {string} level - level for the writer
+ * @param {object} db - mongo db connection
  */
 function addDbWriter(logger, level, db) {
 
@@ -153,11 +159,13 @@ function addDbWriter(logger, level, db) {
 
 /**
  * Add File writer for this logger
- * @param {object} logger
- * @param {string} level
- * @param {object} conf
+ * @param {object} logger - logger to add writer to
+ * @param {string} level - level for the writer
+ * @param {object} conf - config for the writer
+ *  LOG_FILE_DIRNAME
+ *  LOG_FILE_PREFIX
  */
-function addFileWriter(logger, level, conf = {}) {
+function addFileWriter(logger, level, conf) {
 
   if (!conf.LOG_FILE_DIRNAME) {
     throw new Error('A file directory is required to setup this writer.');
