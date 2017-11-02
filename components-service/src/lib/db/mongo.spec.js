@@ -10,8 +10,22 @@ describe('lib/db/mongo', function() {
     createIndex(field, options) {},
 
     count(pred, callback) {
-      if (pred.id == 123) callback(null, 1);
-      else callback(new Error('error'));
+      return callback(null, 1);
+    },
+
+    find(pred) {
+
+      const data = [{ name: 'kartik' }];
+
+      return {
+        sort(sort) {
+          return {
+            toArray(callback) {
+              callback(null, data);
+            }
+          }
+        } 
+      }
     },
 
     insert(data, callback) {
@@ -118,7 +132,7 @@ describe('lib/db/mongo', function() {
         countSpy.restore();
       });
 
-      it('should return the count from db collection', async function() {
+      it('should return the count with a predicate', async function() {
 
         // get count
         const pred = {id: 123};
@@ -130,13 +144,72 @@ describe('lib/db/mongo', function() {
 
       });
 
-      it('should return error', function(done) {
+      it('should return the count with no predicate', async function() {
 
-        dao.count({}).catch(e => {
+        // get count
+        const pred = {};
+        const count = await dao.count(pred);
+        
+        assert.strictEqual(count, 1);
+        sinon.assert.calledOnce(countSpy);
+        sinon.assert.calledWith(countSpy, pred);
+
+      });
+
+      it('should return error from db collection', function(done) {
+
+        // force error
+        countSpy.restore();
+        const countStub = sinon.stub(testCollectionDb, 'count').callsFake((pred, callback) => {
+          callback(new Error('error'));
+        });
+
+        dao.count().catch(e => {
           assert.strictEqual(e.message, 'error');
-          sinon.assert.calledWith(countSpy, {});
+          sinon.assert.calledOnce(countStub);
+          countStub.restore();
           done();
         });
+
+      });
+
+    });
+
+    describe('find', function() {
+
+      const findSpy = sinon.spy(testCollectionDb, 'find');
+
+      beforeEach(function() {
+        findSpy.reset();
+      });
+
+      after(function() {
+        findSpy.restore();
+      });
+
+      it ('should return results with predicate', async function() {
+
+        const pred = {name: 'me'};
+        const sort = {age: -1}
+
+        const res = await dao.find(pred, sort);
+
+        assert.deepEqual(res, [{ name: 'kartik' }]);
+        sinon.assert.calledOnce(findSpy);
+        sinon.assert.calledWith(findSpy, pred);
+
+      });
+
+      it ('should return results with no predicate', async function() {
+
+        const pred = {};
+        const sort = {}
+
+        const res = await dao.find(pred, sort);
+
+        assert.deepEqual(res, [{ name: 'kartik' }]);
+        sinon.assert.calledOnce(findSpy);
+        sinon.assert.calledWith(findSpy, pred);
 
       });
 
@@ -172,7 +245,7 @@ describe('lib/db/mongo', function() {
           sinon.assert.calledOnce(insertSpy);
           done();
         });
-      })
+      });
 
     });
 
@@ -188,7 +261,7 @@ describe('lib/db/mongo', function() {
         updateSpy.restore();
       });
 
-      if ('should return the updated count from db collection', async function() {
+      it ('should return the updated count from db collection', async function() {
 
         // do update
         const data = {id: 'test', name: 'test'};

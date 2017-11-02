@@ -27,7 +27,7 @@ const DB_PARAMS = {
  * @return {Promise} promise object that resolves to a 
  * db connection object.
  */
-export const connect = (conf = {}) => {
+export const connect = (conf) => {
   return new Promise((resolve, reject) => {
     MongoClient.connect(conf.MONGO_ENDPOINT, DB_PARAMS, (err, db) => {
       if (err) {
@@ -75,7 +75,7 @@ export const getDao = (db, collectionName) => {
    *   on success - array of records
    *   on failure - Db error
    */
-  const find = (pred = {}, sort = {}) => {
+  const find = (pred, sort) => {
     return new Promise((resolve, reject) => {
       dbCollection.find(pred).sort(sort).toArray((err, res) => {
         if (err) {
