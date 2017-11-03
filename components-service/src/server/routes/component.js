@@ -26,7 +26,7 @@ export default (repo) => {
   // build routes
   router.route('/')
 
-    // GET - Get list of components
+    /** GET /api/components - list of components */
     .get((req, res, next) => {
 
       const query = Object.assign({}, req.sanitizedQuery);
@@ -41,7 +41,7 @@ export default (repo) => {
 
     })
 
-    // POST - Creates a new component
+    /** POST /api/components - creates a component */
     .post((req, res, next) => {
 
       const data = req.sanitizedBody.component;

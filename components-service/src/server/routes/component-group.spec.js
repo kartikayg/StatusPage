@@ -4,7 +4,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import httpStatus from 'http-status';
 
-import componentRoute from './component';
+import componentGroupRoute from './component-group';
 import server from '../../server/index';
 import {IdNotFoundError} from '../../repositories/errors';
 
@@ -15,7 +15,7 @@ describe('routes/component', function() {
    * TEST OBJECTS
    */
 
-  const testCmp = {
+  const testCmpGroup = {
     name: 'widget',
     sort_order: 2,
     status: 'partial_outage',
@@ -28,26 +28,26 @@ describe('routes/component', function() {
 
   let testRepo = {
     
-    name: 'components',
+    name: 'component_groups',
 
     load(id) {
-      return Promise.resolve(testCmp);
+      return Promise.resolve(testCmpGroup);
     },
 
     list(filter = {}) {
-      return Promise.resolve([testCmp]);
+      return Promise.resolve([testCmpGroup]);
     },
 
     create(data) {
-      return Promise.resolve(testCmp);
+      return Promise.resolve(testCmpGroup);
     },
 
     update(id, data) {
-      return Promise.resolve(testCmp);
+      return Promise.resolve(testCmpGroup);
     },
 
     partialUpdate(id, data) {
-      return Promise.resolve(testCmp);
+      return Promise.resolve(testCmpGroup);
     },
 
     remove(id) {
@@ -60,10 +60,10 @@ describe('routes/component', function() {
 
   before(async function() {
     app = await server.start({
-      PORT: 6666,
+      PORT: 6667,
       NODE_ENV: process.env.NODE_ENV
     }, {
-      repos: { component: testRepo, componentGroup: { name: 'component_groups'} }
+      repos: { component: { name: 'components'}, componentGroup: testRepo }
     })
   });
 
@@ -77,7 +77,7 @@ describe('routes/component', function() {
     it ('should error if invalid repo passed', function(done) {
 
       try {
-        componentRoute({ name: 'bogus' });
+        componentGroupRoute({ name: 'bogus' });
       }
       catch (e) {
         assert.strictEqual(e.message, 'Invalid repo passed to this router. Passed repo name: bogus');
@@ -88,16 +88,16 @@ describe('routes/component', function() {
 
   });
   
-  describe('GET /components', function() {
+  describe('GET /component_groups', function() {
 
-    it ('should return components and 200 response, when no filters passed', function(done) {
+    it ('should return component groups and 200 response, when no filters passed', function(done) {
 
       const listSpy = sinon.spy(testRepo, 'list');
 
       request(app)
-        .get('/api/components')
+        .get('/api/component_groups')
         .expect('Content-Type', /json/)
-        .expect(200, [testCmp])
+        .expect(200, [testCmpGroup])
         .then(res => {
             
           sinon.assert.calledWith(listSpy, {});
@@ -109,14 +109,14 @@ describe('routes/component', function() {
 
     });
 
-    it ('should return components and 200 response, when multiple filters passed', function(done) {
+    it ('should return component groups and 200 response, when multiple filters passed', function(done) {
 
       const listSpy = sinon.spy(testRepo, 'list');
 
       request(app)
-        .get('/api/components?active=false&status=good')
+        .get('/api/component_groups?active=false&status=good')
         .expect('Content-Type', /json/)
-        .expect(200, [testCmp])
+        .expect(200, [testCmpGroup])
         .then(res => {
 
           sinon.assert.calledWith(listSpy, {active: false, status: 'good'});
@@ -136,7 +136,7 @@ describe('routes/component', function() {
       });
 
       request(app)
-        .get('/api/components')
+        .get('/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(500, { message: httpStatus[500] })
         .then(res => {
@@ -150,21 +150,21 @@ describe('routes/component', function() {
   });
 
 
-  describe('POST /components', function() {
+  describe('POST /component_groups', function() {
 
-    it ('should create and return component object', function(done) {
+    it ('should create and return component group object', function(done) {
 
       const createSpy = sinon.spy(testRepo, 'create');
 
-      const component = {
+      const componentgroup = {
         name: '  widget  ' // will be sanitized (trimmed)
       };
 
       request(app)
-        .post('/api/components')
-        .send({ component })
+        .post('/api/component_groups')
+        .send({ componentgroup })
         .expect('Content-Type', /json/)
-        .expect(200, testCmp)
+        .expect(200, testCmpGroup)
         .then(res => {
           
           const expected = { name: 'widget' };
@@ -186,14 +186,14 @@ describe('routes/component', function() {
         return Promise.reject(e);
       });
 
-      const component = {
+      const componentgroup = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
-        .post('/api/components')
-        .send({ component })
+        .post('/api/component_groups')
+        .send({ componentgroup })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
         .then(res => {
@@ -211,9 +211,9 @@ describe('routes/component', function() {
       const createSpy = sinon.spy(testRepo, 'create');
 
       request(app)
-        .post('/api/components')
+        .post('/api/component_groups')
         .expect('Content-Type', /json/)
-        .expect(422, {message: 'No component data sent in this request.'})
+        .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
           sinon.assert.notCalled(createSpy);
           createSpy.restore();
@@ -224,19 +224,19 @@ describe('routes/component', function() {
 
   });
 
-  describe('GET /component/:id', function() {
+  describe('GET /component_groups/:id', function() {
 
-    it ('should return the component', function(done) {
+    it ('should return the component group', function(done) {
 
       const loadSpy = sinon.spy(testRepo, 'load');
 
       request(app)
-        .get(`/api/components/${testCmp.id}`)
+        .get(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
-        .expect(200, testCmp)
+        .expect(200, testCmpGroup)
         .then(res => {
             
-          sinon.assert.calledWith(loadSpy, testCmp.id);
+          sinon.assert.calledWith(loadSpy, testCmpGroup.id);
           sinon.assert.calledOnce(loadSpy);
           
           loadSpy.restore();
@@ -245,7 +245,7 @@ describe('routes/component', function() {
 
     });
 
-    it ('should return 422 b/c of invalid component id', function(done) {
+    it ('should return 422 b/c of invalid component group id', function(done) {
 
       // force an error
       const loadStub = sinon.stub(testRepo, 'load').callsFake(id => {
@@ -253,12 +253,12 @@ describe('routes/component', function() {
       });
 
       request(app)
-        .get(`/api/components/${testCmp.id}`)
+        .get(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
             
-          sinon.assert.calledWith(loadStub, testCmp.id);
+          sinon.assert.calledWith(loadStub, testCmpGroup.id);
           sinon.assert.calledOnce(loadStub);
           
           loadStub.restore();
@@ -270,22 +270,22 @@ describe('routes/component', function() {
   });
 
 
-  describe('PUT /component/:id', function() {
+  describe('PUT /component_groups/:id', function() {
 
-    it ('should update a component and return a 200', function(done) {
+    it ('should update a component group and return a 200', function(done) {
 
       const updateSpy = sinon.spy(testRepo, 'update');
 
-      const component = {
+      const componentgroup = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
-        .put(`/api/components/${testCmp.id}  `)
-        .send({ component })
+        .put(`/api/component_groups/${testCmpGroup.id}  `)
+        .send({ componentgroup })
         .expect('Content-Type', /json/)
-        .expect(200, testCmp)
+        .expect(200, testCmpGroup)
         .then(res => {
             
            const expected = {
@@ -293,7 +293,7 @@ describe('routes/component', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
+          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -302,20 +302,20 @@ describe('routes/component', function() {
 
     });
 
-    it ('should return 422 b/c of invalid component id', function(done) {
+    it ('should return 422 b/c of invalid component group id', function(done) {
 
       const updateSpy = sinon.stub(testRepo, 'update').callsFake((id, data) => {
         throw new IdNotFoundError('Id not found');
       });
 
-      const component = {
+      const componentgroup = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
-        .put(`/api/components/${testCmp.id}  `)
-        .send({ component })
+        .put(`/api/component_groups/${testCmpGroup.id}  `)
+        .send({ componentgroup })
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -325,7 +325,7 @@ describe('routes/component', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
+          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -334,14 +334,14 @@ describe('routes/component', function() {
 
     });
 
-    it ('should fail b/c of no component posted', function(done) {
+    it ('should fail b/c of no component group posted', function(done) {
 
       const updateSpy = sinon.spy(testRepo, 'update');
 
       request(app)
-        .put(`/api/components/${testCmp.id}`)
+        .put(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
-        .expect(422, {message: 'No component data sent in this request.'})
+        .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
           sinon.assert.notCalled(updateSpy);
           updateSpy.restore();
@@ -352,19 +352,19 @@ describe('routes/component', function() {
 
   });
 
-  describe('DELETE /component/:id', function() {
+  describe('DELETE /component_groups/:id', function() {
 
-    it ('should delete a component', function(done) {
+    it ('should delete a component group', function(done) {
 
       const removeSpy = sinon.spy(testRepo, 'remove');
 
       request(app)
-        .delete(`/api/components/${testCmp.id}`)
+        .delete(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
-        .expect(200, {message: 'Component deleted'})
+        .expect(200, {message: 'Component Group deleted'})
         .then(res => {
             
-          sinon.assert.calledWith(removeSpy, testCmp.id);
+          sinon.assert.calledWith(removeSpy, testCmpGroup.id);
           sinon.assert.calledOnce(removeSpy);
           
           removeSpy.restore();
@@ -373,19 +373,19 @@ describe('routes/component', function() {
 
     });
 
-    it ('should return 422 b/c of invalid component id', function(done) {
+    it ('should return 422 b/c of invalid component group id', function(done) {
 
       const removeStub = sinon.stub(testRepo, 'remove').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
       request(app)
-        .delete(`/api/components/${testCmp.id}`)
+        .delete(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
             
-          sinon.assert.calledWith(removeStub, testCmp.id);
+          sinon.assert.calledWith(removeStub, testCmpGroup.id);
           sinon.assert.calledOnce(removeStub);
           
           removeStub.restore();
@@ -396,22 +396,22 @@ describe('routes/component', function() {
 
   });
 
-  describe('PATCH /component/:id', function() {
+  describe('PATCH /component_groups/:id', function() {
 
     it ('should partial update a component', function(done) {
 
       const updateSpy = sinon.spy(testRepo, 'partialUpdate');
 
-      const component = {
+      const componentgroup = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
-        .patch(`/api/components/${testCmp.id}  `)
-        .send({ component })
+        .patch(`/api/component_groups/${testCmpGroup.id}  `)
+        .send({ componentgroup })
         .expect('Content-Type', /json/)
-        .expect(200, testCmp)
+        .expect(200, testCmpGroup)
         .then(res => {
             
            const expected = {
@@ -419,7 +419,7 @@ describe('routes/component', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
+          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -428,14 +428,14 @@ describe('routes/component', function() {
 
     });
 
-    it ('should fail b/c of no component posted', function(done) {
+    it ('should fail b/c of no component group posted', function(done) {
 
       const updateSpy = sinon.spy(testRepo, 'partialUpdate');
 
       request(app)
-        .patch(`/api/components/${testCmp.id}`)
+        .patch(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
-        .expect(422, {message: 'No component data sent in this request.'})
+        .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
           sinon.assert.notCalled(updateSpy);
           updateSpy.restore();
@@ -451,7 +451,7 @@ describe('routes/component', function() {
     it ('should return 404 on invalid url', function(done) {
 
       request(app)
-        .get('/api/components/test/test')
+        .get('/api/component_groups/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 

@@ -33,7 +33,7 @@ export default (repos = {}) => {
   router.use('/components', componentRoutes(repos.component));
 
   // mount component-group routes
-  router.use('/component-groups', componentGroupRoutes(repos.componentGroup));
+  router.use('/component_groups', componentGroupRoutes(repos.componentGroup));
 
   // generic error handler. if there is any special case/override, it should be
   // handled by the route.
