@@ -150,12 +150,11 @@ const init = (dao, groupRepo) => {
 
   /**
    * Partial updates a component.
-   * @param {string} componentId
-   * @param {object} newData - New Data for the component. This should be the
-   *  entire the component data set.
+   * @param {string} id - component id
+   * @param {object} data - whatever fields that needs to be updated.
    * @return {promise} 
-   *  on success: component object
-   *  on failure: Error
+   *  if fulfilled: component object
+   *  if rejected: Error
    */
   repo.partialUpdate = async (id, data) => {
 

@@ -81,303 +81,334 @@ describe('repo/component', function() {
 
   });
 
-  it ('find with one filter', async function() {
+  describe('list()', function() {
 
-    const findSpy = sinon.spy(testDao, 'find');
+    it ('should return components with one filter', async function() {
 
-    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+      const findSpy = sinon.spy(testDao, 'find');
 
-    // one filter
-    let pred = { active: true };
-    const components = await repo.list(pred);
+      const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
-    sinon.assert.calledOnce(findSpy);
-    sinon.assert.calledWith(findSpy, pred, sortBy);
-    assert.deepEqual(components, [existingCmpWithoutId]);
+      // one filter
+      let pred = { active: true };
+      const components = await repo.list(pred);
 
-    findSpy.restore();
-
-  });
-
-  it ('find with multiple filters', async function() {
-
-    const findSpy = sinon.spy(testDao, 'find');
-
-    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
-
-    // one filter
-    let pred = { active: true, group_id: 'test' };
-    const components = await repo.list(pred);
-
-    sinon.assert.calledOnce(findSpy);
-    sinon.assert.calledWith(findSpy, pred, sortBy);
-    assert.deepEqual(components, [existingCmpWithoutId]);
-
-    findSpy.restore();
-
-  });
-
-  it ('find with extra filters but no error', async function() {
-
-    const findSpy = sinon.spy(testDao, 'find');
-
-    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
-
-    // one filter
-    let pred = { active: true, filter: 'test' };
-    const components = await repo.list(pred);
-
-    sinon.assert.calledOnce(findSpy);
-    sinon.assert.calledWith(findSpy, {active: true}, sortBy);
-    assert.deepEqual(components, [existingCmpWithoutId]);
-
-    findSpy.restore();
-
-  });
-
-  it ('find with no return values', async function() {
-
-    const findSpy = sinon.spy(testDao, 'find');
-
-    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
-
-    // one filter
-    let pred = { active: false, group_id: 'group', status: 'operational'};
-    const components = await repo.list(pred);
-
-    sinon.assert.calledOnce(findSpy);
-    sinon.assert.calledWith(findSpy, pred, sortBy);
-    assert.deepEqual(components, []);
-
-    findSpy.restore();
-
-  });
-
-  it ('find with db error', function(done) {
-
-    const findStub = sinon.stub(testDao, 'find').callsFake((pred, sortBy) => {
-      throw new Error('db error');
-    });
-
-    const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
-    const pred = { active: false, group_id: 'group', status: 'operational'};
-    
-    repo.list(pred).catch(e => {
-
-      assert.strictEqual(e.message, 'db error');
-      sinon.assert.calledOnce(findStub);
-      sinon.assert.calledWith(findStub, pred, sortBy);
-
-      findStub.restore();
-      done();
-    });
-
-  });
-
-
-  it ('load', async function() {
-
-    const findSpy = sinon.spy(testDao, 'find');
-
-    const component = await repo.load(testCmpId);
-
-    // its calling dao find
-    // its calling with the right pred
-    // returning the stuff from dao.
-    sinon.assert.calledOnce(findSpy);
-    sinon.assert.calledWith(findSpy, { id: testCmpId });
-    assert.deepEqual(component, existingCmpWithoutId);
-
-    findSpy.restore();
-
-  });
-
-  it ('load error when no component is found', function(done) {
-
-    const findSpy = sinon.spy(testDao, 'find');
-
-    repo.load('1').catch(e => {
-    
-      // its calling dao find
-      // returning the error  
       sinon.assert.calledOnce(findSpy);
-      assert.strictEqual(e.name, 'IdNotFoundError');
+      sinon.assert.calledWith(findSpy, pred, sortBy);
+      assert.deepEqual(components, [existingCmpWithoutId]);
 
       findSpy.restore();
 
-      done();
-
-    });    
-
-  });
-
-  it ('create, vaidate data', async function() {
-
-    const insertSpy = sinon.spy(testDao, 'insert');
-    const genIdStub = sinon.stub(componentEntity, 'generateId').callsFake(() => {
-      return testCmpId;
     });
 
-    const component = await repo.create(newCmp);
+    it ('should return components with multiple filters', async function() {
 
-    // call the dao insert 
-    sinon.assert.calledOnce(insertSpy);
+      const findSpy = sinon.spy(testDao, 'find');
 
-    // dao called with right params
-    const insertArg = insertSpy.args[0][0];
-    const insertExpected = Object.assign({id: testCmpId, created_at: insertArg.created_at, updated_at: insertArg.updated_at}, newCmp)
-    assert.deepEqual(insertExpected, insertArg);
+      const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
-    // check id generation
-    sinon.assert.calledOnce(genIdStub);
+      // one filter
+      let pred = { active: true, group_id: 'test' };
+      const components = await repo.list(pred);
 
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, pred, sortBy);
+      assert.deepEqual(components, [existingCmpWithoutId]);
 
-    // returning the res from dao insert
-    assert.deepEqual(component, existingCmpWithoutId);
+      findSpy.restore();
 
-    insertSpy.restore();
-    genIdStub.restore();
-
-  });
-
-  it ('create with group_id', async function() {
-
-    const groupExistsSpy = sinon.spy(testGroupRepo, 'doesIdExists');
-    const insertSpy = sinon.spy(testDao, 'insert');
-
-    const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
-    const component = await repo.create(cmpWithId);
-
-    // group exists fn ..
-    sinon.assert.calledOnce(groupExistsSpy);
-    sinon.assert.calledWith(groupExistsSpy, 'test123');
-
-    
-    // insert fn, right group_id passed ..
-    const insertArg = insertSpy.args[0][0];
-    assert.strictEqual('test123', insertArg.group_id);
-    
-    groupExistsSpy.restore();
-    insertSpy.restore();
-
-  });
-
-  it ('create error b/c of validation', function(done) {
-
-    repo.create({}).catch(e => {
-      assert.strictEqual(e.name, 'ValidationError');
-      done();
     });
 
-  });
+    it ('should return components  with extra filters but no error', async function() {
 
-  it ('create error b/c of an non-existant group id', function(done) {
+      const findSpy = sinon.spy(testDao, 'find');
 
-    // return false
-    const groupExistsStub = sinon.stub(testGroupRepo, 'doesIdExists').callsFake((id) => {
-      return Promise.resolve(false);
+      const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+
+      // one filter
+      let pred = { active: true, filter: 'test' };
+      const components = await repo.list(pred);
+
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, {active: true}, sortBy);
+      assert.deepEqual(components, [existingCmpWithoutId]);
+
+      findSpy.restore();
+
     });
 
-    const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
-    repo.create(cmpWithId).catch(e => {
-      sinon.assert.calledOnce(groupExistsStub);  
-      assert.strictEqual(e.name, 'IdNotFoundError');
+    it ('should return no components with filters', async function() {
+
+      const findSpy = sinon.spy(testDao, 'find');
+
+      const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+
+      // one filter
+      let pred = { active: false, group_id: 'group', status: 'operational'};
+      const components = await repo.list(pred);
+
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, pred, sortBy);
+      assert.deepEqual(components, []);
+
+      findSpy.restore();
+
+    });
+
+    it ('should return an error on find()', function(done) {
+
+      const findStub = sinon.stub(testDao, 'find').callsFake((pred, sortBy) => {
+        throw new Error('db error');
+      });
+
+      const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+      const pred = { active: false, group_id: 'group', status: 'operational'};
       
-      groupExistsStub.restore();
-      done();
+      repo.list(pred).catch(e => {
+
+        assert.strictEqual(e.message, 'db error');
+        sinon.assert.calledOnce(findStub);
+        sinon.assert.calledWith(findStub, pred, sortBy);
+
+        findStub.restore();
+        done();
+      });
+
     });
 
   });
 
-  it ('update', async function() {
+  describe('load()', function() {
 
-    const updateSpy = sinon.spy(testDao, 'update');
+    it ('should load a component given a valid id', async function() {
 
-    const updated = {
-      name: 'updated name',
-      sort_order: 1,
-      status: 'operational',
-      description: 'desc'
-    };
+      const findSpy = sinon.spy(testDao, 'find');
 
-    await repo.update(testCmpId, updated);
+      const component = await repo.load(testCmpId);
 
-    // dao called using the new data
-    const updateArg = updateSpy.args[0][0];
-    const updateExpected = Object.assign({}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
-    assert.deepEqual(updateExpected, updateArg);
+      // its calling dao find
+      // its calling with the right pred
+      // returning the stuff from dao.
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, { id: testCmpId });
+      assert.deepEqual(component, existingCmpWithoutId);
 
-    // calling update dao
-    sinon.assert.calledOnce(updateSpy);
+      findSpy.restore();
 
-    updateSpy.restore();
+    });
 
-  });
+    it ('should error when no component is found', function(done) {
 
-  it ('update error b/c of validation', function(done) {
+      const findSpy = sinon.spy(testDao, 'find');
 
-    repo.update('123', {}).catch(e => {
-      assert.strictEqual(e.name, 'ValidationError');
-      done();
+      repo.load('1').catch(e => {
+      
+        // its calling dao find
+        // returning the error  
+        sinon.assert.calledOnce(findSpy);
+        assert.strictEqual(e.name, 'IdNotFoundError');
+
+        findSpy.restore();
+
+        done();
+
+      });    
+
     });
 
   });
 
-  it ('partial update', async function() {
+  describe('create()', function() {
 
-    const repoUpdateStub = sinon.stub(repo, 'update');
+    it ('should validate and create a component', async function() {
 
-    const updated = {
-      name: 'partial updated name'
-    };
+      const insertSpy = sinon.spy(testDao, 'insert');
+      const genIdStub = sinon.stub(componentEntity, 'generateId').callsFake(() => {
+        return testCmpId;
+      });
 
-    const res = await repo.partialUpdate(testCmpId, updated);
+      const component = await repo.create(newCmp);
 
-    // calling update on repo
-    sinon.assert.calledOnce(repoUpdateStub);
-    sinon.assert.calledWith(repoUpdateStub, testCmpId, {
-      name: 'partial updated name',
-      sort_order: 2,
-      status: 'partial_outage',
-      active: true
+      // call the dao insert 
+      sinon.assert.calledOnce(insertSpy);
+
+      // dao called with right params
+      const insertArg = insertSpy.args[0][0];
+      const insertExpected = Object.assign({id: testCmpId, created_at: insertArg.created_at, updated_at: insertArg.updated_at}, newCmp)
+      assert.deepEqual(insertExpected, insertArg);
+
+      // check id generation
+      sinon.assert.calledOnce(genIdStub);
+
+
+      // returning the res from dao insert
+      assert.deepEqual(component, existingCmpWithoutId);
+
+      insertSpy.restore();
+      genIdStub.restore();
+
     });
 
-    repoUpdateStub.restore();
+    it ('should create a component with group_id', async function() {
+
+      const groupExistsSpy = sinon.spy(testGroupRepo, 'doesIdExists');
+      const insertSpy = sinon.spy(testDao, 'insert');
+
+      const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+      const component = await repo.create(cmpWithId);
+
+      // group exists fn ..
+      sinon.assert.calledOnce(groupExistsSpy);
+      sinon.assert.calledWith(groupExistsSpy, 'test123');
+
+      
+      // insert fn, right group_id passed ..
+      const insertArg = insertSpy.args[0][0];
+      assert.strictEqual('test123', insertArg.group_id);
+      
+      groupExistsSpy.restore();
+      insertSpy.restore();
+
+    });
+
+    it ('should fail b/c of validation', function(done) {
+
+      repo.create({}).catch(e => {
+        assert.strictEqual(e.name, 'ValidationError');
+        done();
+      });
+
+    });
+
+    it ('should fail b/c of a non-existant group id', function(done) {
+
+      // return false
+      const groupExistsStub = sinon.stub(testGroupRepo, 'doesIdExists').callsFake((id) => {
+        return Promise.resolve(false);
+      });
+
+      const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+      repo.create(cmpWithId).catch(e => {
+        sinon.assert.calledOnce(groupExistsStub);  
+        assert.strictEqual(e.name, 'IdNotFoundError');
+        
+        groupExistsStub.restore();
+        done();
+      });
+
+    });
 
   });
 
+  describe('update', function() {
 
-  it ('remove', async function() {
+    it ('should update a component with new data', async function() {
 
-    const removeSpy = sinon.spy(testDao, 'remove');
+      const updateSpy = sinon.spy(testDao, 'update');
 
-    await repo.remove(testCmpId);
+      const updated = {
+        name: 'updated name',
+        sort_order: 1,
+        status: 'operational',
+        description: 'desc'
+      };
 
-    // its calling dao remove
-    // its calling with the right pred
-    sinon.assert.calledOnce(removeSpy);
-    sinon.assert.calledWith(removeSpy, { id: testCmpId });
+      await repo.update(testCmpId, updated);
 
-    removeSpy.restore();
+      // dao called using the new data
+      const updateArg = updateSpy.args[0][0];
+      const updateExpected = Object.assign({}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
+      assert.deepEqual(updateExpected, updateArg);
+
+      // calling update dao
+      sinon.assert.calledOnce(updateSpy);
+
+      updateSpy.restore();
+
+    });
+
+    it ('should fail b/c of validation', function(done) {
+
+      repo.update(testCmpId, {}).catch(e => {
+        assert.strictEqual(e.name, 'ValidationError');
+        done();
+      });
+
+    });
+
+    it ('should fail b/c of invalid id', function(done) {
+
+      repo.update('1234', {}).catch(e => {
+        assert.strictEqual(e.name, 'IdNotFoundError');
+        done();
+      });
+
+    });
 
   });
 
-  it ('remove error when no component is found', function(done) {
+  describe('partialUpdate()', function() {
 
-    const removeSpy = sinon.spy(testDao, 'remove');
+    it ('should partially update a component', async function() {
 
-    repo.remove('1').catch(e => {
-    
+      const repoUpdateStub = sinon.stub(repo, 'update');
+
+      const updated = {
+        name: 'partial updated name'
+      };
+
+      const res = await repo.partialUpdate(testCmpId, updated);
+
+      // calling update on repo
+      sinon.assert.calledOnce(repoUpdateStub);
+      sinon.assert.calledWith(repoUpdateStub, testCmpId, {
+        name: 'partial updated name',
+        sort_order: 2,
+        status: 'partial_outage',
+        active: true
+      });
+
+      repoUpdateStub.restore();
+
+    });
+
+  });
+
+  describe('remove()', function() {
+
+    it ('should remove a component', async function() {
+
+      const removeSpy = sinon.spy(testDao, 'remove');
+
+      await repo.remove(testCmpId);
+
       // its calling dao remove
-      // returning the error  
+      // its calling with the right pred
       sinon.assert.calledOnce(removeSpy);
-      assert.strictEqual(e.name, 'IdNotFoundError');
+      sinon.assert.calledWith(removeSpy, { id: testCmpId });
 
       removeSpy.restore();
 
-      done();
+    });
 
-    });    
+    it ('should fail b/c of invalid id', function(done) {
+
+      const removeSpy = sinon.spy(testDao, 'remove');
+
+      repo.remove('1').catch(e => {
+      
+        // its calling dao remove
+        // returning the error  
+        sinon.assert.calledOnce(removeSpy);
+        assert.strictEqual(e.name, 'IdNotFoundError');
+
+        removeSpy.restore();
+
+        done();
+
+      });    
+
+    });
 
   });
 

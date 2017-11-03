@@ -104,7 +104,7 @@ describe('lib/db/mongo', function() {
       // setup two tables
       sinon.assert.calledTwice(createSpy);
       sinon.assert.calledWith(createSpy, 'components');
-      sinon.assert.calledWith(createSpy, 'componentgroups');
+      sinon.assert.calledWith(createSpy, 'component_groups');
 
       // setup indexes
       sinon.assert.calledTwice(idxSpy);
