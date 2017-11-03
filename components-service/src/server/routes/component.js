@@ -4,10 +4,12 @@
 
 import express from 'express';
 import boolean from 'boolean';
+import httpStatus from 'http-status';
 
 import {params as sanitizeParams} from '../middleware/sanitize';
 
 /**
+ * Export the routes
  * @param {object} repo - component repo
  * @return {object} router
  */
@@ -18,7 +20,7 @@ export default (repo) => {
   }
 
 
-  // 
+  // express router
   const router = express.Router();
 
   // build routes
@@ -41,9 +43,18 @@ export default (repo) => {
 
     // POST - Creates a new component
     .post((req, res, next) => {
-      repo.create(req.sanitizedBody.component).then(component => {
-        res.json(component);
-      }).catch(next);
+
+      const data = req.sanitizedBody.component;
+
+      if (!data || typeof data !== 'object') {
+        res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
+      }
+      else {
+        repo.create(data).then(component => {
+          res.json(component);
+        }).catch(next);
+      }
+
     });
 
   router.route('/:componentId')
@@ -62,11 +73,17 @@ export default (repo) => {
     .put((req, res, next) => {
 
       const cmpId = req.sanitizedParams.componentId;
-      const data = req.sanitizedBody.component || {};
+      const data = req.sanitizedBody.component;
 
-      repo.update(cmpId, data).then(component => {
-        res.json(component);
-      }).catch(next);
+      // not a valid component object sent
+      if (!data || typeof data !== 'object') {
+        res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
+      }
+      else {
+        repo.update(cmpId, data).then(component => {
+          res.json(component);
+        }).catch(next);
+      }
 
     })
 
@@ -74,11 +91,17 @@ export default (repo) => {
     .patch((req, res, next) => {
 
       const cmpId = req.sanitizedParams.componentId;
-      const data = req.sanitizedBody.component || {};
+      const data = req.sanitizedBody.component;
 
-      repo.partialUpdate(cmpId, data).then(component => {
-        res.json(component);
-      }).catch(next);
+      // not a valid component object sent
+      if (!data || typeof data !== 'object') {
+        res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
+      }
+      else {
+        repo.partialUpdate(cmpId, data).then(component => {
+          res.json(component);
+        }).catch(next);
+      }
 
     })
 
