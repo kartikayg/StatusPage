@@ -16,9 +16,14 @@ import logRequest from './middleware/log-request';
 
 /**
  * Starts the express server
- * @param {object} conf
+ * @param {object} conf - configuration for the server
+ *  PORT
+ *  NODE_ENV
+ *  other properties for log request
+ * @param {object} options
+ *  repos
  */
-const start = (conf = {}, options = {}) => {
+const start = (conf, options) => {
 
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
 

@@ -446,5 +446,18 @@ describe('routes/component', function() {
 
   });
 
+  describe('invalid url', function() {
+
+    it ('should return 404 on invalid url', function(done) {
+
+      request(app)
+        .get('/api/components/test/test')
+        .expect('Content-Type', /json/)
+        .expect(404, done);
+
+    });
+
+  });
+
 });
 
