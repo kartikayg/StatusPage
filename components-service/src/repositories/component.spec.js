@@ -55,6 +55,10 @@ describe('repo/component', function() {
   };
 
   const testGroupRepo = {
+    
+    doesIdExists(id) {
+      return Promise.resolve(true);
+    }
 
   };
 
@@ -64,6 +68,18 @@ describe('repo/component', function() {
   /**
    * TEST CASES
    */
+
+  it ('should throw error if invalid dao passed', function(done) {
+
+    try {
+      component.init({name: 'bogus'}, {});
+    }
+    catch (e) {
+      assert.strictEqual(e.message, 'Invalid DAO passed to this repo. Passed dao name: bogus');
+      done();
+    }
+
+  });
 
   it ('find with one filter', async function() {
 
@@ -195,7 +211,7 @@ describe('repo/component', function() {
 
   });
 
-  it ('create', async function() {
+  it ('create, vaidate data', async function() {
 
     const insertSpy = sinon.spy(testDao, 'insert');
     const genIdStub = sinon.stub(componentEntity, 'generateId').callsFake(() => {
@@ -224,10 +240,50 @@ describe('repo/component', function() {
 
   });
 
+  it ('create with group_id', async function() {
+
+    const groupExistsSpy = sinon.spy(testGroupRepo, 'doesIdExists');
+    const insertSpy = sinon.spy(testDao, 'insert');
+
+    const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+    const component = await repo.create(cmpWithId);
+
+    // group exists fn ..
+    sinon.assert.calledOnce(groupExistsSpy);
+    sinon.assert.calledWith(groupExistsSpy, 'test123');
+
+    
+    // insert fn, right group_id passed ..
+    const insertArg = insertSpy.args[0][0];
+    assert.strictEqual('test123', insertArg.group_id);
+    
+    groupExistsSpy.restore();
+    insertSpy.restore();
+
+  });
+
   it ('create error b/c of validation', function(done) {
 
     repo.create({}).catch(e => {
       assert.strictEqual(e.name, 'ValidationError');
+      done();
+    });
+
+  });
+
+  it ('create error b/c of an non-existant group id', function(done) {
+
+    // return false
+    const groupExistsStub = sinon.stub(testGroupRepo, 'doesIdExists').callsFake((id) => {
+      return Promise.resolve(false);
+    });
+
+    const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+    repo.create(cmpWithId).catch(e => {
+      sinon.assert.calledOnce(groupExistsStub);  
+      assert.strictEqual(e.name, 'IdNotFoundError');
+      
+      groupExistsStub.restore();
       done();
     });
 
@@ -266,6 +322,30 @@ describe('repo/component', function() {
     });
 
   });
+
+  it ('partial update', async function() {
+
+    const repoUpdateStub = sinon.stub(repo, 'update');
+
+    const updated = {
+      name: 'partial updated name'
+    };
+
+    const res = await repo.partialUpdate(testCmpId, updated);
+
+    // calling update on repo
+    sinon.assert.calledOnce(repoUpdateStub);
+    sinon.assert.calledWith(repoUpdateStub, testCmpId, {
+      name: 'partial updated name',
+      sort_order: 2,
+      status: 'partial_outage',
+      active: true
+    });
+
+    repoUpdateStub.restore();
+
+  });
+
 
   it ('remove', async function() {
 

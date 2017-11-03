@@ -8,6 +8,7 @@ import {component as componentEntity} from '../entities/index';
 import {IdNotFoundError} from './errors';
 
 /**
+ * Initializes the repo
  * @param {object} dao - database access object 
  *  for components collection
  * @param {repo} groupRepo - component group repo
@@ -18,6 +19,10 @@ const init = (dao, groupRepo) => {
   if (dao.name !== 'components') {
     throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
   }
+
+  const repo = {
+    name: dao.name
+  };
 
   /**
    * Validates a component data before saving it.
@@ -44,7 +49,9 @@ const init = (dao, groupRepo) => {
   };
 
   /**
-   *
+   * Formats a component.
+   * @param {object} component
+   * @return {object}
    */
   const format = (component) => {
     const cmp = Object.assign({}, component);
@@ -59,7 +66,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {object} component data
    *  if rejected, {Error} error
    */
-  const load = async (id) => {
+  repo.load = async (id) => {
 
     const data = await dao.find({ id });
 
@@ -79,7 +86,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {array} array of components
    *  if rejected, {Error} error
    */
-  const list = async (filter = {}) => {
+  repo.list = async (filter) => {
 
     // sort by group and then the sort order and then id. in
     // case sort_order is same, it will order by creation (_id)
@@ -100,7 +107,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
-  const create = async (data) => {
+  repo.create = async (data) => {
 
     // validate, save and return the formatted data
     const component = await validateData(data);
@@ -124,10 +131,10 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
-  const update = async (id, newData = {}) => {
+  repo.update = async (id, newData) => {
 
     // load the component
-    const currentCmp = await load(id);
+    const currentCmp = await repo.load(id);
 
     // validate new data
     const v = await validateData(newData);
@@ -150,10 +157,10 @@ const init = (dao, groupRepo) => {
    *  on success: component object
    *  on failure: Error
    */
-  const partialUpdate = async (id, data) => {
+  repo.partialUpdate = async (id, data) => {
 
     // load the component
-    const currentCmp = await load(id);
+    const currentCmp = await repo.load(id);
 
     // merge the new data with existing
     const newComponent = Object.assign({}, currentCmp, data);
@@ -164,7 +171,7 @@ const init = (dao, groupRepo) => {
     delete newComponent._id;
 
     // update the component
-    const res = await update(id, newComponent);
+    const res = await repo.update(id, newComponent);
     return res;
 
   };
@@ -176,7 +183,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, void
    *  if rejected, {Error} error
    */
-  const remove = async (id) => {
+  repo.remove = async (id) => {
 
     // remove the component
     const cnt = await dao.remove({ id });
@@ -187,15 +194,7 @@ const init = (dao, groupRepo) => {
 
   };
 
-  return Object.create({
-    name: dao.name,
-    load,
-    list,
-    create,
-    update,
-    partialUpdate,
-    remove
-  });
+  return repo;
 
 };
 
