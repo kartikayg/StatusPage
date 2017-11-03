@@ -17,7 +17,7 @@ import winston from 'winston';
  *  may not be logged.
  * @return {function} express middleware
  */
-export default (conf = {}, immediate = false) => {
+export default (conf, immediate = false) => {
 
   const level = 'info';
 

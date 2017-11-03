@@ -42,7 +42,7 @@ export const connect = (conf) => {
 
 /**
  * Setup tables schema and constraints in the Db
- * @param {object} MongoDb connection
+ * @param {object} db - MongoDb connection
  */
 export const initialSetup = async (db) => {
 
@@ -59,9 +59,10 @@ export const initialSetup = async (db) => {
 
 /**
  * Returns a DAO for a collection in the mongo db
- * @param {object} Mongo db connection
- * @param {string} collectionName collection name in mongo
- * @return {object}
+ * @param {object} db Mongo db connection
+ * @param {string} collectionName - collection name in mongo
+ * @return {object} DAO functions 
+ *  find(), count(), insert(), update(), remove()
  */
 export const getDao = (db, collectionName) => {
 

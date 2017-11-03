@@ -15,12 +15,11 @@ export const logLevels = ['error', 'warn', 'info', 'debug'];
 
 /**
  * Logs a message using winston library
- *
  * @param {string} level
  * @param {string} message preferably a string. Otherwise:
  *    object - json.stringify()
  *    Error  - Error.message
- * @param {object} meta any information to add to the log
+ * @param {object} meta - any information to add to the log
  */
 export const log = (level, message, meta) => {
 
@@ -98,7 +97,7 @@ export const initWriters = (conf, options) => {
 
 
 /**
- * Add console writer for this logger.
+ * Add console writer to the logger.
  * @param {object} logger - logger to add the writer to
  * @param {string} level - level for the writer
  */
@@ -134,7 +133,7 @@ function addConsoleWriter(logger, level) {
 }
 
 /**
- * Add db writer for this logger
+ * Add db writer to the logger
  * @param {object} logger - logger to add writer to
  * @param {string} level - level for the writer
  * @param {object} db - mongo db connection
@@ -158,7 +157,7 @@ function addDbWriter(logger, level, db) {
 }
 
 /**
- * Add File writer for this logger
+ * Add File writer to the logger
  * @param {object} logger - logger to add writer to
  * @param {string} level - level for the writer
  * @param {object} conf - config for the writer

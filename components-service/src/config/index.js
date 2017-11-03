@@ -12,7 +12,7 @@ const components = {server, logger, db};
 /**
  * Loads config for all the components defined in this folder. Each component
  * should have a schema variable to validate and load the config.
- * @param {object} envVars environment variables to load the config from
+ * @param {object} envVars - environment variables to load the config from
  * @return {object} config object
  */
 const load = (envVars = {}) => {
