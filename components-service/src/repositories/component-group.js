@@ -3,30 +3,33 @@
  */
 
 /**
- *
+ * 
  */
 const init = (dao) => {
 
-  if (dao.name !== 'componentgroups') {
+  if (dao.name !== 'component_groups') {
     throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
   }
 
+  const repo = {
+    name: dao.name
+  };
+
   /**
-   * Make sure the component id exists in the backend
+   * Checks whether the group id exists or not
    * @param {string} id
    * @return {Promise} 
    *  if fulfilled, true or false
    *  if rejected, Error
    */
-  const doesIdExists = async (id) => {
+  repo.doesIdExists = async (id) => {
     const cnt = await dao.count({ id });
     return cnt === 1;
   };
 
-  return Object.create({
-    name: dao.name,
-    doesIdExists
-  });
+
+
+  return repo;
 
 };
 

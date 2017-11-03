@@ -52,8 +52,8 @@ export const initialSetup = async (db) => {
 
 
   // component groups collection
-  await db.createCollection('componentgroups');
-  db.collection('componentgroups').createIndex({ id: 1 }, { unique: true });
+  await db.createCollection('component_groups');
+  db.collection('component_groups').createIndex({ id: 1 }, { unique: true });
 
 };
 
