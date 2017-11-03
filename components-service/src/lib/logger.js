@@ -111,7 +111,7 @@ function addConsoleWriter(logger, level) {
 
       let output = `[${(new Date()).toISOString()}: ` +
                    `${winston.config.colorize(ops.level, ops.level.toUpperCase())}] - ` +
-                   `${ops.message ? ops.message : ''} `;
+                   `${ops.message} `;
 
       if (ops.meta && Object.keys(ops.meta).length) {
 

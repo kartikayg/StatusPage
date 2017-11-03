@@ -85,11 +85,19 @@ describe('lib/logger', function() {
 
       // options passed to the add(). we are not going to compare each property
       // but only what is passed .
-      const options = addStub.args[0][1];
+      let options = addStub.args[0][1];
 
       assert.strictEqual(options.level, 'debug');
       assert.strictEqual(options.dirname, 'dir');
       assert.strictEqual(options.filename, 'file');
+
+      addStub.reset();
+
+      // no prefix
+      logger.initWriters({ LOG_FILE_LEVEL: 'debug', LOG_FILE_DIRNAME: 'dir' });
+
+      options = addStub.args[0][1];
+      assert.strictEqual(options.filename, 'log');
 
     });
 
