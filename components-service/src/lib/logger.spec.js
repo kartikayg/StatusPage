@@ -132,7 +132,7 @@ describe('lib/logger', function() {
       logStub.restore();
     });
 
-    it('log()', function() {
+    it('should call winston log', function() {
 
       const message = 'test123';
 
@@ -142,7 +142,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('log error', function() {
+    it('should create a proper object when logging error', function() {
 
       const e = new Error('test123');
 
@@ -160,7 +160,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('debug()', function() {
+    it('should call winston debug', function() {
 
       const message = 'test123';
 
@@ -171,7 +171,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('info()', function() {
+    it('should call winston info', function() {
 
       const message = 'test123';
 
@@ -182,7 +182,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('warn() an object, should be stringify before logging', function() {
+    it('should call winston warn(), also should stringify the object before logging', function() {
 
       const message = { message: 'test123'};
 
@@ -193,7 +193,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('error()', function() {
+    it('should call winston error()', function() {
 
       const message = 'test123';
 
@@ -204,7 +204,7 @@ describe('lib/logger', function() {
 
     });
 
-    it('log to console', function() {
+    it('should log to console', function() {
 
       // we want the log to happen, so remove the stub
       logStub.restore();
