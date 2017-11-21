@@ -1,0 +1,4 @@
+dist
+node_modules
+src/**/*.spec.js
+test/**/*.js

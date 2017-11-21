@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  logger_test:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - 6001:6001
+    command: ["npm", "run", "test:coverage"]
+    depends_on:
+      - messaging-queue_test
+  messaging-queue_test:
+    hostname: testloggerservice
+    image: rabbitmq:3.6.6-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+      - RABBITMQ_USE_LONGNAME=true
+    ports:
+      - 6002:5672
