@@ -29,7 +29,6 @@
   ],
   "dependencies": {
     "amqp": "^0.2.6",
-    "dotenv": "^4.0.0",
     "dotenv-parse-variables": "^0.1.0",
     "is-json": "^2.0.1",
     "joi": "^13.0.1",
@@ -61,8 +60,10 @@
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "mockery": "^2.1.0",
+    "moment": "^2.19.2",
     "run-sequence": "^2.2.0",
-    "sinon": "^4.1.2"
+    "sinon": "^4.1.2",
+    "test-console": "^1.1.0"
   },
   "private": true,
   "babel": {

@@ -9,6 +9,8 @@ services:
     ports:
       - 6001:6001
     command: ["npm", "run", "test:coverage"]
+    env_file:
+      - test.env
     depends_on:
       - messaging-queue_test
   messaging-queue_test:

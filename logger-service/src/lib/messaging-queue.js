@@ -30,12 +30,21 @@ const connect = (endpoint, timeout) => {
     };
     const connection = amqp.createConnection({ url: endpoint }, connOptions);
 
+    // if the connection is not established within timeout limit, error out
+    const timeoutId = setTimeout(() => {
+      if (initialReady === false) {
+        logger.debug(`raabit mq server connection timed out: ${endpoint}.`);
+        reject(new Error(`Not able to establish a connection with the server: ${endpoint}.`));
+      }
+    }, timeout);
+
     // Wait for connection to become established. once done, return the
     // queue object
     connection.on('ready', () => {
       logger.debug(`raabit mq server connection ready: ${endpoint}.`);
       isReady = true;
       initialReady = true;
+      clearTimeout(timeoutId);
       resolve(connection);
     });
 
@@ -52,14 +61,6 @@ const connect = (endpoint, timeout) => {
     connection.on('error', (e) => {
       logger.error(e);
     });
-
-    // if the connection is not established within timeout limit, error out
-    setTimeout(() => {
-      if (initialReady === false) {
-        logger.debug(`raabit mq server connection timed out: ${endpoint}.`);
-        reject(new Error(`Not able to establish a connection with the server: ${endpoint}.`));
-      }
-    }, timeout);
 
   });
 
@@ -119,8 +120,17 @@ const queueWrapper = (connection) => {
 
   };
 
+  /**
+   * Disconnects the queue
+   */
+  const disconnect = () => {
+    connection.removeAllListeners('end');
+    connection.disconnect();
+  };
+
   return {
-    subscribe
+    subscribe,
+    disconnect
   };
 
 };

@@ -38,22 +38,18 @@ const createWinstonLogger = (writers, options) => {
         const lMeta = logData.meta;
 
         const { serviceName } = lMeta;
-        let output = `[${winston.config.colorize(logData.level, logData.level.toUpperCase())}:${serviceName}]` +
+        let output = `[${logData.level.toUpperCase()}:${serviceName}]` +
                    ` - ${logData.timestamp || (new Date()).toISOString()}` +
                    ` ${logData.message} `;
 
-        if (lMeta && Object.keys(lMeta).length) {
+        if (lMeta.isError === true) {
+          output += `\n${lMeta.stack}\n`;
+        }
 
-          if (lMeta.isError === true) {
-            output += `\n${lMeta.stack}\n`;
-          }
-
-          // log any more meta info if there is anything left
-          const newMeta = omit(['serviceName', 'stack', 'isError', 'timestamp'], lMeta);
-          if (Object.keys(newMeta).length) {
-            output += JSON.stringify(newMeta);
-          }
-
+        // log any more meta info if there is anything left
+        const newMeta = omit(['serviceName', 'stack', 'isError', 'timestamp'], lMeta);
+        if (Object.keys(newMeta).length) {
+          output += JSON.stringify(newMeta);
         }
 
         return output;

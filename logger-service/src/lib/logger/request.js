@@ -38,12 +38,9 @@ const createWinstonLogger = (writers, options) => {
       level: levelName,
       formatter: (logData) => {
 
-        const meta = logData.meta || {};
-        if (Object.keys(meta).length === 0) {
-          return '';
-        }
+        const { meta } = logData;
 
-        const output = `[${winston.config.colorize(levelName, levelName.toUpperCase())}:${meta.serviceName}]` +
+        const output = `[${levelName.toUpperCase()}:${meta.serviceName}]` +
                      ` - ${logData.timestamp || (new Date()).toISOString()} ` +
                      `${meta.method} ${meta.url} ${meta.ip} ${meta.status} ${meta.contentLength} ${meta.responseTime}`;
 
@@ -64,16 +61,11 @@ const createWinstonLogger = (writers, options) => {
       json: false,
       formatter: (logData) => {
 
-        const meta = logData.meta || {};
-        if (Object.keys(meta).length === 0) {
-          return '';
-        }
-
         const output = Object.assign(
           {},
           { timestamp: (new Date()).toISOString() },
-          pick(['serviceName', 'method', 'url', 'ip', 'status', 'contentLength', 'responseTime', 'timestamp'], meta),
-          { level: levelName.toUpperCase() }
+          pick(['serviceName', 'method', 'url', 'ip', 'status', 'contentLength', 'responseTime', 'timestamp'], logData.meta),
+          { level: levelName }
         );
 
         return JSON.stringify(output);

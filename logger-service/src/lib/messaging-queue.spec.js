@@ -23,7 +23,8 @@ describe ('lib/messaging-queue', function () {
           setTimeout(() => { this.emit('ready'); }, 300);
           break;
         case endEndpoint:
-          setTimeout(() => { this.emit('ready'); }, 300);
+          setTimeout(() => { this.emit('ready'); }, 200);
+          setTimeout(() => { this.emit('error', new Error('error')); }, 300);
           setTimeout(() => { this.emit('end'); }, 500);
           break;
         default:
@@ -118,20 +119,6 @@ describe ('lib/messaging-queue', function () {
 
       initQueue('invalid', 500).catch(e => {
         assert.strictEqual(e.message, 'Not able to establish a connection with the server: invalid.');
-        done();
-      });
-
-    });
-
-    it ('should timeout for invalid connection in the provided time', function (done) {
-
-      this.timeout(4000);
-
-      const startTime = (new Date()).getTime(); 
-
-      initQueue('invalid', 3000).catch(e => {
-        const seconds = Math.abs(((new Date()).getTime() - startTime) / 1000);
-        assert.isTrue(seconds > 3 && seconds < 3.1);
         done();
       });
 
