@@ -1,237 +1,239 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
-import winston from 'winston';
-import 'winston-mongodb';
 
-import * as logger from './logger';
+describe ('lib/logger', function () {
 
-describe('lib/logger', function() {
+  let allowedLevels;
+  let defaultLogger;
+  let initLogger;
 
-  describe ('init writers', function() {
+  // stub for the messaging queue
+  const messagingQueueStub = {
+    publish: sinon.spy()
+  };
+
+  before(function() {
+
+    // clear the cache to get a fresh object
+    delete require.cache[require.resolve('./logger')];
     
-    const clearStub = sinon.stub(winston, 'clear');
-    const addStub = sinon.stub(winston, 'add');
-
-    beforeEach(function() {
-      addStub.reset(); clearStub.reset();
-    });
-
-    after(function() {
-      addStub.restore(); clearStub.restore();
-    });
-
-
-    it ('should clear all writers initially', function() {
-      logger.initWriters({}, {});
-      sinon.assert.calledOnce(clearStub);
-    });
-
-    it ('should setup the console writer based on conf', function() {
-
-      logger.initWriters({ LOG_CONSOLE_LEVEL: 'info' });
-
-      sinon.assert.calledOnce(addStub);
-      sinon.assert.calledWith(addStub, winston.transports.Console);
-
-      // options passed to the add(). we are not going to compare each property
-      // but only what is passed .
-      const options = addStub.args[0][1];
-
-      assert.strictEqual(options.level, 'info');
-
-    });
-
-    it ('should setup the db writer based on conf', function() {
-
-      require('winston-mongodb');
-
-      const db = {};
-
-      logger.initWriters({ LOG_DB_LEVEL: 'error' }, { db });
-
-      sinon.assert.calledOnce(addStub);
-      sinon.assert.calledWith(addStub, winston.transports.MongoDB);
-
-      // options passed to the add(). we are not going to compare each property
-      // but only what is passed .
-      const options = addStub.args[0][1];
-
-      assert.strictEqual(options.level, 'error');
-      assert.strictEqual(options.db, db);
-
-    });
-
-    it ('should error out when no db is passed for db writer setup', function(done) {
-
-      try {
-        logger.initWriters({ LOG_DB_LEVEL: 'error' }, {});
-      }
-      catch (e) {
-        sinon.assert.notCalled(addStub);
-        assert.strictEqual(e.message, 'A Db object is required to setup this writer.');
-        done();
-      }
-
-    });
-
-    it ('should setup the file writer based on conf', function() {
-
-      require('winston-daily-rotate-file');
-
-      logger.initWriters({ LOG_FILE_LEVEL: 'debug', LOG_FILE_DIRNAME: 'dir', LOG_FILE_PREFIX: 'file' });
-
-      sinon.assert.calledOnce(addStub);
-      sinon.assert.calledWith(addStub, winston.transports.DailyRotateFile);
-
-      // options passed to the add(). we are not going to compare each property
-      // but only what is passed .
-      let options = addStub.args[0][1];
-
-      assert.strictEqual(options.level, 'debug');
-      assert.strictEqual(options.dirname, 'dir');
-      assert.strictEqual(options.filename, 'file');
-
-      addStub.reset();
-
-      // no prefix
-      logger.initWriters({ LOG_FILE_LEVEL: 'debug', LOG_FILE_DIRNAME: 'dir' });
-
-      options = addStub.args[0][1];
-      assert.strictEqual(options.filename, 'log');
-
-    });
-
-    it ('should error out when no file dir is passed for file writer setup', function(done) {
-
-      try {
-        logger.initWriters({ LOG_FILE_LEVEL: 'error' });
-      }
-      catch (e) {
-        sinon.assert.notCalled(addStub);
-        assert.strictEqual(e.message, 'A file directory is required to setup this writer.');
-        done();
-      }
-
-    });
-
-    it ('should setup multiple writers', function() {
-
-      require('winston-mongodb');
-
-      logger.initWriters({ LOG_CONSOLE_LEVEL: 'info', LOG_DB_LEVEL: 'error'  }, { db: {} });
-
-      sinon.assert.calledTwice(addStub);
-      sinon.assert.calledWith(addStub, winston.transports.Console);
-      sinon.assert.calledWith(addStub, winston.transports.MongoDB);
-
-    });
+    defaultLogger = require('./logger').default;
+    allowedLevels = require('./logger').allowedLevels;
+    initLogger    = require('./logger').init;
 
   });
 
-  describe('log methods', function() {
+  after(function() {
+    delete require.cache[require.resolve('./logger')];
+  });
 
-    let logStub = sinon.stub(winston, 'log');
+  beforeEach(function() {
+    // reset all spies ..
+    messagingQueueStub.publish.reset();
+  });
 
-    beforeEach(function() {
-      logStub.reset();
-    });
+  it ('should return a default logger', function () {
 
-    after(function() {
-      logStub.restore();
-    });
+    assert.isObject(defaultLogger);
 
-    it('should call winston log', function() {
+    assert.isFunction(defaultLogger.log);
+    assert.isFunction(defaultLogger.error);
+    assert.isFunction(defaultLogger.warn);
+    assert.isFunction(defaultLogger.info);
+    assert.isFunction(defaultLogger.debug);
 
-      const message = 'test123';
+  });
 
-      logger.log('warn', message);
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'warn', message, {});
+  it ('should return the allowed levels', function () {
+    assert.deepEqual(allowedLevels, ['error', 'warn', 'info', 'debug']);
+  });
 
-    });
 
-    it('should create a proper object when logging error', function() {
 
-      const e = new Error('test123');
+  it ('should create a new logger', function() {
 
-      const meta = {
-        stack: e.stack,
-        code: 500,
-        name: e.name,
-        isError: true,
-        test: 'hello'
-      };
+    const logger = initLogger('debug', messagingQueueStub);
 
-      logger.log('error', e, {test: 'hello'});
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'error', 'test123', meta);
+    assert.isObject(logger);
 
-    });
+    assert.isFunction(logger.log);
+    assert.isFunction(logger.error);
+    assert.isFunction(logger.warn);
+    assert.isFunction(logger.info);
+    assert.isFunction(logger.debug);
 
-    it('should call winston debug', function() {
+  });
 
-      const message = 'test123';
+  it ('should publish on queue when logging a message', function () {
 
-      logger.debug(message, {test: 'hello'});
+    const logger = initLogger('debug', messagingQueueStub);
 
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'debug', message, {test: 'hello'});
+    const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
+    logger.log('error', 'message', meta);
 
-    });
+    sinon.assert.calledOnce(messagingQueueStub.publish);
 
-    it('should call winston info', function() {
+    const logParam = {
+      level: 'error',
+      message: 'message',
+      meta
+    }
 
-      const message = 'test123';
+    sinon.assert.calledWith(messagingQueueStub.publish, logParam, 'logs', { routingKey: 'app' });
 
-      logger.info(message);
+  });
 
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'info', message, {});
+  it ('should be defaulting serviceName and timestamp if not passed', function () {
 
-    });
+    const logger = initLogger('debug', messagingQueueStub);
+    logger.log('error', 'message');
 
-    it('should call winston warn(), also should stringify the object before logging', function() {
+    const metaArgs = messagingQueueStub.publish.args[0][0].meta;
 
-      const message = { message: 'test123'};
+    assert.strictEqual(metaArgs.serviceName, 'components-service');
+    assert.isString(metaArgs.timestamp);
 
-      logger.warn(message);
+  });
 
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'warn', JSON.stringify(message), {});
+  it ('should log if the level of message is below the max level allowed', function () {
 
-    });
+    const logger = initLogger('info', messagingQueueStub);
+    logger.log('warn', 'message');
 
-    it('should call winston error()', function() {
+    sinon.assert.calledOnce(messagingQueueStub.publish);
 
-      const message = 'test123';
+  });
 
-      logger.error(message);
+  it ('should not log if the level of message is above the max level allowed', function () {
 
-      sinon.assert.calledOnce(logStub);
-      sinon.assert.calledWith(logStub, 'error', message, {});
+    const logger = initLogger('warn', messagingQueueStub);
+    logger.log('debug', 'message');
 
-    });
+    sinon.assert.notCalled(messagingQueueStub.publish);
 
-    it('should log to console', function() {
+  });
 
-      // we want the log to happen, so remove the stub
-      logStub.restore();
+  it ('should create a proper object when logging error', function () {
 
-      const writeOutSpy = sinon.spy(process.stdout, 'write');
-      const writeErrSpy = sinon.spy(process.stderr, 'write');
+    const logger = initLogger('error', messagingQueueStub);
 
-      logger.initWriters({ LOG_CONSOLE_LEVEL: 'info' });
-      logger.info('this is info.');
-      logger.error('this is a error', {error: new Error('test')});
+    const e = new Error('test123');
+    const meta = {
+      stack: e.stack,
+      code: 500,
+      name: e.name,
+      isError: true,
+      test: 'hello',
+      serviceName: 'components-service',
+      timestamp: (new Date()).toISOString()
+    };
 
-      sinon.assert.calledOnce(writeErrSpy);
-      sinon.assert.calledOnce(writeOutSpy);
+    logger.error(e, {test: 'hello', timestamp: meta.timestamp});
+    sinon.assert.calledOnce(messagingQueueStub.publish);
 
-      writeOutSpy.restore();
-      writeErrSpy.restore();
+    const logParam = {
+      level: 'error',
+      message: 'test123',
+      meta
+    }
 
-    });
+    sinon.assert.calledWith(messagingQueueStub.publish, logParam);
 
+  });
+
+  it ('should stringify the object before logging', function() {
+
+    const message = { message: 'test123'};
+    const logger = initLogger('debug', messagingQueueStub);
+
+    const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
+
+    logger.warn(message, meta);
+
+    sinon.assert.calledOnce(messagingQueueStub.publish);
+
+    const logParam = {
+      level: 'warn',
+      message: JSON.stringify(message),
+      meta
+    }
+
+    sinon.assert.calledWith(messagingQueueStub.publish, logParam);
+
+  });
+
+
+  it ('should call log() with debug level', function() {
+
+    const logger = initLogger('debug', messagingQueueStub);
+    const logSpy = sinon.spy(logger, 'log');
+
+    const message = 'test123';
+    const meta = {m: 'meta'};
+    logger.debug(message, meta);
+
+    sinon.assert.calledOnce(logSpy);
+    sinon.assert.calledWith(logSpy, 'debug', message, meta);
+
+    logSpy.restore();
+
+  });
+
+  it ('should call log() with info level', function() {
+
+    const logger = initLogger('info', messagingQueueStub);
+
+    const logSpy = sinon.spy(logger, 'log');
+
+    const message = 'test123';
+    const meta = {m: 'meta'};
+    logger.info(message, meta);
+
+    sinon.assert.calledOnce(logSpy);
+    sinon.assert.calledWith(logSpy, 'info', message, meta);
+
+    logSpy.restore();
+
+  });
+
+  it ('should call log() with warn level', function() {
+
+    const logger = initLogger('warn', messagingQueueStub);
+
+    const logSpy = sinon.spy(logger, 'log');
+
+    const message = 'test123';
+    const meta = {m: 'meta'};
+    logger.warn(message, meta);
+
+    sinon.assert.calledOnce(logSpy);
+    sinon.assert.calledWith(logSpy, 'warn', message, meta);
+
+    logSpy.restore();
+
+  });
+
+
+  it ('should call log() with error level', function() {
+
+    const logger = initLogger('error', messagingQueueStub);
+
+    const logSpy = sinon.spy(logger, 'log');
+
+    const message = 'test123';
+    const meta = {m: 'meta'};
+    logger.error(message, meta);
+
+    sinon.assert.calledOnce(logSpy);
+    sinon.assert.calledWith(logSpy, 'error', message, meta);
+
+    logSpy.restore();
+
+  });
+
+  it ('should update the default logger', function () {
+    const logger = initLogger('error', messagingQueueStub, true);
+    assert.deepEqual(defaultLogger, logger);
   });
 
 });

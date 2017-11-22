@@ -11,7 +11,7 @@ import helmet from 'helmet';
 import httpStatus from 'http-status';
 
 import routes from './routes';
-import {error as logError} from '../lib/logger';
+import logger from '../lib/logger';
 import logRequest from './middleware/log-request';
 
 /**
@@ -22,6 +22,7 @@ import logRequest from './middleware/log-request';
  *  other properties for log request
  * @param {object} options
  *  repos
+ *  messagingQueue
  */
 const start = (conf, options) => {
 
@@ -43,7 +44,9 @@ const start = (conf, options) => {
     app.use(cors());
 
     // log the call
-    app.use(logRequest(conf));
+    if (conf.ENABLE_HTTP_REQUEST_LOGS === true) {
+      app.use(logRequest(options.messagingQueue));
+    }
 
     // setup routes
     app.use('/api', routes(options.repos));
@@ -53,15 +56,13 @@ const start = (conf, options) => {
     app.use((err, req, res, next) => {
 
       try {
-        logError(err, {
+        logger.error(err, {
           url: req.originalUrl || req.url,
           method: req.method,
           referrer: req.headers.referer || req.headers.referrer
         });
       }
-      catch (e) {
-        console.error(e); // eslint-disable-line no-console
-      }
+      catch (e) {}
 
       return next(err);
 
@@ -98,4 +99,4 @@ const start = (conf, options) => {
 
 };
 
-export default Object.create({ start });
+export default { start };

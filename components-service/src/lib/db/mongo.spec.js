@@ -1,11 +1,11 @@
 import {assert} from 'chai';
 import sinon from 'sinon';
-
-import * as mongo from './mongo';
+import mockery from 'mockery';
 
 describe('lib/db/mongo', function() {
 
-  let testCollectionDb = {
+  // collection object, stub for the db collection
+  const testCollection = {
     
     createIndex(field, options) {},
 
@@ -45,61 +45,86 @@ describe('lib/db/mongo', function() {
 
   };
 
-  let testDb = {
+  // db object, stub for mongodb
+  const testDb = {
     createCollection(name, options) {
       return Promise.resolve();
     },
     collection(name) {
-      return testCollectionDb;
+      return testCollection;
     }
   };
 
-  describe('connect', function() {
+  const validEndpoint = 'mongodb://db/componentservice';
 
-    it('should return a db connection', async function() {
+  // mocking the mongoclient library. instead of doing an actual connection
+  // this returns the testDb
+  const MongoClientMock = {
+    connect(endpoint, options, callback) {
+      if (endpoint == validEndpoint) {
+        callback(null, testDb);
+      }
+      else {
+        callback(new Error('invalid db'));
+      }
+    }
+  };
 
-      const db = await mongo.connect({
-        MONGO_ENDPOINT: 'mongodb://db/componentservice'
-      });
+  let initDb;
+
+  before(function() {
+
+     // setup mockery
+    mockery.enable({ warnOnUnregistered: false });
+    mockery.registerMock('mongodb', MongoClientMock);
+
+    // loading module here so that the mockery is all setup. if loading before,
+    // then mocking amqp won't work.
+
+    delete require.cache[require.resolve('./mongo')];
+    initDb = require('./mongo').init;
+
+  });
+
+  // mockery done
+  after(function () {
+    mockery.deregisterMock('mongodb');
+    mockery.disable();
+    delete require.cache[require.resolve('./mongo')];
+  });
+
+  describe ('connect', function () {
+
+    it ('should return a db object for a valid mongo db endpoint', async function () {
+      const db = await initDb(validEndpoint);
+
+      assert.isFunction(db.setup);
+      assert.isFunction(db.dao);
 
       assert.isObject(db);
-      assert.equal(db.databaseName, 'componentservice');
-
-      db.close();
-
     });
 
-    it('should throw Error exception if invalid mongo connection string', function(done) {
-      
-      mongo.connect({MONGO_ENDPOINT: 'invalid_url'})
-        .catch(e => {
-          assert.equal(e.name, 'Error');
-          done();
-        });
+    it ('should throw exception if invalid mongo connection string', function (done) {
 
-    });
-
-    it('should throw MongoError exception if invalid mongo connection string', function(done) {
-      
-      mongo.connect({MONGO_ENDPOINT: 'mongodb://invalid/123'})
-        .catch(e => {
-          assert.equal(e.name, 'MongoError');
-          done();
-        });
+      initDb('invalid').catch(e => {
+        assert.equal(e.message, 'invalid db');
+        done();
+      });
 
     });
 
   });
 
 
-  describe('initial setup', function() {
+  describe ('initial setup', function () {
 
-    it('should setup the tables with indexes', async function() {
+    it ('should setup the tables with indexes', async function () {
 
       const createSpy = sinon.spy(testDb, 'createCollection');
-      const idxSpy = sinon.spy(testCollectionDb, 'createIndex');
+      const idxSpy = sinon.spy(testCollection, 'createIndex');
 
-      await mongo.initialSetup(testDb);
+      const db = await initDb(validEndpoint);
+      await db.setup();      
 
       // setup two tables
       sinon.assert.calledTwice(createSpy);
@@ -116,13 +141,19 @@ describe('lib/db/mongo', function() {
 
   });
 
-  describe('dao', function() {
+  describe ('dao testing, using the mongo db collection', function () {
 
-    let dao = mongo.getDao(testDb, 'components');
+    let db;
+    let dao;
 
-    describe('count', function() {
+    before (async function () {
+      db = await initDb(validEndpoint);
+      dao = db.dao('components');
+    });
 
-      const countSpy = sinon.spy(testCollectionDb, 'count');
+    describe ('count', function () {
+
+      const countSpy = sinon.spy(testCollection, 'count');
 
       beforeEach(function() {
         countSpy.reset();
@@ -132,7 +163,7 @@ describe('lib/db/mongo', function() {
         countSpy.restore();
       });
 
-      it('should return the count with a predicate', async function() {
+      it('should return the count with a predicate', async function () {
 
         // get count
         const pred = {id: 123};
@@ -160,7 +191,7 @@ describe('lib/db/mongo', function() {
 
         // force error
         countSpy.restore();
-        const countStub = sinon.stub(testCollectionDb, 'count').callsFake((pred, callback) => {
+        const countStub = sinon.stub(testCollection, 'count').callsFake((pred, callback) => {
           callback(new Error('error'));
         });
 
@@ -177,7 +208,7 @@ describe('lib/db/mongo', function() {
 
     describe('find', function() {
 
-      const findSpy = sinon.spy(testCollectionDb, 'find');
+      const findSpy = sinon.spy(testCollection, 'find');
 
       beforeEach(function() {
         findSpy.reset();
@@ -217,7 +248,7 @@ describe('lib/db/mongo', function() {
 
     describe('insert', function() {
 
-      const insertSpy = sinon.spy(testCollectionDb, 'insert');
+      const insertSpy = sinon.spy(testCollection, 'insert');
 
       beforeEach(function() {
         insertSpy.reset();
@@ -251,7 +282,7 @@ describe('lib/db/mongo', function() {
 
     describe('update', function() {
 
-      const updateSpy = sinon.spy(testCollectionDb, 'update');
+      const updateSpy = sinon.spy(testCollection, 'update');
 
       beforeEach(function() {
         updateSpy.reset();
@@ -286,7 +317,7 @@ describe('lib/db/mongo', function() {
 
     describe('remove', function() {
 
-      const removeSpy = sinon.spy(testCollectionDb, 'deleteMany');
+      const removeSpy = sinon.spy(testCollection, 'deleteMany');
 
       beforeEach(function() {
         removeSpy.reset();

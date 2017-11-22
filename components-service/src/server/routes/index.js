@@ -23,16 +23,16 @@ export default (repos = {}) => {
   router.get('/health-check', (req, res) => {
     res.json({
       status: 'RUNNING',
-      name: '',
+      name: 'Components Service',
       version: '1.0',
       environment: process.env.NODE_ENV
     });
   });
 
-  // mount component routes at /users
+  // mount component routes at /components
   router.use('/components', componentRoutes(repos.component));
 
-  // mount component-group routes
+  // mount group routes at /component_groups
   router.use('/component_groups', componentGroupRoutes(repos.componentGroup));
 
   // generic error handler. if there is any special case/override, it should be

@@ -6,11 +6,10 @@ describe('config', function() {
   const testEnv = {
     NODE_ENV: 'development',
     PORT: 1234,
-    LOG_CONSOLE_LEVEL: 'info',
-    LOG_DB_LEVEL: 'error',
-    LOG_FILE_LEVEL: 'warn',
-    LOG_FILE_DIRNAME: 'logs/',
-    MONGO_ENDPOINT: 'mongodb://dave:password@localhost:27017/myproject'
+    LOG_LEVEL: 'info',
+    ENABLE_HTTP_REQUEST_LOGS: "false",
+    MONGO_ENDPOINT: 'mongodb://dave:password@localhost:27017/myproject',
+    RABBMITMQ_CONN_ENDPOINT: 'amqp://localhost'
   };
 
   it('should return a proper object on success', function() {
@@ -18,13 +17,12 @@ describe('config', function() {
     const expectedConfig = {
       server: {
         PORT: testEnv.PORT,
-        NODE_ENV: testEnv.NODE_ENV
+        NODE_ENV: testEnv.NODE_ENV,
+        RABBMITMQ_CONN_ENDPOINT: testEnv.RABBMITMQ_CONN_ENDPOINT,
+        ENABLE_HTTP_REQUEST_LOGS: false
       },
       logger: {
-        LOG_CONSOLE_LEVEL: testEnv.LOG_CONSOLE_LEVEL,
-        LOG_DB_LEVEL: testEnv.LOG_DB_LEVEL,
-        LOG_FILE_LEVEL: testEnv.LOG_FILE_LEVEL,
-        LOG_FILE_DIRNAME: testEnv.LOG_FILE_DIRNAME
+        LOG_LEVEL: testEnv.LOG_LEVEL
       },
       db: {
         MONGO_ENDPOINT: testEnv.MONGO_ENDPOINT

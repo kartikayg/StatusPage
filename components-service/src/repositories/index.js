@@ -5,12 +5,10 @@
 import component from './component';
 import componentGroup from './component-group';
 
-import {getDao} from '../lib/db/mongo';
-
 const init = (db) => {
 
-  const componentGroupRepo = componentGroup.init(getDao(db, 'component_groups'));
-  const componentRepo = component.init(getDao(db, 'components'), componentGroupRepo);
+  const componentGroupRepo = componentGroup.init(db.dao('component_groups'));
+  const componentRepo = component.init(db.dao('components'), componentGroupRepo);
 
   return Object.assign({}, {
     component: componentRepo,
@@ -19,4 +17,4 @@ const init = (db) => {
 
 };
 
-export default Object.create({ init });
+export default { init };

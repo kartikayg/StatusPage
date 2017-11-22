@@ -9,7 +9,7 @@ import server from '../../server/index';
 import {IdNotFoundError} from '../../repositories/errors';
 
 
-describe('routes/component', function() {
+describe('routes/component_groups', function() {
 
   /**
    * TEST OBJECTS
@@ -26,7 +26,7 @@ describe('routes/component', function() {
     description: 'desc'
   };
 
-  let testRepo = {
+  let testRepoStub = {
     
     name: 'component_groups',
 
@@ -63,7 +63,7 @@ describe('routes/component', function() {
       PORT: 6667,
       NODE_ENV: process.env.NODE_ENV
     }, {
-      repos: { component: { name: 'components'}, componentGroup: testRepo }
+      repos: { component: { name: 'components'}, componentGroup: testRepoStub }
     })
   });
 
@@ -92,7 +92,7 @@ describe('routes/component', function() {
 
     it ('should return component groups and 200 response, when no filters passed', function(done) {
 
-      const listSpy = sinon.spy(testRepo, 'list');
+      const listSpy = sinon.spy(testRepoStub, 'list');
 
       request(app)
         .get('/api/component_groups')
@@ -111,7 +111,7 @@ describe('routes/component', function() {
 
     it ('should return component groups and 200 response, when multiple filters passed', function(done) {
 
-      const listSpy = sinon.spy(testRepo, 'list');
+      const listSpy = sinon.spy(testRepoStub, 'list');
 
       request(app)
         .get('/api/component_groups?active=false&status=good')
@@ -128,10 +128,10 @@ describe('routes/component', function() {
 
     });
 
-    it ('should return 500 response when exception thrown from repo', function(done) {
+    it ('should return 500 response when exception thrown from repo', function (done) {
 
       // throw error
-      const listStub = sinon.stub(testRepo, 'list').callsFake((filter) => {
+      const listStub = sinon.stub(testRepoStub, 'list').callsFake((filter) => {
         return Promise.reject(new Error('error'));
       });
 
@@ -154,7 +154,7 @@ describe('routes/component', function() {
 
     it ('should create and return component group object', function(done) {
 
-      const createSpy = sinon.spy(testRepo, 'create');
+      const createSpy = sinon.spy(testRepoStub, 'create');
 
       const componentgroup = {
         name: '  widget  ' // will be sanitized (trimmed)
@@ -180,7 +180,7 @@ describe('routes/component', function() {
     it ('should return 422 b/c of validation error', function(done) {
 
       // forcing an error from repo
-      const createStub = sinon.stub(testRepo, 'create').callsFake(data => {
+      const createStub = sinon.stub(testRepoStub, 'create').callsFake(data => {
         const e = new Error('validation');
         e.name = 'ValidationError';
         return Promise.reject(e);
@@ -208,7 +208,7 @@ describe('routes/component', function() {
 
     it ('should fail b/c of no component posted', function(done) {
 
-      const createSpy = sinon.spy(testRepo, 'create');
+      const createSpy = sinon.spy(testRepoStub, 'create');
 
       request(app)
         .post('/api/component_groups')
@@ -228,7 +228,7 @@ describe('routes/component', function() {
 
     it ('should return the component group', function(done) {
 
-      const loadSpy = sinon.spy(testRepo, 'load');
+      const loadSpy = sinon.spy(testRepoStub, 'load');
 
       request(app)
         .get(`/api/component_groups/${testCmpGroup.id}`)
@@ -248,7 +248,7 @@ describe('routes/component', function() {
     it ('should return 422 b/c of invalid component group id', function(done) {
 
       // force an error
-      const loadStub = sinon.stub(testRepo, 'load').callsFake(id => {
+      const loadStub = sinon.stub(testRepoStub, 'load').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -274,7 +274,7 @@ describe('routes/component', function() {
 
     it ('should update a component group and return a 200', function(done) {
 
-      const updateSpy = sinon.spy(testRepo, 'update');
+      const updateSpy = sinon.spy(testRepoStub, 'update');
 
       const componentgroup = {
         name: '  widget  ',
@@ -304,7 +304,7 @@ describe('routes/component', function() {
 
     it ('should return 422 b/c of invalid component group id', function(done) {
 
-      const updateSpy = sinon.stub(testRepo, 'update').callsFake((id, data) => {
+      const updateSpy = sinon.stub(testRepoStub, 'update').callsFake((id, data) => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -336,7 +336,7 @@ describe('routes/component', function() {
 
     it ('should fail b/c of no component group posted', function(done) {
 
-      const updateSpy = sinon.spy(testRepo, 'update');
+      const updateSpy = sinon.spy(testRepoStub, 'update');
 
       request(app)
         .put(`/api/component_groups/${testCmpGroup.id}`)
@@ -356,7 +356,7 @@ describe('routes/component', function() {
 
     it ('should delete a component group', function(done) {
 
-      const removeSpy = sinon.spy(testRepo, 'remove');
+      const removeSpy = sinon.spy(testRepoStub, 'remove');
 
       request(app)
         .delete(`/api/component_groups/${testCmpGroup.id}`)
@@ -375,7 +375,7 @@ describe('routes/component', function() {
 
     it ('should return 422 b/c of invalid component group id', function(done) {
 
-      const removeStub = sinon.stub(testRepo, 'remove').callsFake(id => {
+      const removeStub = sinon.stub(testRepoStub, 'remove').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -400,7 +400,7 @@ describe('routes/component', function() {
 
     it ('should partial update a component', function(done) {
 
-      const updateSpy = sinon.spy(testRepo, 'partialUpdate');
+      const updateSpy = sinon.spy(testRepoStub, 'partialUpdate');
 
       const componentgroup = {
         name: '  widget  ',
@@ -430,7 +430,7 @@ describe('routes/component', function() {
 
     it ('should fail b/c of no component group posted', function(done) {
 
-      const updateSpy = sinon.spy(testRepo, 'partialUpdate');
+      const updateSpy = sinon.spy(testRepoStub, 'partialUpdate');
 
       request(app)
         .patch(`/api/component_groups/${testCmpGroup.id}`)

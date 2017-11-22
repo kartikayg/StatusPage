@@ -6,7 +6,7 @@
 import uniqid from 'uniqid';
 
 /**
- * Generates an alphanumeric ID. 
+ * Generates an alphanumeric ID.
  * @param {string} entityPrefix - Prefix to prepend to the ID. If its passed,
  *  the resulting ID would be {prefix}{generated-id},
  *  otherwise it is {generated-id}

@@ -10,7 +10,7 @@ import {IdNotFoundError} from './errors';
 
 /**
  * Initializes the repo
- * @param {object} dao - database access object 
+ * @param {object} dao - database access object
  *  for components collection
  * @return {object}
  */
@@ -27,7 +27,7 @@ const init = (dao) => {
   /**
    * Validates a component group data before saving it.
    * @param {object} data to validate
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
@@ -50,7 +50,7 @@ const init = (dao) => {
   /**
    * Checks whether the group id exists or not
    * @param {string} id
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, true or false
    *  if rejected, Error
    */
@@ -102,7 +102,7 @@ const init = (dao) => {
   /**
    * Creates a new component group.
    * @param {object} data
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} component group object
    *  if rejected, {Error} error
    */
@@ -126,7 +126,7 @@ const init = (dao) => {
    * @param {string} id - component group id
    * @param {object} newData - New Data for the component group. This should be the
    *  entire the component group data set.
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} component group object
    *  if rejected, {Error} error
    */
@@ -151,7 +151,7 @@ const init = (dao) => {
    * Partial updates a component group.
    * @param {string} id - group id
    * @param {object} data - whatever fields that needs to be updated.
-   * @return {promise} 
+   * @return {promise}
    *  if fulfilled: component group object
    *  if rejected: Error
    */
@@ -177,7 +177,7 @@ const init = (dao) => {
   /**
    * Removes a component group.
    * @param {string} id - component group id
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, void
    *  if rejected, {Error} error
    */
@@ -197,4 +197,4 @@ const init = (dao) => {
 
 };
 
-export default Object.create({ init });
+export default { init };

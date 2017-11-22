@@ -10,13 +10,19 @@ import Joi from 'joi';
  */
 export const schema =
   Joi.object().keys({
+
     NODE_ENV: Joi.string()
       .required()
-      .only(['development', 'production', 'test']),
+      .only('development', 'production', 'test'),
+
     PORT: Joi.number()
       .required(),
-    LOG_HTTP_REQUEST_WRITER: Joi.string()
-      .only(['file', 'db', 'console']),
-    LOG_HTTP_REQUEST_DIRNAME: Joi.string(),
-    LOG_HTTP_REQUEST_PREFIX: Joi.string()
-  }).with('LOG_HTTP_REQUEST_WRITER', 'LOG_HTTP_REQUEST_DIRNAME');
+
+    RABBMITMQ_CONN_ENDPOINT: Joi.string()
+      .required()
+      .uri({ scheme: 'amqp' }),
+
+    ENABLE_HTTP_REQUEST_LOGS: Joi.boolean()
+      .default(false)
+
+  });

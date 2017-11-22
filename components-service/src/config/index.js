@@ -41,4 +41,4 @@ const load = (envVars = {}) => {
 
 };
 
-export default Object.create({ load });
+export default { load };

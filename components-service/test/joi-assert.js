@@ -16,7 +16,7 @@ const error = (schema, data, errors, options = {}) => {
   const errorsToCheck = _.isArray(errors) ? errors : [errors];
   const joiOptions    = Object.assign({ abortEarly: false }, options);
 
-  const {error}       = Joi.validate(data, schema, joiOptions);
+  const {error, value}       = Joi.validate(data, schema, joiOptions);
 
   error.details       = error.details || [];
 

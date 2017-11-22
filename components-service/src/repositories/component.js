@@ -9,7 +9,7 @@ import {IdNotFoundError} from './errors';
 
 /**
  * Initializes the repo
- * @param {object} dao - database access object 
+ * @param {object} dao - database access object
  *  for components collection
  * @param {repo} groupRepo - component group repo
  * @return {object}
@@ -27,13 +27,13 @@ const init = (dao, groupRepo) => {
   /**
    * Validates a component data before saving it.
    * @param {object} data to validate
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
   const validateData = async (data) => {
 
-    // basic validation. 
+    // basic validation.
     const component = await componentEntity.validate(data);
 
     // validate group id, if present
@@ -103,7 +103,7 @@ const init = (dao, groupRepo) => {
   /**
    * Creates a new component.
    * @param {object} data
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
@@ -127,7 +127,7 @@ const init = (dao, groupRepo) => {
    * @param {string} id - component id
    * @param {object} newData - New Data for the component. This should be the
    *  entire the component data set.
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
@@ -152,7 +152,7 @@ const init = (dao, groupRepo) => {
    * Partial updates a component.
    * @param {string} id - component id
    * @param {object} data - whatever fields that needs to be updated.
-   * @return {promise} 
+   * @return {promise}
    *  if fulfilled: component object
    *  if rejected: Error
    */
@@ -178,7 +178,7 @@ const init = (dao, groupRepo) => {
   /**
    * Removes a component.
    * @param {string} id - component id
-   * @return {Promise} 
+   * @return {Promise}
    *  if fulfilled, void
    *  if rejected, {Error} error
    */
@@ -197,4 +197,4 @@ const init = (dao, groupRepo) => {
 
 };
 
-export default Object.create({ init });
+export default { init };

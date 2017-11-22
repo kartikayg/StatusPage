@@ -17,10 +17,10 @@ const entities = { component, componentGroup };
  * Validates data against an entity schema.
  * @param {string} entityType
  * @param {object} data - Data to validate
- * @return {Promise} 
+ * @return {Promise}
  *   if fulfilled, {object} Returns the validated value
  *   if rejected {Error} error
- */ 
+ */
 const schemaValidator = (entityType, data) => {
 
   return new Promise((resolve, reject) => {

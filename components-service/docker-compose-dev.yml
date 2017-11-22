@@ -2,12 +2,12 @@ version: '3'
 
 services:
   api:
-    image: node:8.4.0
+    image: node:8.9.0
     volumes:
       - .:/app
     working_dir: /app
     ports:
-      - "6040:6040"
+      - "6010:6010"
     command: ["npm", "run", "dev"]
     env_file:
       - .env
@@ -18,4 +18,4 @@ services:
     volumes:
       - ./mongodata:/data/db
     ports:
-      - 6041:27017
+      - 6011:27017

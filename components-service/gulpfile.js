@@ -26,7 +26,6 @@ gulp.task('lint', () =>
   gulp.src(paths.js)
     .pipe(eslint())
     .pipe(eslint.format()) 
-    .pipe(eslint.failOnError())
 );
 
 // Copy non-js files to dist

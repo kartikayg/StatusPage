@@ -20,16 +20,17 @@ const DB_PARAMS = {
   socketTimeoutMS: 30000
 };
 
+
 /**
  * Creates a Mongo DB connection
- * @param {object} conf - DB config object
- *   - mongo_url - connection string. e.g.: mongodb://db/componentservice
- * @return {Promise} promise object that resolves to a 
- * db connection object.
+ * @param {string} endpoint - mongodb endpoint
+ * @return {Promise}
+ *  if success, a mongodb conn object
+ *  if rejected, error
  */
-export const connect = (conf) => {
+const connect = (endpoint) => {
   return new Promise((resolve, reject) => {
-    MongoClient.connect(conf.MONGO_ENDPOINT, DB_PARAMS, (err, db) => {
+    MongoClient.connect(endpoint, DB_PARAMS, (err, db) => {
       if (err) {
         reject(err);
       }
@@ -44,7 +45,7 @@ export const connect = (conf) => {
  * Setup tables schema and constraints in the Db
  * @param {object} db - MongoDb connection
  */
-export const initialSetup = async (db) => {
+const initialSetup = async (db) => {
 
   // components collection
   await db.createCollection('components');
@@ -61,10 +62,10 @@ export const initialSetup = async (db) => {
  * Returns a DAO for a collection in the mongo db
  * @param {object} db Mongo db connection
  * @param {string} collectionName - collection name in mongo
- * @return {object} DAO functions 
+ * @return {object} DAO functions
  *  find(), count(), insert(), update(), remove()
  */
-export const getDao = (db, collectionName) => {
+const getDao = (db, collectionName) => {
 
   const dbCollection = db.collection(collectionName);
 
@@ -189,3 +190,32 @@ export const getDao = (db, collectionName) => {
   });
 
 };
+
+/**
+ * Initializes a new Mongo db object. This returns a wrapper over the
+ * Mongo db connection exposing whatever functionality is needed.
+ * @param {string} endpoint - mongo db endpoint
+ * @return {Promise}
+ *  if successful, db wrapper object
+ *    setup()
+ *    dao()
+ *  if rejected, error
+ */
+const init = async (endpoint) => {
+
+  const connection = await connect(endpoint);
+
+  const db = {
+    setup() {
+      return initialSetup(connection);
+    },
+    dao(collectionName) {
+      return getDao(connection, collectionName);
+    }
+  };
+
+  return db;
+
+};
+
+export default { init };
