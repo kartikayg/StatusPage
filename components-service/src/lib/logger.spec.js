@@ -5,7 +5,7 @@ describe ('lib/logger', function () {
 
   let allowedLevels;
   let defaultLogger;
-  let initLogger;
+  let initMQLogger;
 
   // stub for the messaging queue
   const messagingQueueStub = {
@@ -19,7 +19,7 @@ describe ('lib/logger', function () {
     
     defaultLogger = require('./logger').default;
     allowedLevels = require('./logger').allowedLevels;
-    initLogger    = require('./logger').init;
+    initMQLogger    = require('./logger').initMQLogger;
 
   });
 
@@ -52,7 +52,7 @@ describe ('lib/logger', function () {
 
   it ('should create a new logger', function() {
 
-    const logger = initLogger('debug', messagingQueueStub);
+    const logger = initMQLogger('debug', messagingQueueStub);
 
     assert.isObject(logger);
 
@@ -66,7 +66,7 @@ describe ('lib/logger', function () {
 
   it ('should publish on queue when logging a message', function () {
 
-    const logger = initLogger('debug', messagingQueueStub);
+    const logger = initMQLogger('debug', messagingQueueStub);
 
     const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
     logger.log('error', 'message', meta);
@@ -85,7 +85,7 @@ describe ('lib/logger', function () {
 
   it ('should be defaulting serviceName and timestamp if not passed', function () {
 
-    const logger = initLogger('debug', messagingQueueStub);
+    const logger = initMQLogger('debug', messagingQueueStub);
     logger.log('error', 'message');
 
     const metaArgs = messagingQueueStub.publish.args[0][0].meta;
@@ -97,7 +97,7 @@ describe ('lib/logger', function () {
 
   it ('should log if the level of message is below the max level allowed', function () {
 
-    const logger = initLogger('info', messagingQueueStub);
+    const logger = initMQLogger('info', messagingQueueStub);
     logger.log('warn', 'message');
 
     sinon.assert.calledOnce(messagingQueueStub.publish);
@@ -106,7 +106,7 @@ describe ('lib/logger', function () {
 
   it ('should not log if the level of message is above the max level allowed', function () {
 
-    const logger = initLogger('warn', messagingQueueStub);
+    const logger = initMQLogger('warn', messagingQueueStub);
     logger.log('debug', 'message');
 
     sinon.assert.notCalled(messagingQueueStub.publish);
@@ -115,7 +115,7 @@ describe ('lib/logger', function () {
 
   it ('should create a proper object when logging error', function () {
 
-    const logger = initLogger('error', messagingQueueStub);
+    const logger = initMQLogger('error', messagingQueueStub);
 
     const e = new Error('test123');
     const meta = {
@@ -144,7 +144,7 @@ describe ('lib/logger', function () {
   it ('should stringify the object before logging', function() {
 
     const message = { message: 'test123'};
-    const logger = initLogger('debug', messagingQueueStub);
+    const logger = initMQLogger('debug', messagingQueueStub);
 
     const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
 
@@ -165,7 +165,7 @@ describe ('lib/logger', function () {
 
   it ('should call log() with debug level', function() {
 
-    const logger = initLogger('debug', messagingQueueStub);
+    const logger = initMQLogger('debug', messagingQueueStub);
     const logSpy = sinon.spy(logger, 'log');
 
     const message = 'test123';
@@ -181,7 +181,7 @@ describe ('lib/logger', function () {
 
   it ('should call log() with info level', function() {
 
-    const logger = initLogger('info', messagingQueueStub);
+    const logger = initMQLogger('info', messagingQueueStub);
 
     const logSpy = sinon.spy(logger, 'log');
 
@@ -198,7 +198,7 @@ describe ('lib/logger', function () {
 
   it ('should call log() with warn level', function() {
 
-    const logger = initLogger('warn', messagingQueueStub);
+    const logger = initMQLogger('warn', messagingQueueStub);
 
     const logSpy = sinon.spy(logger, 'log');
 
@@ -216,7 +216,7 @@ describe ('lib/logger', function () {
 
   it ('should call log() with error level', function() {
 
-    const logger = initLogger('error', messagingQueueStub);
+    const logger = initMQLogger('error', messagingQueueStub);
 
     const logSpy = sinon.spy(logger, 'log');
 
@@ -232,7 +232,7 @@ describe ('lib/logger', function () {
   });
 
   it ('should update the default logger', function () {
-    const logger = initLogger('error', messagingQueueStub, true);
+    const logger = initMQLogger('error', messagingQueueStub, true);
     assert.deepEqual(defaultLogger, logger);
   });
 

@@ -234,7 +234,16 @@ describe('repo/component', function() {
 
       // dao called with right params
       const insertArg = insertSpy.args[0][0];
-      const insertExpected = Object.assign({id: testCmpId, created_at: insertArg.created_at, updated_at: insertArg.updated_at}, newCmp)
+      const insertExpected = Object.assign(
+        {
+          id: testCmpId,
+          created_at: insertArg.created_at,
+          updated_at: insertArg.updated_at,
+          description: null,
+          group_id: null
+        },
+        newCmp
+      );
       assert.deepEqual(insertExpected, insertArg);
 
       // check id generation
@@ -317,7 +326,7 @@ describe('repo/component', function() {
 
       // dao called using the new data
       const updateArg = updateSpy.args[0][0];
-      const updateExpected = Object.assign({}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
+      const updateExpected = Object.assign({group_id: null}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
       assert.deepEqual(updateExpected, updateArg);
 
       // calling update dao

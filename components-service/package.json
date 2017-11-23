@@ -67,6 +67,7 @@
     "gulp-eslint": "^4.0.0",
     "gulp-file-cache": "0.0.1",
     "gulp-nodemon": "^2.2.1",
+    "is-json": "^2.0.1",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.5.3",
     "mockery": "^2.1.0",

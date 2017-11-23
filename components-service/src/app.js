@@ -5,7 +5,7 @@
 // internal packages
 import config from './config';
 import {init as initQueue} from './lib/messaging-queue';
-import {init as initLogger} from './lib/logger';
+import {initMQLogger} from './lib/logger';
 import {init as initDb} from './lib/db/mongo';
 import respository from './repositories';
 import server from './server';
@@ -13,12 +13,16 @@ import server from './server';
 // {object} - messaging queue used for this app
 let messagingQueue;
 
+// {object} express application
+let app;
+
 /**
  * Initalizes the microservice. Here are the main steps in this function:
  *  Load config
  *  Init Db adapter
  *  Setup logger writers
  *  Load Repos
+ * @return {object} express app
  */
 const start = async () => {
 
@@ -33,15 +37,17 @@ const start = async () => {
   messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 180000);
 
   // init logger
-  const logger = initLogger(conf.logger.LOG_LEVEL, messagingQueue, true);
+  const logger = initMQLogger(conf.logger.LOG_LEVEL, messagingQueue, true);
 
   // load repositories
   const repos = respository.init(db);
 
   // start the server
-  await server.start(conf.server, { repos, messagingQueue });
+  app = await server.start(conf.server, { repos, messagingQueue });
 
   logger.debug('component-service application has started ...');
+
+  return app;
 
 };
 
@@ -50,6 +56,7 @@ const start = async () => {
  */
 const stop = () => {
   messagingQueue.disconnect();
+  app.close();
 };
 
 export default { start, stop };

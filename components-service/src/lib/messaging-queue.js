@@ -32,7 +32,6 @@ const connect = (endpoint, timeout) => {
     // if the connection is not established within timeout limit, error out
     const timeoutId = setTimeout(() => {
       if (initialReady === false) {
-        logger.debug(`raabit mq server connection timed out: ${endpoint}.`);
         reject(new Error(`Not able to establish a connection with the server: ${endpoint}.`));
       }
     }, timeout);
@@ -56,9 +55,10 @@ const connect = (endpoint, timeout) => {
       }
     });
 
-    // on error, log it
+    // on error, console it as the logger uses messaging
+    // queue to send it
     connection.on('error', (e) => {
-      logger.error(e);
+      console.error(e); // eslint-disable-line no-console
     });
   });
 
@@ -97,11 +97,9 @@ const queueWrapper = (connection) => {
 
       // connects to an excahnge
       connection.exchange(exchangeName, eOpts, (ex) => {
-        ex.on('open', () => {
-          const pubMessage = (typeof message !== 'string' ? JSON.stringify(message) : message);
-          ex.publish(options.routingKey, pubMessage);
-          resolve();
-        });
+        const pubMessage = (typeof message !== 'string' ? JSON.stringify(message) : message);
+        ex.publish(options.routingKey, pubMessage);
+        resolve();
       });
 
     });

@@ -60,11 +60,15 @@ describe('routes/component_groups', function() {
 
   before(async function() {
     app = await server.start({
-      PORT: 6667,
+      PORT: 6012,
       NODE_ENV: process.env.NODE_ENV
     }, {
       repos: { component: { name: 'components'}, componentGroup: testRepoStub }
     })
+  });
+
+  after(function () {
+    app.close();
   });
 
 
@@ -132,7 +136,7 @@ describe('routes/component_groups', function() {
 
       // throw error
       const listStub = sinon.stub(testRepoStub, 'list').callsFake((filter) => {
-        return Promise.reject(new Error('error'));
+        return Promise.reject({message: 'error'});
       });
 
       request(app)

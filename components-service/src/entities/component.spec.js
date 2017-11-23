@@ -32,7 +32,9 @@ describe('entity/component', function() {
       name: 'API',
       status: 'operational',
       sort_order: 1,
-      active: true
+      active: true,
+      description: null,
+      group_id: null
     };
 
     joiassert.equal(component.schema, data, expected);

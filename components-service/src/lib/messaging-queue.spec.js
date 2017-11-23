@@ -16,10 +16,7 @@ describe ('lib/messaging-queue', function () {
   };
 
   const amqpExchangeStub = {
-    publish: sinon.spy(),
-    on(event, cb) {
-      cb();
-    }
+    publish: sinon.spy()
   };
 
   class ConnectionMock extends EventEmitter {
@@ -117,17 +114,6 @@ describe ('lib/messaging-queue', function () {
 
     });
 
-    it ('should log error if connection emits error', function (done) {
-
-      this.timeout(2000);
-
-      initQueue('invalid', 1500).catch(e => {
-        sinon.assert.calledOnce(logErrorSpy);
-        done();
-      });
-
-    });
-
     it ('should reject if no connection ready before the timeout', function (done) {
 
       initQueue('invalid', 500).catch(e => {
@@ -191,7 +177,7 @@ describe ('lib/messaging-queue', function () {
     });
 
     it ('should return a promise when publishing', function () {
-        expect(messagingQueue.publish('test', 'ex')).to.be.a('promise');
+        expect(messagingQueue.publish('test', 'ex', {})).to.be.a('promise');
     });
 
     it ('should call exchange() on connection object when publishing with default params', function (done) {

@@ -272,7 +272,15 @@ describe('repo/component_groups', function() {
 
       // dao called with right params
       const insertArg = insertSpy.args[0][0];
-      const insertExpected = Object.assign({id: testCmpGrpId, created_at: insertArg.created_at, updated_at: insertArg.updated_at}, newCmpGroup)
+      const insertExpected = Object.assign(
+        {
+          id: testCmpGrpId,
+          created_at: insertArg.created_at,
+          updated_at: insertArg.updated_at,
+          description: null
+        }, 
+        newCmpGroup
+      );
       assert.deepEqual(insertExpected, insertArg);
 
       // check id generation

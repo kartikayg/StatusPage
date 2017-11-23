@@ -5,9 +5,13 @@
 // {array} allowedLevels - allowed log levels
 const allowedLevels = ['error', 'warn', 'info', 'debug'];
 
+// {object} defaultLogger - object to export as default value.
+const defaultLogger = {};
 
-// {object} defaultLogger - default instance of the logger.
-const defaultLogger = {
+
+// {object} consoleLogger - logger object that uses console.
+// this should really be only used for testing.
+const consoleLogger = {
   log(...args) {
     console.log(...args); // eslint-disable-line no-console
   },
@@ -27,7 +31,8 @@ const defaultLogger = {
 
 
 /**
- * Initializes a new logger.
+ * Initializes a new logger that publishes the message to a
+ * messaging queue.
  * @param {string} maxLevel - log level for this logger
  * @param {object} messagingQueue - messaging queue to publish the
  *  log message
@@ -35,7 +40,7 @@ const defaultLogger = {
  *  set {this} logger as the default logger for this package
  * @return {object} Logger
  */
-const init = (maxLevel, messagingQueue, setDefault = false) => {
+const initMQLogger = (maxLevel, messagingQueue, setDefault = false) => {
 
   const logger = {};
 
@@ -111,9 +116,21 @@ const init = (maxLevel, messagingQueue, setDefault = false) => {
 };
 
 
+/**
+ * Resets the default logger to console. This is useful
+ * during testing
+ */
+const resetToConsole = () => {
+  Object.assign(defaultLogger, consoleLogger);
+};
+
+resetToConsole();
+
+
 // as default export, return the default logger
 export default defaultLogger;
 
 // other fn exports
-export { init };
+export { initMQLogger };
 export { allowedLevels };
+export { resetToConsole };

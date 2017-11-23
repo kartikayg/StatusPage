@@ -29,7 +29,8 @@ describe('entity/component-group', function() {
       name: 'API-Group',
       status: 'operational',
       sort_order: 0,
-      active: true
+      active: true,
+      description: null
     };
 
     joiassert.equal(componentGroup.schema, data, expected);

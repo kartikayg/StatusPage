@@ -8,7 +8,9 @@ const schema = {
   name: Joi.string()
     .required()
     .max(32),
-  description: Joi.string(),
+  description: Joi.string()
+    .default(null)
+    .allow(null),
   status: Joi.string()
     .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage'])
     .default('operational'),
@@ -19,6 +21,8 @@ const schema = {
   active: Joi.boolean()
     .default(true),
   group_id: Joi.string()
+    .default(null)
+    .allow(null)
 };
 
 const prefix = 'CM';

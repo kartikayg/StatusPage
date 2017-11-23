@@ -26,7 +26,7 @@ import logRequest from './middleware/log-request';
  */
 const start = (conf, options) => {
 
-  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+  return new Promise((resolve) => {
 
     const app = express();
 
@@ -62,7 +62,7 @@ const start = (conf, options) => {
           referrer: req.headers.referer || req.headers.referrer
         });
       }
-      catch (e) {}
+      catch (e) {} // eslint-disable-line no-empty
 
       return next(err);
 
@@ -91,7 +91,10 @@ const start = (conf, options) => {
 
     });
 
-    app.listen(conf.PORT, () => {
+    const server = app.listen(conf.PORT, (...args) => {
+      app.close = function() {
+        server.close();
+      }
       return resolve(app);
     });
 
