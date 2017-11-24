@@ -14,6 +14,8 @@ import logger from './lib/logger/application';
 
 describe('app - integration tests', function () {
 
+  this.timeout(0);
+
   let messagingQueue;
   let exchange;
 
@@ -27,8 +29,6 @@ describe('app - integration tests', function () {
   }
 
   before(function (done) {
-
-    this.timeout(6000);
 
     // delete all old log files
     const files = fs.readdirSync(logFilesDir);
@@ -65,9 +65,9 @@ describe('app - integration tests', function () {
 
   });
 
-  describe ('logger', function () {
+  describe ('logger, with info level', function () {
 
-    it ('should log message to console and file for logger() info call', function () {
+    it ('should log message to console and file for logger() info call', function (done) {
 
       const inspect = testConsole.stdout.inspect();
 
@@ -75,19 +75,26 @@ describe('app - integration tests', function () {
       inspect.restore();
 
       // check for console
-      assert.strictEqual(inspect.output.length, 1); // one console
-      assert.match(inspect.output[0], /\[INFO:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay \n/);
+      assert.isAtLeast(inspect.output.length, 1); // one console
+      assert.match(inspect.output[inspect.output.length - 1], /\[INFO:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay \n/);
 
-      // check for file
-      assert.isTrue(fs.existsSync(appLogFile));
+      // had to add a timeout b/c the file exists check wasn't working without it.
+      setTimeout(() => {
 
-      const lastLine = JSON.parse(getLastLine(appLogFile));
-      assert.isObject(lastLine);
+        // check for file
+        assert.isTrue(fs.existsSync(appLogFile), `the app log file (${appLogFile}) exisits`);
 
-      assert.strictEqual(lastLine.level, 'info');
-      assert.strictEqual(lastLine.serviceName, process.env.SERVICE_NAME);
-      assert.strictEqual(lastLine.message, 'hello kartikay');
-      assert.match(lastLine.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
+        const lastLine = JSON.parse(getLastLine(appLogFile));
+        assert.isObject(lastLine);
+
+        assert.strictEqual(lastLine.level, 'info');
+        assert.strictEqual(lastLine.serviceName, process.env.SERVICE_NAME);
+        assert.strictEqual(lastLine.message, 'hello kartikay');
+        assert.match(lastLine.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
+
+        done();
+
+      }, 1000);
 
     });
 
@@ -99,8 +106,8 @@ describe('app - integration tests', function () {
       inspect.restore();
 
       // check for console
-      assert.strictEqual(inspect.output.length, 1); // one console
-      assert.match(inspect.output[0], /\[WARN:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay {"nickname":"Kartik"}\n/);
+      assert.isAtLeast(inspect.output.length, 1); // one console
+      assert.match(inspect.output[inspect.output.length - 1], /\[WARN:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay {"nickname":"Kartik"}\n/);
 
       // check for file
       assert.isTrue(fs.existsSync(appLogFile));
@@ -124,10 +131,10 @@ describe('app - integration tests', function () {
       inspect.restore();
 
       // check for console
-      assert.strictEqual(inspect.output.length, 1); // one console
+      assert.isAtLeast(inspect.output.length, 1); // one console
       
       // its hard to check the exact string, so doing a partial match
-      assert.match(inspect.output[0], /\[ERROR:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z test123 \n.*/);
+      assert.match(inspect.output[inspect.output.length - 1], /\[ERROR:logger-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z test123 \n.*/);
 
       // check for file
       assert.isTrue(fs.existsSync(appLogFile));
@@ -143,6 +150,18 @@ describe('app - integration tests', function () {
       assert.strictEqual(lastLine.meta.name, 'Error');
       assert.strictEqual(lastLine.meta.isError, true);
       assert.isString(lastLine.meta.stack);
+
+    });
+
+    it ('should not log debug call as the level is info', function () {
+
+      const inspect = testConsole.stdout.inspect();
+
+      const message = 'hello kartikay';
+      logger.debug(new Error('test123'));
+
+      inspect.restore();
+      assert.strictEqual(inspect.output.length, 0);
 
     });
 
@@ -163,8 +182,8 @@ describe('app - integration tests', function () {
         inspect.restore();
 
         // check for console
-        assert.strictEqual(inspect.output.length, 1); // one console
-        assert.match(inspect.output[0], /\[INFO:components-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay \n/);
+        assert.isAtLeast(inspect.output.length, 1); // one console
+        assert.match(inspect.output[inspect.output.length - 1], /\[INFO:components-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay \n/);
 
         // check for file
         assert.isTrue(fs.existsSync(appLogFile));
@@ -182,6 +201,33 @@ describe('app - integration tests', function () {
       }, 1000);
 
     });
+
+    it ('should log even if the log level is below what is the log level of the service', function (done) {
+
+      const inspect = testConsole.stdout.inspect();
+
+      const message = { level: 'debug', message: 'hello kartikay debug', meta: { serviceName: 'components-service' } };
+      exchange.publish('app', JSON.stringify(message));
+
+      // wait for a second
+      setTimeout(() => {
+
+        inspect.restore();
+
+        // check for console
+        assert.isAtLeast(inspect.output.length, 1);
+        assert.match(inspect.output[inspect.output.length - 1], /\[DEBUG:components-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z hello kartikay debug \n/);
+
+        const lastLine = JSON.parse(getLastLine(appLogFile));
+        assert.isObject(lastLine);
+        assert.strictEqual(lastLine.level, 'debug');
+
+        done();
+
+      }, 1000);
+
+    });
+
 
     it ('should not log application log message if not an object', function (done) {
 
@@ -227,8 +273,8 @@ describe('app - integration tests', function () {
         inspect.restore();
 
         // check for console
-        assert.strictEqual(inspect.output.length, 1); // one console
-        assert.match(inspect.output[0], /\[HTTPREQUEST:components-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z GET url ip status 204 200 ms\n/);
+        assert.isAtLeast(inspect.output.length, 1); // one console
+        assert.match(inspect.output[inspect.output.length - 1], /\[HTTPREQUEST:components-service\] - \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z GET url ip status 204 200 ms\n/);
 
         // check for file
         assert.isTrue(fs.existsSync(reqLogFile));

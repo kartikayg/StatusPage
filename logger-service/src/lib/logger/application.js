@@ -33,6 +33,7 @@ const createWinstonLogger = (writers, options) => {
   // console writer
   if (writers.includes('console')) {
     wLogger.add(winston.transports.Console, {
+      debugStdout: true,
       formatter: (logData) => {
 
         const lMeta = logData.meta;
