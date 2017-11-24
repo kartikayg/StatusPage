@@ -61,7 +61,7 @@ describe('app - integration tests', function () {
 
     // disconnect queues
     messagingQueue.disconnect();
-    require('./app').stop();
+    require('./app').shutdown();
 
   });
 
@@ -85,7 +85,7 @@ describe('app - integration tests', function () {
       assert.isObject(lastLine);
 
       assert.strictEqual(lastLine.level, 'info');
-      assert.strictEqual(lastLine.serviceName, 'logger-service');
+      assert.strictEqual(lastLine.serviceName, process.env.SERVICE_NAME);
       assert.strictEqual(lastLine.message, 'hello kartikay');
       assert.match(lastLine.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
 
@@ -109,7 +109,7 @@ describe('app - integration tests', function () {
       assert.isObject(lastLine);
 
       assert.strictEqual(lastLine.level, 'warn');
-      assert.strictEqual(lastLine.serviceName, 'logger-service');
+      assert.strictEqual(lastLine.serviceName, process.env.SERVICE_NAME);
       assert.strictEqual(lastLine.message, 'hello kartikay');
       assert.match(lastLine.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
       assert.deepEqual(lastLine.meta, {nickname: 'Kartik'});
@@ -136,7 +136,7 @@ describe('app - integration tests', function () {
       assert.isObject(lastLine);
 
       assert.strictEqual(lastLine.level, 'error');
-      assert.strictEqual(lastLine.serviceName, 'logger-service');
+      assert.strictEqual(lastLine.serviceName, process.env.SERVICE_NAME);
       assert.strictEqual(lastLine.message, 'test123');
       assert.match(lastLine.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
       assert.strictEqual(lastLine.meta.code, 500);

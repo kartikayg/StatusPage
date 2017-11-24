@@ -115,7 +115,7 @@ const createLoggerWrapper = (maxLevel, wLogger) => {
     }
 
     let logMessage = message;
-    let logMeta = Object.assign({ serviceName: 'logger-service' }, meta || {});
+    let logMeta = Object.assign({ serviceName: process.env.SERVICE_NAME }, meta || {});
 
     // if the message is an error
     if (message instanceof Error) {
@@ -204,4 +204,3 @@ export default defaultLogger;
 // other fn exports
 export { init };
 export { allowedLevels };
-

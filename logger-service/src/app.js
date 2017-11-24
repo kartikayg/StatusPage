@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Start and stop for the application
  */
 
 // npm packges
@@ -47,6 +47,8 @@ const start = async () => {
   // add listeners on the messaging queue
   await addQueueListeners({ appLogger, reqLogger });
 
+  appLogger.debug(`${process.env.SERVICE_NAME} started ...`);
+
 };
 
 /**
@@ -85,8 +87,10 @@ const addQueueListeners = async (loggers) => {
 /**
  * Shuts down the microservice
  */
-const stop = () => {
-  messagingQueue.disconnect();
+const shutdown = () => {
+  if (messagingQueue) {
+    messagingQueue.disconnect();
+  }
 };
 
-export default { start, stop };
+export default { start, shutdown };
