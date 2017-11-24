@@ -83,7 +83,7 @@ describe('app - integration tests', function () {
 
     it ('should publish to queue when logging a message', function (done) {
 
-      logger.log('debug', 'hello kartikay');
+      logger.log('info', 'hello kartikay');
 
       setTimeout(function() {
 
@@ -94,7 +94,7 @@ describe('app - integration tests', function () {
 
         const o = JSON.parse(arg);
 
-        assert.strictEqual(o.level, 'debug');
+        assert.strictEqual(o.level, 'info');
         assert.strictEqual(o.message, 'hello kartikay');
         assert.strictEqual(o.meta.serviceName, process.env.SERVICE_NAME);
         assert.match(o.meta.timestamp, /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/);
@@ -128,6 +128,17 @@ describe('app - integration tests', function () {
 
         done();
 
+      }, 2000);
+
+    });
+
+    it ('should not publish to queue if the log level is debug, as its above the max level', function (done) {
+
+      logger.log('debug', 'hello kartikay');
+
+      setTimeout(function() {
+        sinon.assert.notCalled(appLogQueueCallbackSpy);
+        done();
       }, 2000);
 
     });

@@ -34,7 +34,7 @@ const start = async () => {
   await db.setup();
 
   // init messaging queue
-  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 180000);
+  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 120000);
 
   // init logger
   const logger = initMQLogger(conf.logger.LOG_LEVEL, messagingQueue, true);
