@@ -1,0 +1,31 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Dependency directory
+node_modules
+
+# .env
+.env
+
+# docker db backup
+mongodata
+
+# gulp file cache
+.gulp-cache
+
+# Babel ES6 compiles files
+dist
+
+# Coverage directory used by tools like istanbul
+coverage
