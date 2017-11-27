@@ -14,7 +14,7 @@ import server from './server';
 let messagingQueue;
 
 // {object} express application
-let app; 
+let app;
 
 /**
  * Initalizes the microservice. Here are the main steps in this function:
