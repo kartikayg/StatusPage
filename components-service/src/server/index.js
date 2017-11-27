@@ -62,7 +62,9 @@ const start = (conf, options) => {
           referrer: req.headers.referer || req.headers.referrer
         });
       }
-      catch (e) {} // eslint-disable-line no-empty
+      catch (e) {
+        console.log(e); // eslint-disable-line no-console
+      }
 
       return next(err);
 
@@ -91,10 +93,10 @@ const start = (conf, options) => {
 
     });
 
-    const server = app.listen(conf.PORT, (...args) => {
-      app.close = function() {
+    const server = app.listen(conf.PORT, () => {
+      app.close = function () { // eslint-disable-line func-names
         server.close();
-      }
+      };
       return resolve(app);
     });
 

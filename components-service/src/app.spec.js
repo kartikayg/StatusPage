@@ -69,7 +69,7 @@ describe('app - integration tests', function () {
     });
 
     after(function (done) {
-      require('./app').stop();
+      require('./app').shutdown();
       require('./lib/logger').resetToConsole();
       setTimeout(done, 2000);
     });
@@ -158,7 +158,7 @@ describe('app - integration tests', function () {
     });
 
     after(function (done) {
-      require('./app').stop();
+      require('./app').shutdown();
       require('./lib/logger').resetToConsole();
       setTimeout(done, 2000);
     });
@@ -266,7 +266,7 @@ describe('app - integration tests', function () {
     });
 
     after(function (done) {
-      require('./app').stop();
+      require('./app').shutdown();
       require('./lib/logger').resetToConsole();
       setTimeout(done, 2000);
     });
@@ -407,6 +407,34 @@ describe('app - integration tests', function () {
 
           done();
         });
+
+    });
+
+  });
+
+  describe ('misc', function () {
+
+    let app;
+
+    before(function (done) {
+      require('./app').start().then(r => {
+        app = r;
+      });
+      setTimeout(done, 2000);
+    });
+
+    after(function (done) {
+      require('./app').shutdown();
+      require('./lib/logger').resetToConsole();
+      setTimeout(done, 2000);
+    });
+
+    it ('should return 404 on invalid url', function(done) {
+
+      request(app)
+        .get('/api/components/test/test')
+        .expect('Content-Type', /json/)
+        .expect(404, done);
 
     });
 

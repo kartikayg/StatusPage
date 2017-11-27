@@ -1,5 +1,5 @@
 /**
- * Entry point for the microservice/
+ * @fileoverview Start and stop for the application
  */
 
 // internal packages
@@ -54,9 +54,16 @@ const start = async () => {
 /**
  * Shuts down the microservice
  */
-const stop = () => {
-  messagingQueue.disconnect();
-  app.close();
+const shutdown = () => {
+
+  if (messagingQueue) {
+    messagingQueue.disconnect();
+  }
+
+  if (app) {
+    app.close();
+  }
+
 };
 
-export default { start, stop };
+export default { start, shutdown };

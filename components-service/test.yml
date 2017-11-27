@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  api_test:
+  test_api:
     image: node:8.9.0
     volumes:
       - .:/app
@@ -12,13 +12,13 @@ services:
     env_file:
       - test.env
     depends_on:
-      - db_test
-      - messagingqueue_test
-  db_test:
+      - test_db
+      - test_messagingqueue
+  test_db:
     image: "mongo:3.4"
     ports:
       - 6013:27017
-  messagingqueue_test:
+  test_messagingqueue:
     hostname: testcomponentservice
     image: rabbitmq:3.6.6-management
     environment:
