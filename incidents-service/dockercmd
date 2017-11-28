@@ -14,10 +14,10 @@ case "$1" in
     ;;
    
   test)
-    docker-compose -f test.yml stop && \                  ## stop any old leftover services. there shouldn't be, but still.
-    docker-compose -f test.yml run test_api  && \
-    docker stop componentsservice_test_messagingqueue_1 && \ ## once done, stop the queue
-    docker stop componentsservice_test_db_1                  ## once done, stop the db
+    ## stop any old leftover services. there shouldn't be, but still.
+    docker-compose -f test.yml stop && \
+    docker-compose -f test.yml run test_api && \
+    docker-compose -f test.yml stop \
     ;;
    
   lint)
