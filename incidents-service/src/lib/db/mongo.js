@@ -47,14 +47,9 @@ const connect = (endpoint) => {
  */
 const initialSetup = async (db) => {
 
-  // components collection
-  await db.createCollection('components');
-  db.collection('components').createIndex({ id: 1 }, { unique: true });
-
-
-  // component groups collection
-  await db.createCollection('component_groups');
-  db.collection('component_groups').createIndex({ id: 1 }, { unique: true });
+  // incidents collection
+  await db.createCollection('incidents');
+  db.collection('incidents').createIndex({ id: 1 }, { unique: true });
 
 };
 

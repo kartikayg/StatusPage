@@ -40,11 +40,13 @@
     "helmet": "^3.9.0",
     "http-status": "^1.0.1",
     "joi": "^10.6.0",
+    "joi-html-input": "^1.1.5",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
     "mongodb": "^2.2.33",
     "morgan": "^1.9.0",
     "morgan-json": "^1.1.0",
+    "sanitize-html": "^1.16.1",
     "striptags": "^3.1.0",
     "uniqid": "^4.1.1"
   },
