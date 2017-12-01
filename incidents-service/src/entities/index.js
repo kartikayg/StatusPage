@@ -51,7 +51,7 @@ const getEntityId = (entityType) => {
 /**
  * Prototype for the entity object to export out
  */
-const entity = {
+const AbstractEntity = {
 
   // must be defined when creating object from this prototype
   type: undefined,
@@ -69,7 +69,7 @@ const entity = {
 
 // now for each entity, export them out.
 Object.keys(entities).forEach(t => {
-  const e = Object.create(entity);
+  const e = Object.create(AbstractEntity);
   e.type = t;
 
   exports[t] = e;
