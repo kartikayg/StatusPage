@@ -3,7 +3,6 @@
  */
 
 import express from 'express';
-import boolean from 'boolean';
 import httpStatus from 'http-status';
 
 import {params as sanitizeParams} from '../middleware/sanitize';

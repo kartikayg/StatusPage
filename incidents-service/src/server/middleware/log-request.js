@@ -8,7 +8,7 @@ import morganJson from 'morgan-json';
 
 // add token for request time
 morgan.token('request-time', () => {
-  return new Date();
+  return new Date().toISOString();
 });
 
 

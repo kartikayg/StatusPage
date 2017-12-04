@@ -202,12 +202,13 @@ const init = (dao, messagingQueue) => {
           pred.components = validFilters[k];
           break;
         case 'created_after':
-          pred.created_at = { $gte : validFilters[k] }
+          pred.created_at = { $gte: validFilters[k] };
           break;
-        case 'query':
+        case 'query': {
           const regex = { $regex: new RegExp(validFilters[k]), $options: 'i' };
-          pred['$or'] = [{ name: regex }, { 'updates.message': regex }];
+          pred.$or = [{ name: regex }, { 'updates.message': regex }];
           break;
+        }
         default:
           break;
       }
