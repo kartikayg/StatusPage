@@ -4,6 +4,8 @@ import MockDate from 'mockdate';
 
 import pick from 'lodash/fp/pick';
 import omit from 'lodash/fp/omit';
+import find from 'lodash/fp/find';
+import cloneDeep from 'lodash/fp/cloneDeep';
 
 import incidentRepo from './incident';
 import {incident as incidentEntity, incidentUpdate as incidentUpdateEntity } from '../entities/index';
@@ -19,7 +21,7 @@ describe('repo/incident', function() {
     publish: sinon.spy()
   };
 
-  const staticCurrentTime = (new Date()).toISOString();
+  const staticCurrentTime = new Date();
 
   const testBackfilledIncidentId = 'IC123';
   
@@ -77,6 +79,7 @@ describe('repo/incident', function() {
       do_twitter_update: true,
       do_notify_subscribers: false,
       status: 'investigating',
+      displayed_at: staticCurrentTime,
       message: 'message'
     }, {
       id: 'IU007',
@@ -86,7 +89,8 @@ describe('repo/incident', function() {
       do_twitter_update: true,
       do_notify_subscribers: false,
       status: 'resolved',
-      message: 'message'
+      message: 'message',
+      displayed_at: staticCurrentTime
     }]
   };
 
@@ -130,7 +134,13 @@ describe('repo/incident', function() {
       if (pred.id == testBackfilledIncidentId) return Promise.resolve([existingBackfilledIncident]);
       if (pred.id == testRealtimeIncidentId) return Promise.resolve([existingRealtimeIncident]);
       if (pred.id == testPendingRealtimeIncidentId) return Promise.resolve([existingPendingRealtimeIncident]);
-      
+      if (Object.keys(pred).length === 0) return Promise.resolve([existingBackfilledIncident, existingRealtimeIncident, existingPendingRealtimeIncident]);
+
+      // only type
+      if (pred.type === 'realtime') {
+        return Promise.resolve([existingRealtimeIncident, existingPendingRealtimeIncident]);
+      }
+
       return Promise.resolve([]);
     },
 
@@ -178,102 +188,113 @@ describe('repo/incident', function() {
 
   });
 
-  // describe('list()', function() {
+  describe('list()', function() {
 
-  //   it ('should return components with one filter', async function() {
+    const sortBy = { _id: 1 };
 
-  //     const findSpy = sinon.spy(daoMockObj, 'find');
+    it ('should return components with no filter', async function () {
 
-  //     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
-  //     // one filter
-  //     let pred = { active: true };
-  //     const components = await repo.list(pred);
+      // one filter
+      const incidents = await repo.list();
 
-  //     sinon.assert.calledOnce(findSpy);
-  //     sinon.assert.calledWith(findSpy, pred, sortBy);
-  //     assert.deepEqual(components, [existingCmpWithoutId]);
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, {}, sortBy);
 
-  //     findSpy.restore();
+      assert.deepEqual(incidents, [existingBackfilledIncident, existingRealtimeIncident, existingPendingRealtimeIncident].map(formatIncident));
 
-  //   });
+      findSpy.restore();
 
-  //   it ('should return components with multiple filters', async function() {
+      findSpy.restore();
 
-  //     const findSpy = sinon.spy(daoMockObj, 'find');
+    });
 
-  //     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+    it ('should return components with type filter', async function() {
 
-  //     // one filter
-  //     let pred = { active: true, group_id: 'test' };
-  //     const components = await repo.list(pred);
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
-  //     sinon.assert.calledOnce(findSpy);
-  //     sinon.assert.calledWith(findSpy, pred, sortBy);
-  //     assert.deepEqual(components, [existingCmpWithoutId]);
+      // one filter
+      let pred = { type: 'realtime' };
+      const incidents = await repo.list(pred);
 
-  //     findSpy.restore();
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, pred, sortBy);
+      assert.deepEqual(incidents, [existingRealtimeIncident, existingPendingRealtimeIncident].map(formatIncident));
 
-  //   });
+      findSpy.restore();
 
-  //   it ('should return components  with extra filters but no error', async function() {
+    });
 
-  //     const findSpy = sinon.spy(daoMockObj, 'find');
+    it ('should return components with type + multiple filters', async function() {
 
-  //     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
-  //     // one filter
-  //     let pred = { active: true, filter: 'test' };
-  //     const components = await repo.list(pred);
+      //  filters
+      let pred = { type: 'realtime', is_resolved: true, component_id: 'component_id', created_after: '2017-01-01' };
+      const incidents = await repo.list(pred);
 
-  //     sinon.assert.calledOnce(findSpy);
-  //     sinon.assert.calledWith(findSpy, {active: true}, sortBy);
-  //     assert.deepEqual(components, [existingCmpWithoutId]);
+      const expectedPred = { type: 'realtime', is_resolved: true, components: 'component_id', created_at: { $gte : new Date('2017-01-01') } };
 
-  //     findSpy.restore();
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, expectedPred, sortBy);
+      assert.deepEqual(incidents, [existingRealtimeIncident, existingPendingRealtimeIncident].map(formatIncident));
 
-  //   });
+      findSpy.restore();
 
-  //   it ('should return no components with filters', async function() {
+    });
 
-  //     const findSpy = sinon.spy(daoMockObj, 'find');
 
-  //     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+    it ('should return no incidents with filters', async function() {
 
-  //     // one filter
-  //     let pred = { active: false, group_id: 'group', status: 'operational'};
-  //     const components = await repo.list(pred);
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
-  //     sinon.assert.calledOnce(findSpy);
-  //     sinon.assert.calledWith(findSpy, pred, sortBy);
-  //     assert.deepEqual(components, []);
+      // pred
+      let pred = { type: 'type' };
+      const incidents = await repo.list(pred);
 
-  //     findSpy.restore();
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, pred, sortBy);
+      assert.deepEqual(incidents, []);
 
-  //   });
+      findSpy.restore();
 
-  //   it ('should return an error on find()', function(done) {
+    });
 
-  //     const findStub = sinon.stub(daoMockObj, 'find').callsFake((pred, sortBy) => {
-  //       throw new Error('db error');
-  //     });
+    it ('should return incidents even if extra filters passed', async function() {
 
-  //     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
-  //     const pred = { active: false, group_id: 'group', status: 'operational'};
+      const findSpy = sinon.spy(daoMockObj, 'find');
+
+      let pred = { type: 'realtime', extra: 'test' };
+      const incidents = await repo.list(pred);
+
+      sinon.assert.calledOnce(findSpy);
+      sinon.assert.calledWith(findSpy, { type: 'realtime' }, sortBy);
+      assert.deepEqual(incidents, [existingRealtimeIncident, existingPendingRealtimeIncident].map(formatIncident));
+
+      findSpy.restore();
+
+    });
+
+    it ('should return an error on find() if db error', function(done) {
+
+      const findStub = sinon.stub(daoMockObj, 'find').callsFake((pred, sortBy) => {
+        throw new Error('db error');
+      });
       
-  //     repo.list(pred).catch(e => {
+      repo.list().catch(e => {
 
-  //       assert.strictEqual(e.message, 'db error');
-  //       sinon.assert.calledOnce(findStub);
-  //       sinon.assert.calledWith(findStub, pred, sortBy);
+        assert.strictEqual(e.message, 'db error');
+        sinon.assert.calledOnce(findStub);
 
-  //       findStub.restore();
-  //       done();
-  //     });
+        findStub.restore();
+        done();
 
-  //   });
+      });
 
-  // });
+    });
+
+  });
 
   describe('load()', function() {
 
@@ -397,7 +418,7 @@ describe('repo/incident', function() {
         const insertArg = insertSpy.args[0][0];
 
         assert.strictEqual(insertArg.is_resolved, true);
-        assert.strictEqual(insertArg.resolved_at, staticCurrentTime);
+        assert.equal(insertArg.resolved_at.toISOString(), staticCurrentTime.toISOString());
 
         insertSpy.restore();
 
@@ -432,7 +453,7 @@ describe('repo/incident', function() {
         const insertArg = insertSpy.args[0][0];
 
         assert.strictEqual(insertArg.updates[0].status, 'resolved');
-        assert.strictEqual(insertArg.resolved_at, staticCurrentTime);
+        assert.strictEqual(insertArg.resolved_at.toISOString(), staticCurrentTime.toISOString());
 
         // returning the res from dao insert
         assert.deepEqual(createdIncident, formatIncident(existingBackfilledIncident));
@@ -454,7 +475,7 @@ describe('repo/incident', function() {
       });
     });
 
-    it ('should fail if trying to update a resolved incident', function(done) {
+    it ('should fail if trying to update a backfilled incident', function(done) {
 
       repo.update(testBackfilledIncidentId, {}).catch(e => {
         assert.strictEqual(e.name, 'UpdateNotAllowedError');
@@ -495,7 +516,7 @@ describe('repo/incident', function() {
       const updateArg = updateSpy.args[0][0];
 
       assert.strictEqual(updateArg.is_resolved, true);
-      assert.strictEqual(updateArg.resolved_at, staticCurrentTime);
+      assert.strictEqual(updateArg.resolved_at.toISOString(), staticCurrentTime.toISOString());
 
       assert.strictEqual(updateArg.updates.length, 2);
 
@@ -573,66 +594,46 @@ describe('repo/incident', function() {
 
       });
 
-    });
+      it ('should add the incident-update with status update if incident is resolved', async function () {
 
-  });
+        const genIncidentUpdIdStub = sinon.stub(incidentUpdateEntity, 'generateId').callsFake(() => {
+          return 'IU765';
+        });
 
-  describe ('postmortem message', function () {
+        const updateSpy = sinon.spy(daoMockObj, 'update');
 
-    it ('should fail if incident is not resolved', function (done) {
+        await repo.update(testRealtimeIncidentId, {
+          status: 'whatever', // it won't be honored
+          message: 'the problem was with db'
+        });
 
-      repo.addPostmortemMessage(testPendingRealtimeIncidentId, {message: 'postmortem'}).catch(e => {
-        assert.strictEqual(e.name, 'UpdateNotAllowedError');
-        done();
+        sinon.assert.calledOnce(updateSpy);
+
+        const updateArg = updateSpy.args[0][0];
+
+        // a new incident-update was added
+        assert.strictEqual(updateArg.updates.length, 3);
+
+        const lastUpdate = updateArg.updates[2];
+
+        // validate the last update values
+        const expected = {
+          message: 'the problem was with db',
+          status: 'update',
+          do_notify_subscribers: false,
+          do_twitter_update: false,
+          id: 'IU765',
+          displayed_at: staticCurrentTime,
+          updated_at: staticCurrentTime,
+          created_at: staticCurrentTime 
+        };
+
+        assert.deepEqual(expected, lastUpdate);
+
+        updateSpy.restore();
+        genIncidentUpdIdStub.restore();
+
       });
-
-    });
-
-    it ('should fail if incident is of type backfilled', function (done) {
-
-      repo.addPostmortemMessage(testBackfilledIncidentId, {message: 'postmortem'}).catch(e => {
-        assert.strictEqual(e.name, 'UpdateNotAllowedError');
-        done();
-      });
-
-    });
-
-    it ('should add a postmortem message to a realtime incident', async function () {
-
-      const genIncidentUpdIdStub = sinon.stub(incidentUpdateEntity, 'generateId').callsFake(() => {
-        return 'IU765';
-      });
-
-      const updateSpy = sinon.spy(daoMockObj, 'update');
-
-      await repo.addPostmortemMessage(testRealtimeIncidentId, {
-        message: 'postmortem'
-      });
-
-      sinon.assert.calledOnce(updateSpy);
-
-      const updateArg = updateSpy.args[0][0];
-
-      assert.strictEqual(updateArg.updates.length, 3);
-
-      const lastUpdate = updateArg.updates[2];
-
-      // validate the last update values
-      const expected = {
-        message: 'postmortem',
-        status: 'postmortem',
-        do_notify_subscribers: false,
-        do_twitter_update: false,
-        id: 'IU765',
-        displayed_at: staticCurrentTime,
-        updated_at: staticCurrentTime,
-        created_at: staticCurrentTime 
-      };
-
-      assert.deepEqual(expected, lastUpdate);
-
-      updateSpy.restore();
-      genIncidentUpdIdStub.restore();
 
     });
 
@@ -671,6 +672,48 @@ describe('repo/incident', function() {
         done();
 
       });    
+
+    });
+
+  });
+
+  describe('change to incident-update', function () {
+
+    it ('should fail b/c of invalid incident-update id', function(done) {
+      repo.changeIncidentUpdateEntry(testRealtimeIncidentId, '1234', {}).catch(e => {
+        assert.strictEqual(e.name, 'IdNotFoundError');
+        done();
+      });
+    });
+
+    it ('should update the incident-update', async function () {
+
+      const updateSpy = sinon.spy(daoMockObj, 'update');
+
+      const currentTime = new Date();
+
+      await repo.changeIncidentUpdateEntry(testRealtimeIncidentId, testIncUpdateId, {
+        displayed_at: currentTime,
+        message: 'updated-message',
+        status: 'resolved'
+      });
+
+      sinon.assert.calledOnce(updateSpy);
+
+      const updateArg = updateSpy.args[0][0];
+
+      // will check against the entire incident object. to make sure that only one incident-update
+      // was changed
+      const cloned = formatIncident(cloneDeep(existingRealtimeIncident));
+
+      // update the cloned incident-update to wwhat is expected
+      const incidentUpdateToChange = find(['id', testIncUpdateId])(cloned.updates);
+      incidentUpdateToChange.displayed_at =  currentTime;
+      incidentUpdateToChange.message = 'updated-message';
+
+      assert.deepEqual(cloned, updateArg);
+
+      updateSpy.restore();
 
     });
 

@@ -7,23 +7,23 @@ describe('entity/incident', function() {
 
   const incidentUpdateTestData = {
     id: 'IU123',
-    created_at: (new Date()).toISOString(),
-    updated_at: (new Date()).toISOString(),
+    created_at: new Date(),
+    updated_at: new Date(),
     message: 'a new incident update',
     status: 'investigating',
     do_twitter_update: false,
     do_notify_subscribers: true,
-    displayed_at: (new Date()).toISOString()
+    displayed_at: new Date()
   };
 
   const incidentTestData = {
     id: 'IC123',
-    created_at: (new Date()).toISOString(),
-    updated_at: (new Date()).toISOString(),
+    created_at: new Date(),
+    updated_at: new Date(),
     name: 'a new incident',
     type: 'realtime',
     components: ['component_id'],
-    resolved_at: (new Date()).toISOString(),
+    resolved_at: new Date(),
     is_resolved: true 
   };
 
@@ -94,8 +94,8 @@ describe('entity/incident', function() {
 
     const data = Object.assign({}, incidentTestData, {
       id: 123,
-      created_at: '2017-12-12',
-      updated_at: '2017-12-12',
+      created_at: 'time',
+      updated_at: 'time',
       name: 123,
       type: 'type'
     });
@@ -104,8 +104,8 @@ describe('entity/incident', function() {
 
     const invalidValuesErr = [
       '"id" must be a string',
-      '"created_at" with value "2017-12-12" fails to match the required pattern: /\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z/',
-      '"updated_at" with value "2017-12-12" fails to match the required pattern: /\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z/',
+      '"created_at" must be a valid ISO 8601 date',
+      '"updated_at" must be a valid ISO 8601 date',
       '"name" must be a string',
       '"type" must be one of [realtime, scheduled, backfilled]'
     ];
@@ -176,7 +176,7 @@ describe('entity/incident', function() {
       const data = Object.assign({}, rlIncidentTestData);
       data['updates'] = [ Object.assign({}, rlIncidentUpdateTestData, {status: 'completed'}) ];
       
-      joiassert.error(incident.schema, data, '"status" must be one of [investigating, identified, monitoring, resolved, postmortem]');
+      joiassert.error(incident.schema, data, '"status" must be one of [investigating, identified, monitoring, resolved, update]');
 
     });
 
@@ -198,8 +198,8 @@ describe('entity/incident', function() {
     const scIncidentTestData = Object.assign({}, incidentTestData, { 
       type: 'scheduled',
       scheduled_status: 'completed',
-      scheduled_start_time: (new Date()).toISOString(),
-      scheduled_end_time: (new Date()).toISOString(),
+      scheduled_start_time: new Date(),
+      scheduled_end_time: new Date(),
       scheduled_auto_status_updates: true,
       scheduled_auto_updates_send_notifications: true
     });
@@ -242,7 +242,7 @@ describe('entity/incident', function() {
       const data = Object.assign({}, scIncidentTestData);
       data['updates'] = [ Object.assign({}, scIncidentUpdateTestData, {status: 'error'}) ];
       
-      joiassert.error(incident.schema, data, '"status" must be one of [scheduled, in_progress, verifying, cancelled, resolved, postmortem]');
+      joiassert.error(incident.schema, data, '"status" must be one of [scheduled, in_progress, verifying, resolved, cancelled, update]');
 
     });
 

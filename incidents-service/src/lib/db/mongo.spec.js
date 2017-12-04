@@ -131,7 +131,7 @@ describe('lib/db/mongo', function() {
       sinon.assert.calledWith(createSpy, 'incidents');
 
       // setup indexes
-      sinon.assert.calledOnce(idxSpy);
+      sinon.assert.calledThrice(idxSpy);
 
       createSpy.restore();
       idxSpy.restore();

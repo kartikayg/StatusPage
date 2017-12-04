@@ -11,11 +11,11 @@ const schema = {
   id: Joi.string()
     .regex(/^IC.+$/)
     .required(),
-  created_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  created_at: Joi.date()
+    .iso()
     .required(),
-  updated_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  updated_at: Joi.date()
+    .iso()
     .required(),
 
   name: Joi.string()
@@ -30,12 +30,12 @@ const schema = {
     .allow(null),
   is_resolved: Joi.boolean()
     .default(false),
-  resolved_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  resolved_at: Joi.date()
+    .iso()
     .when('is_resolved', {
       is: true,
       then: Joi.required(),
-      otherwise: Joi.string()
+      otherwise: Joi.date()
         .default(null)
         .only(null)
     }),
@@ -48,19 +48,19 @@ const schema = {
       then: Joi.string().default('scheduled'),
       otherwise: Joi.string().forbidden()
     }),
-  scheduled_start_time: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  scheduled_start_time: Joi.date()
+    .iso()
     .when('type', {
       is: 'scheduled',
       then: Joi.required(),
-      otherwise: Joi.string().forbidden()
+      otherwise: Joi.date().forbidden()
     }),
-  scheduled_end_time: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  scheduled_end_time: Joi.date()
+    .iso()
     .when('type', {
       is: 'scheduled',
       then: Joi.required(),
-      otherwise: Joi.string().forbidden()
+      otherwise: Joi.date().forbidden()
     }),
   scheduled_auto_status_updates: Joi.boolean()
     .when('type', {
@@ -102,7 +102,7 @@ const schema = {
           {
             status: Joi.string()
               .required()
-              .only(['investigating', 'identified', 'monitoring', 'resolved', 'postmortem'])
+              .only(['investigating', 'identified', 'monitoring', 'resolved', 'update'])
           }
         ))
         .unique((a, b) => a.status === 'resolved' && b.status === 'resolved') // eslint-disable-line arrow-body-style
@@ -117,7 +117,7 @@ const schema = {
           {
             status: Joi.string()
               .required()
-              .only(['scheduled', 'in_progress', 'verifying', 'resolved', 'cancelled', 'postmortem'])
+              .only(['scheduled', 'in_progress', 'verifying', 'resolved', 'cancelled', 'update'])
           }
         ))
         .unique((a, b) => a.status === 'resolved' && b.status === 'resolved') // eslint-disable-line arrow-body-style

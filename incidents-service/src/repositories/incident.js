@@ -2,9 +2,12 @@
  * @fileoverview Repository to manage incidents
  */
 
+import Joi from 'joi';
+
 import cloneDeep from 'lodash/fp/cloneDeep';
 import pick from 'lodash/fp/pick';
 import omit from 'lodash/fp/omit';
+import find from 'lodash/fp/find';
 
 import {incident as incidentEntity, incidentUpdate as incidentUpdateEntity } from '../entities/index';
 import {IdNotFoundError, UpdateNotAllowedError} from './errors';
@@ -13,7 +16,7 @@ import {IdNotFoundError, UpdateNotAllowedError} from './errors';
 /**
  * Validates an incident data before saving it.
  * @param {object} incidentObj - incident to validate
- * @param {object} existingIncident - existing incident. If this is 
+ * @param {object} existingIncident - existing incident. If this is
  *  passed, it means its an update operation and certain checks
  *  will be done.
  * @return {Promise}
@@ -35,7 +38,7 @@ const validate = async (incidentObj, existingIncident = null) => {
 
 
     default:
-      throw new Error(`Invalid type: ${data.type}`);
+      throw new Error(`Invalid type: ${incidentObj.type}`);
 
   }
 
@@ -76,9 +79,10 @@ const buildIncidentObj = (data, existingIncident) => {
   // if updating ...
   if (existingIncident) {
     delete dataCopy.name;
+    dataCopy.type = existingIncident.type;
   }
 
-  switch (data.type) {
+  switch (dataCopy.type) {
 
     case 'realtime':
     case 'backfilled':
@@ -90,12 +94,10 @@ const buildIncidentObj = (data, existingIncident) => {
       );
 
     case 'scheduled':
-
-      break;
-
+      return existingIncident;
 
     default:
-      throw new Error(`Invalid type: ${data.type}`);
+      throw new Error(`Invalid type: ${dataCopy.type}`);
 
   }
 
@@ -113,8 +115,8 @@ const buildIncidentUpdateObj = (data) => {
   const obj = pick(['message', 'status', 'displayed_at', 'do_twitter_update', 'do_notify_subscribers'])(data);
 
   obj.id = incidentUpdateEntity.generateId();
-  obj.created_at = (new Date()).toISOString();
-  obj.updated_at = (new Date()).toISOString();
+  obj.created_at = new Date();
+  obj.updated_at = new Date();
 
   return obj;
 
@@ -158,27 +160,67 @@ const init = (dao, messagingQueue) => {
 
   };
 
-  // /**
-  //  * Returns a list of components based on query
-  //  * @param {object} filter
-  //  *   fields: active, status, group_id
-  //  * @return {Promise}
-  //  *  if fulfilled, {array} array of components
-  //  *  if rejected, {Error} error
-  //  */
-  // repo.list = async (filter) => {
+  /**
+   * Returns a list of incidents based on filters
+   * @param {object} filter. no field is required. allowed fields:
+   *   type - incident type
+   *   is_resolved
+   *   component_id
+   *   created_after - return incidents created on and after this date
+   *   query - search against incident name and update messages
+   * @return {Promise}
+   *  if fulfilled, {array} array of components
+   *  if rejected, {Error} error
+   */
+  repo.list = async (filter = {}) => {
 
-  //   // sort by group and then the sort order and then id. in
-  //   // case sort_order is same, it will order by creation (_id)
-  //   const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
+    // validate passed filters
+    const {error, value: validFilters} = Joi.validate(filter, {
+      type: Joi.string(),
+      is_resolved: Joi.boolean(),
+      component_id: Joi.string(),
+      created_after: Joi.date().iso(),
+      query: Joi.string()
+    }, { allowUnknown: true, abortEarly: false, stripUnknown: true });
 
-  //   // build predicate
-  //   const pred = pick(['active', 'group_id', 'status'])(filter);
+    if (error) {
+      throw error;
+    }
 
-  //   const components = await dao.find(pred, sortBy);
-  //   return components.map(format);
+    // build the predicate using sanitized filters
 
-  // };
+    const pred = {};
+
+    Object.keys(validFilters).forEach(k => {
+
+      switch (k) {
+        case 'type':
+        case 'is_resolved':
+          pred[k] = validFilters[k];
+          break;
+        case 'component_id':
+          pred.components = validFilters[k];
+          break;
+        case 'created_after':
+          pred.created_at = { $gte : validFilters[k] }
+          break;
+        case 'query':
+          const regex = { $regex: new RegExp(validFilters[k]), $options: 'i' };
+          pred['$or'] = [{ name: regex }, { 'updates.message': regex }];
+          break;
+        default:
+          break;
+      }
+
+    });
+
+    // sort by id
+    const sortBy = { _id: 1 };
+
+    const incidents = await dao.find(pred, sortBy);
+    return incidents.map(format);
+
+  };
 
   /**
    * Creates a new incident.
@@ -201,15 +243,15 @@ const init = (dao, messagingQueue) => {
     const incidentObj = buildIncidentObj(data);
 
     incidentObj.id = incidentEntity.generateId();
-    incidentObj.created_at = (new Date()).toISOString();
-    incidentObj.updated_at = (new Date()).toISOString();
+    incidentObj.created_at = new Date();
+    incidentObj.updated_at = new Date();
 
     incidentObj.updates = [incUpdateObj];
 
     // if the update status is resolved
     if (incUpdateObj.status === 'resolved') {
       incidentObj.is_resolved = true;
-      incidentObj.resolved_at = (new Date()).toISOString();
+      incidentObj.resolved_at = new Date();
     }
 
     // validate
@@ -242,30 +284,44 @@ const init = (dao, messagingQueue) => {
 
     const currentIncident = await repo.load(id);
 
-    if (currentIncident.is_resolved) {
-      throw new UpdateNotAllowedError(`Incident ${id} is resolved and can't be updated`);
+    if (currentIncident.type === 'backfilled') {
+      throw new UpdateNotAllowedError(`Incident ${id} is of type backfilled and can't have any updates.`);
     }
 
     let incUpdateObj;
 
-    // if either of them are present, create a new update
+    // if either of them are present, create a new incident-update
     if (data.status || data.message) {
       incUpdateObj = buildIncidentUpdateObj(data);
     }
 
-    // object to save.
-    const dataCopy = Object.assign(cloneDeep(data), { type: currentIncident.type });
+    // if incident is already resolved, no more updates allowed to the incident meta object
+    if (currentIncident.is_resolved && !incUpdateObj) {
+      return format(currentIncident);
+    }
 
-    const incidentToSave = buildIncidentObj(dataCopy, currentIncident);
-    incidentToSave.updated_at = (new Date()).toISOString();
+    // object to save.
+    const incidentToSave = buildIncidentObj(
+      // if resolved, we won't be updating any fields, so passing an empty
+      // object
+      currentIncident.is_resolved ? {} : data,
+      currentIncident
+    );
+
+    incidentToSave.updated_at = new Date();
 
     // if there is a new update
     if (incUpdateObj) {
 
+      // if incident already resolved, then this it is always an update status
+      if (incidentToSave.is_resolved) {
+        incUpdateObj.status = 'update';
+      }
+
       // resolving now ...
-      if (incUpdateObj.status === 'resolved') {
+      else if (incUpdateObj.status === 'resolved') {
         incidentToSave.is_resolved = true;
-        incidentToSave.resolved_at = (new Date()).toISOString();
+        incidentToSave.resolved_at = new Date();
       }
 
       // add it to the array
@@ -305,45 +361,41 @@ const init = (dao, messagingQueue) => {
   };
 
   /**
-   * Adds a postmortem message to an incident. Following rules are applied:
-   *  1. This can't be added to a backfilled incident type
-   *  2. A postmortem can only be added once the incident is resolved
-   * @param {string} id - incident id
-   * @param {object} data for the message
-   * @return {Promise}
-   *  if fulfilled, {object} incident object
-   *  if rejected, {Error} error
+   * Updates an incident update. The following fields are allowed to be updated
+   *  1. displayed_at
+   *  2. message
+   * @param {string} incidentId
+   * @param {string} incidentUpdateId
+   * @param {object} data
+   * @return {object} incident object
    */
-  repo.addPostmortemMessage = async (id, data) => {
+  repo.changeIncidentUpdateEntry = async (incidentId, incidentUpdateId, data) => {
 
-    const currentIncident = await repo.load(id);
+    // find the incident and clone it
+    const currentIncident = await repo.load(incidentId);
+    const incidentToSave = cloneDeep(currentIncident);
 
-    if (!currentIncident.is_resolved) {
-      throw new UpdateNotAllowedError(`Incident ${id} is not resolved and can't have any postmortem updates.`);
+    // find update entry
+    const currIncidentUpd = find(['id', incidentUpdateId])(incidentToSave.updates || []);
+    if (!currIncidentUpd) {
+      throw new IdNotFoundError(`No incident-update found for id: ${incidentUpdateId}.`);
     }
 
-    if (currentIncident.type === 'backfilled') {
-      throw new UpdateNotAllowedError(`Incident ${id} is of type backfilled and can't have any postmortem updates.`);
-    }
+    // update incident-update. as its working from a cloned copy,
+    // we can update it straight
+    Object.assign(
+      currIncidentUpd,
+      pick(['displayed_at', 'message'])(data),
+      { updated_at: new Date() }
+    );
 
-    // build incident-update obj
-    const incUpdateObj = buildIncidentUpdateObj(data);
-    incUpdateObj.status = 'postmortem';
-
-    const incidentToSave = Object.assign(cloneDeep(currentIncident), {
-      updated_at: (new Date()).toISOString()
-    });
-
-    incidentToSave.updates.push(incUpdateObj);
+    incidentToSave.updated_at = new Date();
 
     // validate
     const validIncident = await validate(incidentToSave);
 
     // update
-    await dao.update(validIncident, { id });
-
-    // fire event
-    messagingQueue.publish(validIncident, 'incidents', { routingKey: 'upsert' });
+    await dao.update(validIncident, { incidentId });
 
     return format(validIncident);
 

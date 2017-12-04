@@ -9,7 +9,7 @@ const htmlJoi = Joi.extend(htmlInput);
 
 // returns the current date & time
 const currentTime = () => {
-  return (new Date()).toISOString();
+  return new Date();
 };
 
 const prefix = 'IU';
@@ -18,20 +18,21 @@ const schema = {
   id: Joi.string()
     .regex(/^IU.+$/)
     .required(),
-  created_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  created_at: Joi.date()
+    .iso()
     .required(),
-  updated_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  updated_at: Joi.date()
+    .iso()
     .required(),
 
   message: htmlJoi.htmlInput()
     .allowedTags()
+    .trim()
     .required(),
   status: Joi.string()
     .required(),
-  displayed_at: Joi.string()
-    .regex(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/)
+  displayed_at: Joi.date()
+    .iso()
     .default(currentTime, 'the current date and time'),
 
   do_twitter_update: Joi.boolean()
