@@ -1,0 +1,95 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "notification-service",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=4.8.0",
+    "npm": ">=2.15.11"
+  },
+  "bin": {
+    "gulp": "./node_modules/.bin/gulp",
+    "eslint": "./node_modules/.bin/eslint",
+    "mocha": "./node_modules/.bin/mocha",
+    "istanbul": "./node_modules/.bin/istanbul"
+  },
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp",
+    "lint": "eslint 'src/**/*.js'",
+    "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
+  },
+  "keywords": [
+    "express",
+    "node",
+    "node.js",
+    "es6",
+    "REST",
+    "API"
+  ],
+  "author": "Kartikay Gupta <kartikayg@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "amqp": "^0.2.6",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "helmet": "^3.9.0",
+    "http-status": "^1.0.1",
+    "joi": "^10.6.0",
+    "lodash": "^4.17.4",
+    "method-override": "^2.3.10",
+    "mongodb": "^2.2.33",
+    "morgan": "^1.9.0",
+    "morgan-json": "^1.1.0",
+    "nodemailer": "^4.4.0",
+    "striptags": "^3.1.0",
+    "uniqid": "^4.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "chai": "^4.1.2",
+    "del": "^3.0.0",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^11.3.2",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-lodash-fp": "^2.1.3",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-eslint": "^4.0.0",
+    "gulp-file-cache": "0.0.1",
+    "gulp-nodemon": "^2.2.1",
+    "is-json": "^2.0.1",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^3.5.3",
+    "mockdate": "^2.0.2",
+    "mockery": "^2.1.0",
+    "run-sequence": "^2.2.0",
+    "sinon": "^3.3.0",
+    "supertest": "^3.0.0"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "add-module-exports"
+    ]
+  },
+  "private": true
+}

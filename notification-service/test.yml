@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  test_api:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "6022:6022"
+    command: ["npm", "run", "test:coverage"]
+    env_file:
+      - test.env
+    depends_on:
+      - test_db
+      - test_messagingqueue
+  test_db:
+    image: "mongo:3.4"
+    ports:
+      - 6023:27017
+  test_messagingqueue:
+    hostname: testcomponentservice
+    image: rabbitmq:3.6.6-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+      - RABBITMQ_USE_LONGNAME=true
+    ports:
+      - 6024:5672
