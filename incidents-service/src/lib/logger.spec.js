@@ -68,16 +68,18 @@ describe ('lib/logger', function () {
 
     const logger = initMQLogger('debug', messagingQueueStub);
 
-    const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
+    const meta = { timestamp : (new Date()).toISOString() };
     logger.log('error', 'message', meta);
 
     sinon.assert.calledOnce(messagingQueueStub.publish);
 
+    const expectedMeta = Object.assign({}, meta, { serviceName: process.env.SERVICE_NAME });
+
     const logParam = {
       level: 'error',
       message: 'message',
-      meta
-    }
+      meta: expectedMeta      
+    };
 
     sinon.assert.calledWith(messagingQueueStub.publish, logParam, 'logs', { routingKey: 'app' });
 
@@ -90,7 +92,7 @@ describe ('lib/logger', function () {
 
     const metaArgs = messagingQueueStub.publish.args[0][0].meta;
 
-    assert.strictEqual(metaArgs.serviceName, 'components-service');
+    assert.strictEqual(metaArgs.serviceName, process.env.SERVICE_NAME);
     assert.isString(metaArgs.timestamp);
 
   });
@@ -124,7 +126,7 @@ describe ('lib/logger', function () {
       name: e.name,
       isError: true,
       test: 'hello',
-      serviceName: 'components-service',
+      serviceName: process.env.SERVICE_NAME,
       timestamp: (new Date()).toISOString()
     };
 
@@ -146,7 +148,7 @@ describe ('lib/logger', function () {
     const message = { message: 'test123'};
     const logger = initMQLogger('debug', messagingQueueStub);
 
-    const meta = {timestamp : (new Date()).toISOString(), serviceName: 'components-service' };
+    const meta = {timestamp : (new Date()).toISOString(), serviceName: process.env.SERVICE_NAME };
 
     logger.warn(message, meta);
 
