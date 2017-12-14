@@ -55,7 +55,7 @@ describe('lib/db/mongo', function() {
     }
   };
 
-  const validEndpoint = 'mongodb://db/incidentservice';
+  const validEndpoint = 'mongodb://db/notificationservice';
 
   // mocking the mongoclient library. instead of doing an actual connection
   // this returns the testDb
@@ -128,10 +128,10 @@ describe('lib/db/mongo', function() {
 
       // setup two tables
       sinon.assert.calledOnce(createSpy);
-      sinon.assert.calledWith(createSpy, 'incidents');
+      sinon.assert.calledWith(createSpy, 'subscriptions');
 
       // setup indexes
-      sinon.assert.calledThrice(idxSpy);
+      sinon.assert.calledOnce(idxSpy);
 
       createSpy.restore();
       idxSpy.restore();
@@ -147,7 +147,7 @@ describe('lib/db/mongo', function() {
 
     before (async function () {
       db = await initDb(validEndpoint);
-      dao = db.dao('incidents');
+      dao = db.dao('subscriptions');
     });
 
     describe ('count', function () {

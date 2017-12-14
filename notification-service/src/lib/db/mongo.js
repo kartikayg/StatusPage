@@ -48,11 +48,9 @@ const connect = (endpoint) => {
 const initialSetup = async (db) => {
 
   // incidents collection
-  await db.createCollection('incidents');
+  await db.createCollection('subscriptions');
 
-  db.collection('incidents').createIndex({ id: 1 }, { unique: true });
-  db.collection('incidents').createIndex({ created_at: 1 });
-  db.collection('incidents').createIndex({ type: 1 });
+  db.collection('subscriptions').createIndex({ id: 1 }, { unique: true });
 
 };
 

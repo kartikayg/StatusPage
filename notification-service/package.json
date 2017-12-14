@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp",
-    "lint": "eslint 'src/**/*.js'",
+    "lint": "eslint --fix 'src/**/*.js'",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
     "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
   },
@@ -32,19 +32,22 @@
   "license": "MIT",
   "dependencies": {
     "amqp": "^0.2.6",
+    "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "cors": "^2.8.4",
+    "ejs": "^2.5.7",
+    "email-templates": "^3.1.8",
     "express": "^4.16.2",
     "helmet": "^3.9.0",
     "http-status": "^1.0.1",
-    "joi": "^10.6.0",
+    "joi": "^13.0.2",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
     "mongodb": "^2.2.33",
     "morgan": "^1.9.0",
     "morgan-json": "^1.1.0",
-    "nodemailer": "^4.4.0",
+    "nodemailer": "^4.4.1",
     "striptags": "^3.1.0",
     "uniqid": "^4.1.1"
   },
