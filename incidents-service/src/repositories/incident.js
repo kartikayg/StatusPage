@@ -169,7 +169,7 @@ const init = (dao, messagingQueue) => {
    *   created_after - return incidents created on and after this date
    *   query - search against incident name and update messages
    * @return {Promise}
-   *  if fulfilled, {array} array of components
+   *  if fulfilled, {array} array of incidents
    *  if rejected, {Error} error
    */
   repo.list = async (filter = {}) => {
