@@ -14,10 +14,6 @@ import { subscriber as subscriberEntity } from '../../entities/index';
  */
 const init = (dao) => {
 
-  if (dao.name !== 'subscriptions') {
-    throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
-  }
-
   // repo object
   const repo = {};
 
@@ -58,7 +54,7 @@ const init = (dao) => {
    */
   repo.unsubscribe = async (subscriptionObj) => {
 
-    const { id } = subscriptionObj.id;
+    const { id } = subscriptionObj;
 
     const cnt = await dao.remove({ id });
     if (cnt !== 1) {

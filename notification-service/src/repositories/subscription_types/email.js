@@ -15,14 +15,11 @@ import { subscriber as subscriberEntity } from '../../entities/index';
  */
 const init = (dao) => {
 
-  if (dao.name !== 'subscriptions') {
-    throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
-  }
-
   const commonRepo = common.init(dao);
 
   // repo object. add functions from common object to this repo
   const repo = Object.assign({}, {
+    type: 'email',
     unsubscribe: commonRepo.unsubscribe,
     markConfirmed: commonRepo.markConfirmed,
     manageComponents: commonRepo.manageComponents
@@ -41,10 +38,10 @@ const init = (dao) => {
     });
 
     // validate
-    subscriptionObj = commonRepo.buildValidEntity(subscriptionObj);
+    subscriptionObj = await commonRepo.buildValidEntity(subscriptionObj);
 
     // check for duplication
-    const { email } = subscriptionObj.email;
+    const { email } = subscriptionObj;
     const duplicatedCnt = await dao.count({ email });
     if (duplicatedCnt > 0) {
       throw new DuplicatedSubscriptionError(`Email address (${email}) is already subscribed.`);

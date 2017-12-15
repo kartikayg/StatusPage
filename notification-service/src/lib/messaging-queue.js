@@ -4,7 +4,7 @@
  */
 
 import amqp from 'amqp';
-import pick from 'lodash/fp/pick';
+import _pick from 'lodash/fp/pick';
 
 import logger from './logger';
 
@@ -91,7 +91,7 @@ const queueWrapper = (connection) => {
       durable: true,
       autoDelete: false,
       type: 'direct'
-    }, pick(['type', 'durable', 'autoDelete'])(options || {}));
+    }, _pick(['type', 'durable', 'autoDelete'])(options || {}));
 
     return new Promise((resolve) => {
 

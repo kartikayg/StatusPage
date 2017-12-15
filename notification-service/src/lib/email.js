@@ -4,7 +4,7 @@
 
 import nodemailer from 'nodemailer';
 import EmailTemplate from 'email-templates';
-import cloneDeep from 'lodash/fp/cloneDeep';
+import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import path from 'path';
 
@@ -72,7 +72,7 @@ const send = async (template, to, vars, from, transporter) => {
     message: {
       to: to.toString() // if an array, this will convert it to a string
     },
-    locals: cloneDeep(vars || {}) // in case the package is modifying the data
+    locals: _cloneDeep(vars || {}) // in case the package is modifying the data
   });
 
   return response;

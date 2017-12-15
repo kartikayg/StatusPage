@@ -2,12 +2,12 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import MockDate from 'mockdate';
 
-import emailRepo from './email';
+import webhookRepo from './webhook';
 import { DuplicatedSubscriptionError } from '../errors';
 
 import { subscriber as subscriberEntity } from '../../entities/index';
 
-describe('repo/subscription/types/email', function() {
+describe('repo/subscription/types/webhook', function() {
 
   /**
    * MOCK VARIABLES
@@ -15,19 +15,19 @@ describe('repo/subscription/types/email', function() {
 
   const staticCurrentTime = new Date();
 
-  const duplicatedEmail = 'duplicated@gmail.com';
+  const duplicatedUri = 'http://ktechstatus.com/dupendpoint';
 
   const testSubscriptionId = 'SB123';
   const newSubscriptionObj = {
-    type: 'email',
-    email: 'valid@gmail.com',
+    type: 'webhook',
+    uri: 'http://ktechstatus.com/endpoint',
     components: ['cid_1']
   };
   const existingSubscriptionObj = Object.assign({}, newSubscriptionObj, {
     id: testSubscriptionId,
     created_at: staticCurrentTime,
     updated_at: staticCurrentTime,
-    is_confirmed: false
+    is_confirmed: true
   });
 
   const daoMockObj = {
@@ -39,12 +39,12 @@ describe('repo/subscription/types/email', function() {
     },
 
     count(pred) {
-      return Promise.resolve(pred.email === duplicatedEmail ? 1 : 0);
+      return Promise.resolve(pred.uri === duplicatedUri ? 1 : 0);
     }
 
   };
 
-  const repo = emailRepo.init(daoMockObj);
+  const repo = webhookRepo.init(daoMockObj);
 
   before(function () {
     MockDate.set(staticCurrentTime);
@@ -58,21 +58,19 @@ describe('repo/subscription/types/email', function() {
 
     assert.isObject(repo);
 
-    assert.strictEqual(repo.type, 'email');
+    assert.strictEqual(repo.type, 'webhook');
 
     assert.isFunction(repo.unsubscribe);
-    assert.isFunction(repo.markConfirmed);
     assert.isFunction(repo.manageComponents);
 
     assert.isFunction(repo.subscribe);
-    assert.isFunction(repo.sendConfirmationLink);
     assert.isFunction(repo.notifyOfNewIncidentUpdate);
 
   });
 
   describe('subscribe()', function() {
 
-    it ('should create a new email subscription', async function () {
+    it ('should create a new webhook subscription', async function () {
 
       const insertSpy = sinon.spy(daoMockObj, 'insert');
       const genIncidentIdStub = sinon.stub(subscriberEntity, 'generateId').callsFake(() => {
@@ -89,7 +87,7 @@ describe('repo/subscription/types/email', function() {
         id: testSubscriptionId,
         created_at: staticCurrentTime,
         updated_at: staticCurrentTime,
-        is_confirmed: false, // by default, email sub is not confirmed
+        is_confirmed: true, // webhook sub is always confirmed
       });
 
       assert.deepEqual(insertArg, expected, 'insert params');
@@ -106,7 +104,7 @@ describe('repo/subscription/types/email', function() {
       const insertSpy = sinon.spy(daoMockObj, 'insert');
 
       repo.subscribe(Object.assign({}, newSubscriptionObj, {
-        email: undefined
+        uri: undefined
       })).catch(e => {
         assert.strictEqual(e.name, 'ValidationError');
         sinon.assert.notCalled(insertSpy);
@@ -116,12 +114,12 @@ describe('repo/subscription/types/email', function() {
 
     });
 
-    it ('should fail for duplicate email address', function (done) {
+    it ('should fail for duplicate endpoint', function (done) {
 
       const insertSpy = sinon.spy(daoMockObj, 'insert');
 
       repo.subscribe(Object.assign({}, newSubscriptionObj, {
-        email: duplicatedEmail
+        uri: duplicatedUri
       })).catch(e => {
         assert.strictEqual(e.name, 'DuplicatedSubscriptionError');
         sinon.assert.notCalled(insertSpy);
