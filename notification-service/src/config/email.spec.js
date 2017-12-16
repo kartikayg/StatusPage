@@ -12,7 +12,8 @@ describe('config/email', function() {
       SMTP_PORT: 1234,
       SMTP_USERNAME: 'username',
       SMTP_PASSWORD: 'password',
-      SYSTEM_EMAIL_FROM_ADDRESS: 'admin@site.com'
+      SYSTEM_EMAIL_FROM_ADDRESS: 'admin@site.com',
+      EMAIL_HEADER_COMPANY_NAME: 'test status page'
     };
 
     it('should return a joi object', function() {
@@ -31,7 +32,8 @@ describe('config/email', function() {
         '"SMTP_PORT" is required',
         '"SMTP_USERNAME" is required',
         '"SMTP_PASSWORD" is required',
-        '"SYSTEM_EMAIL_FROM_ADDRESS" is required'
+        '"SYSTEM_EMAIL_FROM_ADDRESS" is required',
+        '"EMAIL_HEADER_COMPANY_NAME" is required'
       ];
 
       joiassert.error(schema, {}, requiredErr);
@@ -45,7 +47,8 @@ describe('config/email', function() {
         SMTP_PORT: 1234,
         SMTP_USERNAME: 'username',
         SMTP_PASSWORD: 'password',
-        SYSTEM_EMAIL_FROM_ADDRESS: 'admin'
+        SYSTEM_EMAIL_FROM_ADDRESS: 'admin',
+        EMAIL_HEADER_COMPANY_NAME: 'test'
       };
 
       const invalidValuesErr = [

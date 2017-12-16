@@ -15,7 +15,7 @@ import { conf } from '../config';
 let _defaultTransporter;
 
 /**
- * Returns the default transporter
+ * Returns the default transporter (SMTP)
  * @param {boolean} forceNew. if true, always creates a
  *   new transporter
  * @return {object}
@@ -29,7 +29,9 @@ const getDefaultTransporter = (forceNew = false) => {
       auth: {
         user: conf.email.SMTP_USERNAME,
         pass: conf.email.SMTP_PASSWORD
-      }
+      },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000
     });
   }
 
@@ -67,12 +69,18 @@ const send = async (template, to, vars, from, transporter) => {
     }
   });
 
-  const response = await emailTpl.send({
+  // prepare template vars
+  const templateVars = Object.assign(_cloneDeep(vars || {}), {
     template,
+    company_name: conf.email.EMAIL_HEADER_COMPANY_NAME
+  });
+
+  const response = await emailTpl.send({
+    template: 'index',
     message: {
       to: to.toString() // if an array, this will convert it to a string
     },
-    locals: _cloneDeep(vars || {}) // in case the package is modifying the data
+    locals: templateVars
   });
 
   return response;

@@ -8,6 +8,8 @@ import common from './common';
 import { DuplicatedSubscriptionError } from '../errors';
 import { subscriber as subscriberEntity } from '../../entities/index';
 
+import emailLib from '../../lib/email';
+
 /**
  * Init repo
  * @param {object} dao
@@ -59,6 +61,7 @@ const init = (dao) => {
    */
   repo.sendConfirmationLink = async (subscriptionObj) => {
     // send a confirmation email out
+    await emailLib.send('confirmation_email_subscription', subscriptionObj.email, subscriptionObj);
   };
 
   /**

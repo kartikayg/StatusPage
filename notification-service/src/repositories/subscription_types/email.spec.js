@@ -2,6 +2,7 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import MockDate from 'mockdate';
 
+import config from '../../config';
 import emailRepo from './email';
 import { DuplicatedSubscriptionError } from '../errors';
 
@@ -20,7 +21,7 @@ describe('repo/subscription/types/email', function() {
   const testSubscriptionId = 'SB123';
   const newSubscriptionObj = {
     type: 'email',
-    email: 'valid@gmail.com',
+    email: 'kartikayg@gmail.com',
     components: ['cid_1']
   };
   const existingSubscriptionObj = Object.assign({}, newSubscriptionObj, {
@@ -48,10 +49,12 @@ describe('repo/subscription/types/email', function() {
 
   before(function () {
     MockDate.set(staticCurrentTime);
+    config.load(process.env);
   });
 
   after(function () {
     MockDate.reset();
+    config.reset();
   });
 
   it ('init should return the repo object', function () {
@@ -74,7 +77,11 @@ describe('repo/subscription/types/email', function() {
 
     it ('should create a new email subscription', async function () {
 
+      this.timeout(10000);
+
       const insertSpy = sinon.spy(daoMockObj, 'insert');
+      const sendConfLinkSpy = sinon.spy(repo, 'sendConfirmationLink');
+
       const genIncidentIdStub = sinon.stub(subscriberEntity, 'generateId').callsFake(() => {
         return testSubscriptionId;
       });
@@ -95,9 +102,11 @@ describe('repo/subscription/types/email', function() {
       assert.deepEqual(insertArg, expected, 'insert params');
 
       sinon.assert.calledOnce(insertSpy);
+      sinon.assert.calledOnce(sendConfLinkSpy);
 
       genIncidentIdStub.restore();
       insertSpy.restore();
+      sendConfLinkSpy.restore();
 
     });
 

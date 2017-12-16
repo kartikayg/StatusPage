@@ -14,7 +14,8 @@ describe('config/index', function() {
     SMTP_PORT: 1234,
     SMTP_USERNAME: 'username',
     SMTP_PASSWORD: 'password',
-    SYSTEM_EMAIL_FROM_ADDRESS: 'admin@site.com'
+    SYSTEM_EMAIL_FROM_ADDRESS: 'admin@site.com',
+    EMAIL_HEADER_COMPANY_NAME: 'test'
   };
 
   it('should return a proper object on success', function() {
@@ -37,7 +38,8 @@ describe('config/index', function() {
         SMTP_PORT: testEnv.SMTP_PORT,
         SMTP_USERNAME: testEnv.SMTP_USERNAME,
         SMTP_PASSWORD: testEnv.SMTP_PASSWORD,
-        SYSTEM_EMAIL_FROM_ADDRESS: testEnv.SYSTEM_EMAIL_FROM_ADDRESS
+        SYSTEM_EMAIL_FROM_ADDRESS: testEnv.SYSTEM_EMAIL_FROM_ADDRESS,
+        EMAIL_HEADER_COMPANY_NAME: testEnv.EMAIL_HEADER_COMPANY_NAME
       }
     };
 
