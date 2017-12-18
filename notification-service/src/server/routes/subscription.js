@@ -20,8 +20,8 @@ export default (subscriptionRepo) => {
   // set variables in req object based on the subscription id in the
   // url. the param() doesn't accept multiple route parameters, so some
   // funky code is done to get around it.
-  router.param('subscriptionId', (req, res, next) => {  
- 
+  router.param('subscriptionId', (req, res, next) => {
+
     const load = () => {
       const { subscriptionId } = req.sanitizedParams;
       subscriptionRepo.load(subscriptionId).then(o => {

@@ -7,7 +7,7 @@ services:
       - .:/app
     working_dir: /app
     ports:
-      - "6022:6022"
+      - "6032:6032"
     command: ["npm", "run", "test:coverage"]
     env_file:
       - test.env
@@ -17,7 +17,7 @@ services:
   test_db:
     image: "mongo:3.4"
     ports:
-      - 6023:27017
+      - 6033:27017
   test_messagingqueue:
     hostname: testcomponentservice
     image: rabbitmq:3.6.6-management
@@ -26,4 +26,4 @@ services:
       - RABBITMQ_DEFAULT_PASS=mypass
       - RABBITMQ_USE_LONGNAME=true
     ports:
-      - 6024:5672
+      - 6034:5672

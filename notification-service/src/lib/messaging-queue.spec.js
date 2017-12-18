@@ -225,5 +225,180 @@ describe ('lib/messaging-queue', function () {
   });
 
 
+  describe ('queue/subscribe', function () {
+
+    let messagingQueue;
+    let connQueueSpy;
+
+    before(function (done) {
+      initQueue(validEndpoint, 500).then(q => {
+        messagingQueue = q;
+        connQueueSpy = sinon.spy(latestConnectionMockObj, 'queue');
+        done();
+      });
+    });
+
+    beforeEach(function () {
+      amqpQueueStub.bind.reset();
+      amqpQueueStub.subscribe.reset();
+      connQueueSpy.reset();
+    });
+
+    it ('should return a promise when subscribing', function () {
+        expect(messagingQueue.subscribe('queue')).to.be.a('promise');
+    });
+
+    it ('should call queue on connection object', function (done) {
+
+      messagingQueue.subscribe('queue').then(() => {
+        sinon.assert.calledOnce(connQueueSpy);
+        sinon.assert.calledWith(connQueueSpy, 'queue', {durable: true, autoDelete: false});
+        sinon.assert.notCalled(amqpQueueStub.bind);
+        done();
+      });
+
+    });
+
+    it ('should call queue on connection object with option params', function (done) {
+
+      messagingQueue.subscribe('queue', {autoDelete: true, foo: 'bar'}).then(() => {          
+        sinon.assert.calledOnce(connQueueSpy);
+        sinon.assert.calledWith(connQueueSpy, 'queue', {durable: true, autoDelete: true, foo: 'bar'});
+        done();
+      });
+
+    });
+
+    it ('should bind on exchange on the queue', function (done) {
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs', bindingKey: 'bind'}).then(() => {
+        
+        // omit out the exchange related params before calling queue
+        sinon.assert.calledWith(connQueueSpy, 'queue', {durable: true, autoDelete: false});
+
+        // bind exchange
+        sinon.assert.calledOnce(amqpQueueStub.bind);
+        sinon.assert.calledWith(amqpQueueStub.bind, 'logs', 'bind');
+
+        done();
+      });
+
+    });
+
+    it ('should bind on exchange on the queue with default binding key', function (done) {
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs'}).then(() => {
+        
+        sinon.assert.calledWith(connQueueSpy, 'queue', {durable: true, autoDelete: false});
+
+        // bind exchange
+        sinon.assert.calledOnce(amqpQueueStub.bind);
+        sinon.assert.calledWith(amqpQueueStub.bind, 'logs', '#');
+
+        done();
+      });
+
+    });
+
+    it ('should bind on exchange on the queue with default binding key', function (done) {
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs'}).then(() => {
+
+        // bind exchange
+        sinon.assert.calledOnce(amqpQueueStub.bind);
+        sinon.assert.calledWith(amqpQueueStub.bind, 'logs', '#');
+
+        done();
+
+      });
+
+    });
+
+    it ('should call calback when a json message comes', function (done) {
+
+      const cb = sinon.spy();
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs'}, cb).then(() => {
+
+        sinon.assert.calledOnce(amqpQueueStub.subscribe);
+
+        const f = amqpQueueStub.subscribe.args[0][0];
+
+        const o = {a: 'test', b: 'value'};
+
+        const msg = {
+          data: {
+            toString() { return JSON.stringify(o); }
+          }
+        };
+
+        f(msg);
+
+        sinon.assert.calledOnce(cb);
+        sinon.assert.calledWith(cb, o);
+
+        done();
+
+      });
+
+    });
+
+    it ('should call calback when a non-json message comes', function (done) {
+
+      const cb = sinon.spy();
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs'}, cb).then(() => {
+
+        sinon.assert.calledOnce(amqpQueueStub.subscribe);
+
+        const f = amqpQueueStub.subscribe.args[0][0];
+
+        const msg = {
+          data: {
+            toString() { return 'hello' }
+          }
+        };
+
+        f(msg);
+
+        sinon.assert.calledOnce(cb);
+        sinon.assert.calledWith(cb, 'hello');
+
+        done();
+
+      });
+
+    });
+
+    it ('should not call calback when an empty message comes', function (done) {
+
+      const cb = sinon.spy();
+
+      messagingQueue.subscribe('queue', {exchangeName: 'logs'}, cb).then(() => {
+
+        sinon.assert.calledOnce(amqpQueueStub.subscribe);
+
+        const f = amqpQueueStub.subscribe.args[0][0];
+
+        const msg = {
+          data: {
+            toString() { return null; }
+          }
+        };
+
+        f(msg);
+
+        sinon.assert.notCalled(cb);
+
+        done();
+
+      });
+
+    });
+
+  });
+
+
+
 });
 

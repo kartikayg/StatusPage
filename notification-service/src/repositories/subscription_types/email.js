@@ -35,7 +35,7 @@ const init = (dao) => {
    */
   repo.subscribe = async (data) => {
 
-    let subscriptionObj = Object.assign(_cloneDeep(data), {
+    let subscriptionObj = Object.assign({ components: [] }, _cloneDeep(data), {
       id: subscriberEntity.generateId(),
       created_at: new Date(),
       updated_at: new Date(),

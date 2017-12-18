@@ -44,7 +44,8 @@ const init = (dao) => {
    * @param {object} filter. no field is required. allowed fields:
    *   type
    *   is_confirmed
-   *   components
+   *   components - return subscriptions that have either no
+   *   components or that have any of the components passed.
    * @return {Promise}
    *  if fulfilled, {array} array of subscriptions
    *  if rejected, {Error} error
@@ -74,8 +75,14 @@ const init = (dao) => {
           pred[k] = validFilters[k];
           break;
         case 'components': {
-          // pred.$or = [{ name: regex }, { 'updates.message': regex }];
-          // pred.components = validFilters[k];
+          pred.$or = [
+            // first filter subscriptions with no set components
+            { components: { $exists: true, $eq: [] } },
+            // then subscription with any of the component
+            ...validFilters[k].map(cmp => {
+              return { components: cmp };
+            })
+          ];
           break;
         }
         default:

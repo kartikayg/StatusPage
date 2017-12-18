@@ -31,7 +31,7 @@ const init = (dao) => {
    */
   repo.subscribe = async (data) => {
 
-    let subscriptionObj = Object.assign(_cloneDeep(data), {
+    let subscriptionObj = Object.assign({ components: [] }, _cloneDeep(data), {
       id: subscriberEntity.generateId(),
       type: 'webhook',
       created_at: new Date(),

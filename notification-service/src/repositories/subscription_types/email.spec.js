@@ -21,7 +21,7 @@ describe('repo/subscription/types/email', function() {
   const testSubscriptionId = 'SB123';
   const newSubscriptionObj = {
     type: 'email',
-    email: 'kartikayg@gmail.com',
+    email: 'test@gmail.com',
     components: ['cid_1']
   };
   const existingSubscriptionObj = Object.assign({}, newSubscriptionObj, {

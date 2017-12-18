@@ -1,5 +1,5 @@
 /**
- * @fileoverview Repository to manage notification
+ * @fileoverview Repository to manage notifications
  */
 
 import _groupBy from 'lodash/fp/groupBy';
@@ -16,7 +16,8 @@ const init = (subscriptionRepo) => {
   const repo = {};
 
   /**
-   *
+   * For a new incident-update, notify on subscriptions.
+   * @param {object} incidentObj
    */
   repo.onNewIncidentUpdate = async (incidentObj) => {
 

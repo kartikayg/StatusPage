@@ -298,6 +298,7 @@ describe('routes/subscriptions', function() {
 
       request(app)
         .patch(`/api/subscriptions/${testSubscriptionId}/confirm`)
+        .send({ components: ['cid_1', 'cid_2'] })
         .expect('Content-Type', /json/)
         .expect(200, existingSubscriptionObj)
         .then(res => {
