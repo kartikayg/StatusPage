@@ -26,9 +26,15 @@ describe('app - integration tests', function () {
   const appLogQueueCallbackSpy = sinon.spy();
   const reqLogQueueCallbackSpy = sinon.spy();
 
+  let dbConnection;
+
   before(function (done) {
 
     MockDate.set(staticCurrentTime);
+
+    MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
+      dbConnection = db;
+    });
 
     messagingQueue = amqp.createConnection({url: process.env.RABBMITMQ_CONN_ENDPOINT});
     messagingQueue.on('ready', () => {
@@ -79,6 +85,7 @@ describe('app - integration tests', function () {
   });
 
   after(function () {
+    dbConnection.close();
     MockDate.reset();
     messagingQueue.disconnect();
   });
@@ -183,19 +190,15 @@ describe('app - integration tests', function () {
 
       // as it runs the db in docker container, the db is never destroyed. so for each test run,
       // drop the table and re-create it.
-      MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
-        db.collection('subscriptions').drop((err) => {
-          db.close();  
-        });
-      });
+      dbConnection.collection('subscriptions').drop();
 
       setTimeout(() => {
         require('./app').start().then(r => {
           app = r;
         });
-      }, 1500);
+      }, 500);
 
-      setTimeout(done, 4000);
+      setTimeout(done, 3000);
 
     });
 
@@ -295,27 +298,23 @@ describe('app - integration tests', function () {
           .then(res => {
 
             // lets check in db also
-            MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
-              db.collection('subscriptions').find({id : res.body.id}).toArray((err, dbRes) => {
-                
-                db.close();
+            dbConnection.collection('subscriptions').find({id : res.body.id}).toArray((err, dbRes) => {
 
-                const s = dbRes[0];
+              const s = dbRes[0];
 
-                const expectedObj = Object.assign({}, newSubscriptionObj, {
-                  _id: s._id, 
-                  id: res.body.id,
-                  created_at: staticCurrentTime,
-                  updated_at: staticCurrentTime,
-                  is_confirmed: false,
-                  components: []
-                });
-
-                assert.deepEqual(expectedObj, s);
-
-                done();
-
+              const expectedObj = Object.assign({}, newSubscriptionObj, {
+                _id: s._id, 
+                id: res.body.id,
+                created_at: staticCurrentTime,
+                updated_at: staticCurrentTime,
+                is_confirmed: false,
+                components: []
               });
+
+              assert.deepEqual(expectedObj, s);
+
+              done();
+
             });
 
           });
@@ -506,12 +505,9 @@ describe('app - integration tests', function () {
             assert.strictEqual(subscriptions.length, 4);
 
             // lets check in db also
-            MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
-              db.collection('subscriptions').count({}, (err, cnt) => {
-                assert.strictEqual(cnt, 4);
-                db.close();
-                done();
-              });
+            dbConnection.collection('subscriptions').count({}, (err, cnt) => {
+              assert.strictEqual(cnt, 4);
+              done();
             });
           });
 
@@ -590,12 +586,9 @@ describe('app - integration tests', function () {
             assert.deepEqual(res.body, { message: 'Subscription removed' });
 
              // lets check in db also
-            MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
-              db.collection('subscriptions').count({id: emailSubscriptionId}, (err, cnt) => {
-                assert.strictEqual(cnt, 0);
-                db.close();
-                done();
-              });
+            dbConnection.collection('subscriptions').count({id: emailSubscriptionId}, (err, cnt) => {
+              assert.strictEqual(cnt, 0);
+              done();
             });
 
           });
