@@ -34,6 +34,8 @@ const init = (dao) => {
     let subscriptionObj = Object.assign(_cloneDeep(data), {
       id: subscriberEntity.generateId(),
       type: 'webhook',
+      created_at: new Date(),
+      updated_at: new Date(),
       is_confirmed: true // for webhook, there is no confirmation needed
     });
 

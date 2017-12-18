@@ -9,6 +9,7 @@ import { DuplicatedSubscriptionError } from '../errors';
 import { subscriber as subscriberEntity } from '../../entities/index';
 
 import emailLib from '../../lib/email';
+import logger from '../../lib/logger';
 
 /**
  * Init repo
@@ -36,7 +37,10 @@ const init = (dao) => {
 
     let subscriptionObj = Object.assign(_cloneDeep(data), {
       id: subscriberEntity.generateId(),
-      type: 'email'
+      created_at: new Date(),
+      updated_at: new Date(),
+      type: 'email',
+      is_confirmed: false
     });
 
     // validate
@@ -50,7 +54,13 @@ const init = (dao) => {
     }
 
     await dao.insert(subscriptionObj);
-    await repo.sendConfirmationLink(subscriptionObj);
+
+    try {
+      await repo.sendConfirmationLink(subscriptionObj);
+    }
+    catch (e) {
+      logger.error(e);
+    }
 
     return subscriptionObj;
 

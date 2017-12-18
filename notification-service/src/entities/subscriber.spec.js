@@ -58,42 +58,25 @@ describe('entity/subscriber', function() {
 
     });
 
-    it ('should populate the default values', function () {
-
-      const data = {
-        id: 'SB123',
-        type: 'email',
-        email: 'kartikayg@gmail.com'
-      };
-
-      const expected = Object.assign({}, data, {
-        created_at: staticCurrentTime,
-        updated_at: staticCurrentTime,
-        components: [],
-        is_confirmed: false
-      });
-
-      joiassert.equal(subscriberEntity.schema, data, expected);
-
-    });
-
     it ('should throw error for missing required values', function () {
 
-      const requiredErr = [
-        '"id" is required',
-        '"email" is required'
-      ];
+      const reqFields = ['id', 'created_at', 'updated_at', 'is_confirmed', 'components', 'email'];
+      const requiredErr = reqFields.map(f => `"${f}" is required`);
 
       joiassert.error(subscriberEntity.schema, { type: 'email' }, requiredErr);
 
     });
 
-    it ('should throw error for invalid values', function () {
+    it ('should throw error for invalid email', function () {
 
       const data = {
         id: 'SB123',
         type: 'email',
-        email: 'kartikayg'
+        email: 'kartikayg@',
+        created_at: new Date(),
+        updated_at: new Date(),
+        is_confirmed: false,
+        components: []
       };
 
       const invalidValuesErr = [
@@ -125,42 +108,25 @@ describe('entity/subscriber', function() {
 
     });
 
-    it ('should populate the default values', function () {
-
-      const data = {
-        id: 'SB123',
-        type: 'webhook',
-        uri: 'http://www.ktechtest.com/endpoint',
-      };
-
-      const expected = Object.assign({}, data, {
-        created_at: staticCurrentTime,
-        updated_at: staticCurrentTime,
-        components: [],
-        is_confirmed: false
-      });
-
-      joiassert.equal(subscriberEntity.schema, data, expected);
-
-    });
-
     it ('should throw error for missing required values', function () {
 
-      const requiredErr = [
-        '"id" is required',
-        '"uri" is required'
-      ];
+      const reqFields = ['id', 'created_at', 'updated_at', 'is_confirmed', 'components', 'uri'];
+      const requiredErr = reqFields.map(f => `"${f}" is required`);
 
       joiassert.error(subscriberEntity.schema, { type: 'webhook' }, requiredErr);
 
     });
 
-    it ('should throw error for invalid values', function () {
+    it ('should throw error for invalid uri', function () {
 
       const data = {
         id: 'SB123',
         type: 'webhook',
-        uri: 'google.com'
+        uri: 'google.com',
+        created_at: new Date(),
+        updated_at: new Date(),
+        is_confirmed: false,
+        components: []
       };
 
       const invalidValuesErr = [

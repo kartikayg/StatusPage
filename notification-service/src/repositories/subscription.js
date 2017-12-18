@@ -114,13 +114,15 @@ const init = (dao) => {
   /**
    * Returns a repo for a given subscription type.
    * @param {string} type
-   * @return {object}
+   * @return {Promise}
+   *  if success, repo object
+   *  if failed, error
    */
   repo.ofType = (type) => {
 
     // validate type
     if (validTypes.includes(type) === false) {
-      throw new InvalidSubscriptionTypeError(type);
+      return Promise.reject(new InvalidSubscriptionTypeError(type));
     }
 
     // if not cached, get it
@@ -128,7 +130,7 @@ const init = (dao) => {
       typesRepo[type] = require(`./subscription_types/${type}`).init(dao); // eslint-disable-line
     }
 
-    return typesRepo[type];
+    return Promise.resolve(typesRepo[type]);
 
   };
 

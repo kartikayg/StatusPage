@@ -216,21 +216,16 @@ describe('repo/subscriptions', function() {
   describe('ofType()', function () {
 
     it ('should error if invalid type', function (done) {
-
-      try {
-        repo.ofType('type')
-      }
-      catch (e) {
+      repo.ofType('type').catch(e => {
         assert.strictEqual(e.name, 'InvalidSubscriptionTypeError');
         done();
-      }
-
+      });
     });
 
-    it ('should return the repo for different subscription types', function () {
+    it ('should return the repo for different subscription types', async function () {
 
-      subscriptionRepo.validTypes.forEach((t) => {
-        const r = repo.ofType(t);
+      await subscriptionRepo.validTypes.forEach(async (t) => {
+        const r = await repo.ofType(t);
         assert.strictEqual(r.type, t);
       });
 

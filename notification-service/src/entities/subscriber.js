@@ -9,11 +9,6 @@ import { schema as webhookSchema } from './subscriber/webhook';
 
 import { validTypes } from '../repositories/subscription';
 
-// returns the current date & time
-const currentTime = () => {
-  return new Date();
-};
-
 const prefix = 'SB';
 
 const schema = Joi.object({
@@ -22,22 +17,22 @@ const schema = Joi.object({
     .required(),
   created_at: Joi.date()
     .iso()
-    .default(currentTime, 'current time'),
+    .required(),
   updated_at: Joi.date()
     .iso()
-    .default(currentTime, 'current time'),
+    .required(),
 
   type: Joi.string()
     .only(validTypes)
     .required(),
 
   is_confirmed: Joi.boolean()
-    .default(false),
+    .required(),
 
   components: Joi.array()
     .items(Joi.string())
     .unique()
-    .default([])
+    .required()
 
 })
   .when(Joi.object({ type: Joi.string().only('email') }).unknown(), {
