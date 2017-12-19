@@ -16,9 +16,9 @@
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp",
-    "lint": "eslint 'src/**/*.js'",
-    "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
-    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
+    "lint": "eslint --fix 'src/**/*.js'",
+    "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register 'src/**/*.spec.js'"
   },
   "keywords": [
     "express",

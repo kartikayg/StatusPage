@@ -1,3 +1,11 @@
+/**
+ * Testing to see if we are sending the log messages to the messaging queue
+ * with the right parameters.
+ *
+ * Note: There is no actual messaging queue operations happening as we have stubbed
+ * the queue.
+ */
+
 import {assert} from 'chai';
 import sinon from 'sinon';
 
@@ -50,7 +58,7 @@ describe ('lib/logger', function () {
 
 
 
-  it ('should create a new logger', function() {
+  it ('should create a new messaginig queue logger', function() {
 
     const logger = initMQLogger('debug', messagingQueueStub);
 
