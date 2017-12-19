@@ -3,7 +3,6 @@
  * are correct or not.
  */
 
-
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
 
