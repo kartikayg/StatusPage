@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "gulp dev",
     "build": "gulp",
-    "lint": "eslint 'src/**/*.js'",
+    "lint": "eslint --fix 'src/**/*.js'",
     "test": "mocha --reporter spec --compilers js:babel-core/register 'src/**/*.spec.js'",
     "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --compilers js:babel-core/register 'src/**/*.spec.js'"
   },
@@ -70,6 +70,7 @@
     "is-json": "^2.0.1",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.5.3",
+    "mockdate": "^2.0.2",
     "mockery": "^2.1.0",
     "run-sequence": "^2.2.0",
     "sinon": "^3.3.0",

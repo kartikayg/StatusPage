@@ -5,21 +5,32 @@
 import Joi from 'joi';
 
 const schema = {
+
+  id: Joi.string()
+    .regex(/^CG.+$/)
+    .required(),
+  created_at: Joi.date()
+    .iso()
+    .required(),
+  updated_at: Joi.date()
+    .iso()
+    .required(),
+
   name: Joi.string()
     .required()
     .max(32),
   description: Joi.string()
-    .default(null)
     .allow(null),
   status: Joi.string()
     .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage'])
-    .default('operational'),
+    .required(),
   sort_order: Joi.number()
     .integer()
-    .min(0)
-    .default(0),
+    .required()
+    .min(1),
   active: Joi.boolean()
-    .default(true)
+    .required()
+
 };
 
 const prefix = 'CG';

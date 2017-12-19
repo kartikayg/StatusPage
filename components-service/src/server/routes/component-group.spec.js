@@ -1,3 +1,9 @@
+/**
+ * TESTING ROUTES - the idea is to test that the right params are being 
+ * passed to the repo and whatever comes back from repo is being returned back.
+ * There is no real db operations that happen.
+ */
+
 import {assert} from 'chai'
 import express from 'express';
 import request from 'supertest';
@@ -8,8 +14,9 @@ import componentGroupRoute from './component-group';
 import server from '../../server/index';
 import {IdNotFoundError} from '../../repositories/errors';
 
-
 describe('routes/component_groups', function() {
+
+  const staticCurrentTime = new Date().toISOString();
 
   /**
    * TEST OBJECTS
@@ -21,8 +28,8 @@ describe('routes/component_groups', function() {
     status: 'partial_outage',
     active: true,
     id: 'test123',
-    created_at: 'time',
-    updated_at: 'time',
+    created_at: staticCurrentTime,
+    updated_at: staticCurrentTime,
     description: 'desc'
   };
 
@@ -46,10 +53,6 @@ describe('routes/component_groups', function() {
       return Promise.resolve(testCmpGroup);
     },
 
-    partialUpdate(id, data) {
-      return Promise.resolve(testCmpGroup);
-    },
-
     remove(id) {
       return Promise.resolve();
     }
@@ -60,7 +63,7 @@ describe('routes/component_groups', function() {
 
   before(async function() {
     app = await server.start({
-      PORT: 6012,
+      PORT: process.env.PORT,
       NODE_ENV: process.env.NODE_ENV
     }, {
       repos: { component: { name: 'components'}, componentGroup: testRepoStub }
@@ -273,8 +276,7 @@ describe('routes/component_groups', function() {
 
   });
 
-
-  describe('PUT /component_groups/:id', function() {
+  describe('PATCH /component_groups/:id', function() {
 
     it ('should update a component group and return a 200', function(done) {
 
@@ -286,7 +288,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .put(`/api/component_groups/${testCmpGroup.id}  `)
+        .patch(`/api/component_groups/${testCmpGroup.id}  `)
         .send({ componentgroup })
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
@@ -318,7 +320,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .put(`/api/component_groups/${testCmpGroup.id}  `)
+        .patch(`/api/component_groups/${testCmpGroup.id}  `)
         .send({ componentgroup })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -343,7 +345,7 @@ describe('routes/component_groups', function() {
       const updateSpy = sinon.spy(testRepoStub, 'update');
 
       request(app)
-        .put(`/api/component_groups/${testCmpGroup.id}`)
+        .patch(`/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
@@ -393,56 +395,6 @@ describe('routes/component_groups', function() {
           sinon.assert.calledOnce(removeStub);
           
           removeStub.restore();
-          done();
-        });
-
-    });
-
-  });
-
-  describe('PATCH /component_groups/:id', function() {
-
-    it ('should partial update a component', function(done) {
-
-      const updateSpy = sinon.spy(testRepoStub, 'partialUpdate');
-
-      const componentgroup = {
-        name: '  widget  ',
-        sort_order: '2'
-      };
-
-      request(app)
-        .patch(`/api/component_groups/${testCmpGroup.id}  `)
-        .send({ componentgroup })
-        .expect('Content-Type', /json/)
-        .expect(200, testCmpGroup)
-        .then(res => {
-            
-           const expected = {
-            name: 'widget',
-            sort_order: '2'
-          };
-
-          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
-          sinon.assert.calledOnce(updateSpy);
-
-          updateSpy.restore();
-          done();
-        });
-
-    });
-
-    it ('should fail b/c of no component group posted', function(done) {
-
-      const updateSpy = sinon.spy(testRepoStub, 'partialUpdate');
-
-      request(app)
-        .patch(`/api/component_groups/${testCmpGroup.id}`)
-        .expect('Content-Type', /json/)
-        .expect(422, {message: 'No component group data sent in this request.'})
-        .then(res => {
-          sinon.assert.notCalled(updateSpy);
-          updateSpy.restore();
           done();
         });
 

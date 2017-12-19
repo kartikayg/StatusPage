@@ -5,24 +5,36 @@
 import Joi from 'joi';
 
 const schema = {
+
+  id: Joi.string()
+    .regex(/^CM.+$/)
+    .required(),
+  created_at: Joi.date()
+    .iso()
+    .required(),
+  updated_at: Joi.date()
+    .iso()
+    .required(),
+
   name: Joi.string()
     .required()
     .max(32),
   description: Joi.string()
-    .default(null)
-    .allow(null),
+    .allow(null)
+    .default(null),
   status: Joi.string()
     .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage'])
-    .default('operational'),
+    .required(),
   sort_order: Joi.number()
     .integer()
-    .min(1)
-    .default(1),
+    .required()
+    .min(1),
   active: Joi.boolean()
-    .default(true),
+    .required(),
   group_id: Joi.string()
-    .default(null)
+    .regex(/^CG.+$/)
     .allow(null)
+    .default(null)
 };
 
 const prefix = 'CM';

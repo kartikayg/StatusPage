@@ -70,24 +70,6 @@ export default (repo) => {
       }).catch(next);
     })
 
-    /** PUT /api/component_groups/:componentGroupId - Updates a component group */
-    .put((req, res, next) => {
-
-      const groupId = req.sanitizedParams.componentGroupId;
-      const data = req.sanitizedBody.componentgroup;
-
-      // not a valid component group object sent
-      if (!data || typeof data !== 'object') {
-        res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component group data sent in this request.' });
-      }
-      else {
-        repo.update(groupId, data).then(group => {
-          res.json(group);
-        }).catch(next);
-      }
-
-    })
-
     /** PATCH /api/component_groups/:componentGroupId - Updates properties of a component group */
     .patch((req, res, next) => {
 
@@ -99,7 +81,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component group data sent in this request.' });
       }
       else {
-        repo.partialUpdate(groupId, data).then(group => {
+        repo.update(groupId, data).then(group => {
           res.json(group);
         }).catch(next);
       }

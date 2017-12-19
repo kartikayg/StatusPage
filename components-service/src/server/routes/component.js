@@ -69,25 +69,7 @@ export default (repo) => {
       }).catch(next);
     })
 
-    /** PUT /api/components/:componentId - Update component */
-    .put((req, res, next) => {
-
-      const cmpId = req.sanitizedParams.componentId;
-      const data = req.sanitizedBody.component;
-
-      // not a valid component object sent
-      if (!data || typeof data !== 'object') {
-        res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
-      }
-      else {
-        repo.update(cmpId, data).then(component => {
-          res.json(component);
-        }).catch(next);
-      }
-
-    })
-
-    /** PATCH /api/components/:componentId - Update one or more properties of a component */
+    /** PATCH /api/components/:componentId - Update properties of a component */
     .patch((req, res, next) => {
 
       const cmpId = req.sanitizedParams.componentId;
@@ -98,7 +80,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
       }
       else {
-        repo.partialUpdate(cmpId, data).then(component => {
+        repo.update(cmpId, data).then(component => {
           res.json(component);
         }).catch(next);
       }

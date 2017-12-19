@@ -22,15 +22,18 @@ describe('entity/index', function() {
     assert.match(entities.componentGroup.generateId(), /^CG.+$/);
   });
 
-  it('should be able to validate the data', async function() {
+  it('should use joi validate to validate the data', async function() {
 
-    const validateStub = sinon.spy(Joi, 'validate');
-    
-    const data = { name: 'test' };
-    const res = await entities.component.validate(data);
+    const validateStub = sinon.stub(Joi, 'validate').callsFake(() => {
+      return {
+        error: null,
+        value: {}
+      };
+    });
+
+    const res = await entities.component.validate({});
     
     sinon.assert.calledOnce(validateStub);
-    assert.isObject(res);
 
     validateStub.restore();
 

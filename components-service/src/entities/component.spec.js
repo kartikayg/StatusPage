@@ -1,5 +1,6 @@
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
+import MockDate from 'mockdate';
 
 import component from './component';
 
@@ -7,9 +8,22 @@ import Joi from 'joi';
 
 describe('entity/component', function() {
 
-  it('should validate the object', function() {
+  const staticCurrentTime = new Date();
+
+  before(function() {
+    MockDate.set(staticCurrentTime);
+  });
+
+  after(function() {
+    MockDate.reset();
+  });
+
+  it ('should validate the object', function () {
 
     const data = {
+      id: 'CM123',
+      created_at: staticCurrentTime,
+      updated_at: staticCurrentTime,
       name: 'API',
       description: 'api',
       status: 'operational',
@@ -22,42 +36,31 @@ describe('entity/component', function() {
 
   });
 
-  it('should populate the default values', function() {
+  it ('should throw error for missing required values', function () {
 
-    const data = {
-      name: 'API'
-    };
+    const reqFields = ['id', 'created_at', 'updated_at', 'name', 'status', 'sort_order', 'active'];
+    const requiredErr = reqFields.map(f => `"${f}" is required`);
 
-    const expected = {
-      name: 'API',
-      status: 'operational',
-      sort_order: 1,
-      active: true,
-      description: null,
-      group_id: null
-    };
-
-    joiassert.equal(component.schema, data, expected);
+    joiassert.error(component.schema, {}, requiredErr);
 
   });
 
-  it('should throw an error on invalid data', function() {
 
-    joiassert.error(component.schema, {}, '"name" is required', {abortEarly: true});
+  it ('should throw an error on invalid data', function () {
 
     const data = {
-      name: 'API-asdkasdnlkasdnlas-asdasdjasd-qqwqwsadasd',
-      group_id: false,
+      id: 'CM123',
+      name: 'API',
       active: 'true',
       sort_order: 'error',
-      status: 'not operational'
+      status: 'not operational',
+      created_at: staticCurrentTime,
+      updated_at: staticCurrentTime,
     };
 
     const expectedErrors = [
-      '"name" length must be less than or equal to 32 characters long',
       '"status" must be one of [operational, degraded_performance, partial_outage, major_outage]',
-      '"sort_order" must be a number',
-      '"group_id" must be a string'
+      '"sort_order" must be a number'
     ];
 
     joiassert.error(component.schema, data, expectedErrors);

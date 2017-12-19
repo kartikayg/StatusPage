@@ -2,7 +2,9 @@
  * @fileoverview Repository to manage components
  */
 
-import pick from 'lodash/fp/pick';
+import _pick from 'lodash/fp/pick';
+import _omit from 'lodash/fp/omit';
+import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import {component as componentEntity} from '../entities/index';
 import {IdNotFoundError} from './errors';
@@ -31,7 +33,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
-  const validateData = async (data) => {
+  const buildValidateEntity = async (data) => {
 
     // basic validation.
     const component = await componentEntity.validate(data);
@@ -54,9 +56,7 @@ const init = (dao, groupRepo) => {
    * @return {object}
    */
   const format = (component) => {
-    const cmp = Object.assign({}, component);
-    delete cmp._id;
-    return cmp;
+    return _omit(['_id'])(component);
   };
 
   /**
@@ -93,7 +93,7 @@ const init = (dao, groupRepo) => {
     const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
     // build predicate
-    const pred = pick(['active', 'group_id', 'status'])(filter);
+    const pred = _pick(['active', 'group_id', 'status'])(filter);
 
     const components = await dao.find(pred, sortBy);
     return components.map(format);
@@ -109,69 +109,51 @@ const init = (dao, groupRepo) => {
    */
   repo.create = async (data) => {
 
+    const defaultValues = {
+      active: true,
+      description: null,
+      group_id: null,
+      status: 'operational',
+      sort_order: 1
+    };
+
+    let componentObj = Object.assign({}, defaultValues, _cloneDeep(data), {
+      id: componentEntity.generateId(),
+      created_at: new Date(),
+      updated_at: new Date()
+    });
+
     // validate, save and return the formatted data
-    const component = await validateData(data);
+    componentObj = await buildValidateEntity(componentObj);
 
-    component.id = componentEntity.generateId();
-    component.created_at = (new Date()).toISOString();
-    component.updated_at = (new Date()).toISOString();
+    await dao.insert(componentObj);
 
-    const componentIns = await dao.insert(component);
-
-    return format(componentIns);
+    return format(componentObj);
 
   };
 
   /**
    * Updates a component.
    * @param {string} id - component id
-   * @param {object} newData - New Data for the component. This should be the
-   *  entire the component data set.
+   * @param {object} data - Data for the component. This will merge with the
+   *   existing data.
    * @return {Promise}
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
-  repo.update = async (id, newData) => {
+  repo.update = async (id, data) => {
 
     // load the component
-    const currentCmp = await repo.load(id);
+    const currentComponentObj = await repo.load(id);
 
-    // validate new data
-    const v = await validateData(newData);
-    const updComponent = Object.assign({}, currentCmp, v);
+    let updatedObj = Object.assign({}, _cloneDeep(currentComponentObj), data);
 
-    updComponent.updated_at = (new Date()).toISOString();
+    updatedObj = await buildValidateEntity(updatedObj);
+    updatedObj.updated_at = new Date();
 
-    await dao.update(updComponent, { id });
+    await dao.update(updatedObj, { id });
 
-    return updComponent;
-
-  };
-
-  /**
-   * Partial updates a component.
-   * @param {string} id - component id
-   * @param {object} data - whatever fields that needs to be updated.
-   * @return {promise}
-   *  if fulfilled: component object
-   *  if rejected: Error
-   */
-  repo.partialUpdate = async (id, data) => {
-
-    // load the component
-    const currentCmp = await repo.load(id);
-
-    // merge the new data with existing
-    const newComponent = Object.assign({}, currentCmp, data);
-
-    delete newComponent.created_at;
-    delete newComponent.updated_at;
-    delete newComponent.id;
-    delete newComponent._id;
-
-    // update the component
-    const res = await repo.update(id, newComponent);
-    return res;
+    return format(updatedObj);
 
   };
 

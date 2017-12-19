@@ -45,7 +45,7 @@ const start = async () => {
   // start the server
   app = await server.start(conf.server, { repos, messagingQueue });
 
-  logger.debug('component-service application has started ...');
+  logger.debug(`${process.env.SERVICE_NAME} has started ...`);
 
   return app;
 

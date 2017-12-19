@@ -1,3 +1,11 @@
+/**
+ * TESTING ROUTES - the idea is to test that the right params are being 
+ * passed to the repo and whatever comes back from repo is being returned back.
+ *
+ * NOTE: There is no real db operations that happen.
+ */
+
+
 import {assert} from 'chai'
 import express from 'express';
 import request from 'supertest';
@@ -15,14 +23,16 @@ describe('routes/component', function() {
    * TEST OBJECTS
    */
 
+  const staticCurrentTime = new Date().toISOString();
+
   const testCmp = {
     name: 'widget',
     sort_order: 2,
     status: 'partial_outage',
     active: true,
     id: 'test123',
-    created_at: 'time',
-    updated_at: 'time',
+    created_at: staticCurrentTime,
+    updated_at: staticCurrentTime,
     description: 'desc'
   };
 
@@ -46,10 +56,6 @@ describe('routes/component', function() {
       return Promise.resolve(testCmp);
     },
 
-    partialUpdate(id, data) {
-      return Promise.resolve(testCmp);
-    },
-
     remove(id) {
       return Promise.resolve();
     }
@@ -60,7 +66,7 @@ describe('routes/component', function() {
 
   before(async function() {
     app = await server.start({
-      PORT: 6012,
+      PORT: process.env.PORT,
       NODE_ENV: process.env.NODE_ENV
     }, {
       repos: { component: testRepo, componentGroup: { name: 'component_groups'} }
@@ -273,8 +279,7 @@ describe('routes/component', function() {
 
   });
 
-
-  describe('PUT /component/:id', function() {
+  describe('PATCH /component/:id', function() {
 
     it ('should update a component and return a 200', function(done) {
 
@@ -286,7 +291,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .put(`/api/components/${testCmp.id}  `)
+        .patch(`/api/components/${testCmp.id}  `)
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(200, testCmp)
@@ -318,7 +323,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .put(`/api/components/${testCmp.id}  `)
+        .patch(`/api/components/${testCmp.id}  `)
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -343,7 +348,7 @@ describe('routes/component', function() {
       const updateSpy = sinon.spy(testRepo, 'update');
 
       request(app)
-        .put(`/api/components/${testCmp.id}`)
+        .patch(`/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component data sent in this request.'})
         .then(res => {
@@ -393,56 +398,6 @@ describe('routes/component', function() {
           sinon.assert.calledOnce(removeStub);
           
           removeStub.restore();
-          done();
-        });
-
-    });
-
-  });
-
-  describe('PATCH /component/:id', function() {
-
-    it ('should partial update a component', function(done) {
-
-      const updateSpy = sinon.spy(testRepo, 'partialUpdate');
-
-      const component = {
-        name: '  widget  ',
-        sort_order: '2'
-      };
-
-      request(app)
-        .patch(`/api/components/${testCmp.id}  `)
-        .send({ component })
-        .expect('Content-Type', /json/)
-        .expect(200, testCmp)
-        .then(res => {
-            
-           const expected = {
-            name: 'widget',
-            sort_order: '2'
-          };
-
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
-          sinon.assert.calledOnce(updateSpy);
-
-          updateSpy.restore();
-          done();
-        });
-
-    });
-
-    it ('should fail b/c of no component posted', function(done) {
-
-      const updateSpy = sinon.spy(testRepo, 'partialUpdate');
-
-      request(app)
-        .patch(`/api/components/${testCmp.id}`)
-        .expect('Content-Type', /json/)
-        .expect(422, {message: 'No component data sent in this request.'})
-        .then(res => {
-          sinon.assert.notCalled(updateSpy);
-          updateSpy.restore();
           done();
         });
 

@@ -1,3 +1,11 @@
+/**
+ * Testing to see if we are calling the right Db functions with right params.
+ * Mock the mongodb package to make sure no db operations happen, but that 
+ * the right methods are called.
+ *
+ * Note: There is no actual db operation happening in this test
+ */
+
 import {assert} from 'chai';
 import sinon from 'sinon';
 import mockery from 'mockery';
@@ -5,7 +13,7 @@ import mockery from 'mockery';
 describe('lib/db/mongo', function() {
 
   // collection object, stub for the db collection
-  const testCollection = {
+  const testCollectionStub = {
     
     createIndex(field, options) {},
 
@@ -46,12 +54,12 @@ describe('lib/db/mongo', function() {
   };
 
   // db object, stub for mongodb
-  const testDb = {
+  const testDbStub = {
     createCollection(name, options) {
       return Promise.resolve();
     },
     collection(name) {
-      return testCollection;
+      return testCollectionStub;
     }
   };
 
@@ -62,7 +70,7 @@ describe('lib/db/mongo', function() {
   const MongoClientMock = {
     connect(endpoint, options, callback) {
       if (endpoint == validEndpoint) {
-        callback(null, testDb);
+        callback(null, testDbStub);
       }
       else {
         callback(new Error('invalid db'));
@@ -120,8 +128,8 @@ describe('lib/db/mongo', function() {
 
     it ('should setup the tables with indexes', async function () {
 
-      const createSpy = sinon.spy(testDb, 'createCollection');
-      const idxSpy = sinon.spy(testCollection, 'createIndex');
+      const createSpy = sinon.spy(testDbStub, 'createCollection');
+      const idxSpy = sinon.spy(testCollectionStub, 'createIndex');
 
       const db = await initDb(validEndpoint);
       await db.setup();      
@@ -151,9 +159,9 @@ describe('lib/db/mongo', function() {
       dao = db.dao('components');
     });
 
-    describe ('count', function () {
+    describe ('count, should call the count() on collection obj', function () {
 
-      const countSpy = sinon.spy(testCollection, 'count');
+      const countSpy = sinon.spy(testCollectionStub, 'count');
 
       beforeEach(function() {
         countSpy.reset();
@@ -191,7 +199,7 @@ describe('lib/db/mongo', function() {
 
         // force error
         countSpy.restore();
-        const countStub = sinon.stub(testCollection, 'count').callsFake((pred, callback) => {
+        const countStub = sinon.stub(testCollectionStub, 'count').callsFake((pred, callback) => {
           callback(new Error('error'));
         });
 
@@ -206,9 +214,9 @@ describe('lib/db/mongo', function() {
 
     });
 
-    describe('find', function() {
+    describe('find, should call the find() on collection obj', function() {
 
-      const findSpy = sinon.spy(testCollection, 'find');
+      const findSpy = sinon.spy(testCollectionStub, 'find');
 
       beforeEach(function() {
         findSpy.reset();
@@ -246,9 +254,9 @@ describe('lib/db/mongo', function() {
 
     });
 
-    describe('insert', function() {
+    describe('insert, should call the insert() on collection obj', function() {
 
-      const insertSpy = sinon.spy(testCollection, 'insert');
+      const insertSpy = sinon.spy(testCollectionStub, 'insert');
 
       beforeEach(function() {
         insertSpy.reset();
@@ -280,9 +288,9 @@ describe('lib/db/mongo', function() {
 
     });
 
-    describe('update', function() {
+    describe('update, should call the update() on collection obj', function() {
 
-      const updateSpy = sinon.spy(testCollection, 'update');
+      const updateSpy = sinon.spy(testCollectionStub, 'update');
 
       beforeEach(function() {
         updateSpy.reset();
@@ -315,9 +323,9 @@ describe('lib/db/mongo', function() {
 
     });
 
-    describe('remove', function() {
+    describe('remove, should call the remove() on collection obj', function() {
 
-      const removeSpy = sinon.spy(testCollection, 'deleteMany');
+      const removeSpy = sinon.spy(testCollectionStub, 'deleteMany');
 
       beforeEach(function() {
         removeSpy.reset();

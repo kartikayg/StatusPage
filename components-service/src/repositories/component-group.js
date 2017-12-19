@@ -2,7 +2,9 @@
  * @fileoverview Repository to manage component groups
  */
 
-import pick from 'lodash/fp/pick';
+import _pick from 'lodash/fp/pick';
+import _cloneDeep from 'lodash/fp/cloneDeep';
+import _omit from 'lodash/fp/omit';
 
 import {componentGroup as componentGroupEntity} from '../entities/index';
 import {IdNotFoundError} from './errors';
@@ -31,9 +33,9 @@ const init = (dao) => {
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
-  const validateData = async (data) => {
-    const component = await componentGroupEntity.validate(data);
-    return component;
+  const buildValidateEntity = async (data) => {
+    const validEntity = await componentGroupEntity.validate(data);
+    return validEntity;
   };
 
   /**
@@ -42,9 +44,7 @@ const init = (dao) => {
    * @return {object}
    */
   const format = (componentGroup) => {
-    const grp = Object.assign({}, componentGroup);
-    delete grp._id;
-    return grp;
+    return _omit(['_id'])(componentGroup);
   };
 
   /**
@@ -92,7 +92,7 @@ const init = (dao) => {
     const sortBy = { sort_order: 1, _id: 1 };
 
     // build predicate
-    const pred = pick(['active', 'status'])(filter);
+    const pred = _pick(['active', 'status'])(filter);
 
     const groups = await dao.find(pred, sortBy);
     return groups.map(format);
@@ -108,69 +108,50 @@ const init = (dao) => {
    */
   repo.create = async (data) => {
 
+    const defaultValues = {
+      active: true,
+      description: null,
+      status: 'operational',
+      sort_order: 1
+    };
+
+    let groupObj = Object.assign({}, defaultValues, _cloneDeep(data), {
+      id: componentGroupEntity.generateId(),
+      created_at: new Date(),
+      updated_at: new Date()
+    });
+
     // validate, save and return the formatted data
-    const group = await validateData(data);
+    groupObj = await buildValidateEntity(groupObj);
 
-    group.id = componentGroupEntity.generateId();
-    group.created_at = (new Date()).toISOString();
-    group.updated_at = (new Date()).toISOString();
+    await dao.insert(groupObj);
 
-    const groupIns = await dao.insert(group);
-
-    return format(groupIns);
+    return format(groupObj);
 
   };
 
   /**
    * Updates a component group.
    * @param {string} id - component group id
-   * @param {object} newData - New Data for the component group. This should be the
-   *  entire the component group data set.
+   * @param {object} data - data for the component group. This will merge with the
+   *   existing data.
    * @return {Promise}
    *  if fulfilled, {object} component group object
    *  if rejected, {Error} error
    */
-  repo.update = async (id, newData) => {
+  repo.update = async (id, data) => {
 
     // load the component group
-    const currentGroup = await repo.load(id);
+    const currentGroupObj = await repo.load(id);
 
-    // validate new data
-    const v = await validateData(newData);
-    const updGroup = Object.assign({}, currentGroup, v);
+    let updatedObj = Object.assign({}, _cloneDeep(currentGroupObj), data);
 
-    updGroup.updated_at = (new Date()).toISOString();
+    updatedObj = await buildValidateEntity(updatedObj);
+    updatedObj.updated_at = new Date();
 
-    await dao.update(updGroup, { id });
+    await dao.update(updatedObj, { id });
 
-    return format(updGroup);
-
-  };
-
-  /**
-   * Partial updates a component group.
-   * @param {string} id - group id
-   * @param {object} data - whatever fields that needs to be updated.
-   * @return {promise}
-   *  if fulfilled: component group object
-   *  if rejected: Error
-   */
-  repo.partialUpdate = async (id, data) => {
-
-    // load the component group
-    const currentGroup = await repo.load(id);
-
-    // merge the new data with existing
-    const updGroup = Object.assign({}, currentGroup, data);
-
-    delete updGroup.created_at;
-    delete updGroup.updated_at;
-    delete updGroup.id;
-    delete updGroup._id;
-
-    // update the group
-    const res = await repo.update(id, updGroup);
-    return res;
+    return format(updatedObj);
 
   };
 

@@ -1,5 +1,15 @@
+/**
+ * TESTING REPO - the idea is to test that the right params are being 
+ * passed to the db dao's and whatever comes back from dao is being returned back.
+ *
+ * Note: There is no real db operations that happen.
+ */
+
 import {assert} from 'chai';
 import sinon from 'sinon';
+import MockDate from 'mockdate';
+
+import _omit from 'lodash/fp/omit';
 
 import component from './component';
 import {component as componentEntity} from '../entities/index';
@@ -10,7 +20,9 @@ describe('repo/component', function() {
    * MOCK VARIABLES
    */
 
-  const testCmpId = '123';
+  const staticCurrentTime = new Date();
+
+  const testCmpId = 'CM123';
 
   const newCmp = {
     name: 'widget',
@@ -22,15 +34,16 @@ describe('repo/component', function() {
   const existingCmp = Object.assign({
     id: testCmpId,
     _id: '_id',
-    created_at: 'time',
-    updated_at: 'time',
+    created_at: staticCurrentTime,
+    updated_at: staticCurrentTime,
+    description: null,
+    group_id: null,
     active: true
   }, newCmp);
 
-  const existingCmpWithoutId = Object.assign({}, existingCmp);
-  delete existingCmpWithoutId._id;
+  const existingCmpWithoutId = _omit(['_id'])(existingCmp);
 
-  const testDao = {
+  const daoMockObj = {
     
     name: 'components',
 
@@ -54,16 +67,22 @@ describe('repo/component', function() {
 
   };
 
-  const testGroupRepo = {
-    
+  const testComponentGroupRepoStub = {
     doesIdExists(id) {
       return Promise.resolve(true);
     }
-
   };
 
-  const repo = component.init(testDao, testGroupRepo);
+  const repo = component.init(daoMockObj, testComponentGroupRepoStub);
 
+
+  before(function () {
+    MockDate.set(staticCurrentTime);
+  });
+
+  after(function () {
+    MockDate.reset();
+  });
 
   /**
    * TEST CASES
@@ -85,7 +104,7 @@ describe('repo/component', function() {
 
     it ('should return components with one filter', async function() {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
@@ -103,7 +122,7 @@ describe('repo/component', function() {
 
     it ('should return components with multiple filters', async function() {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
@@ -121,7 +140,7 @@ describe('repo/component', function() {
 
     it ('should return components  with extra filters but no error', async function() {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
@@ -139,7 +158,7 @@ describe('repo/component', function() {
 
     it ('should return no components with filters', async function() {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       const sortBy = { group_id: 1, sort_order: 1, _id: 1 };
 
@@ -157,7 +176,7 @@ describe('repo/component', function() {
 
     it ('should return an error on find()', function(done) {
 
-      const findStub = sinon.stub(testDao, 'find').callsFake((pred, sortBy) => {
+      const findStub = sinon.stub(daoMockObj, 'find').callsFake((pred, sortBy) => {
         throw new Error('db error');
       });
 
@@ -182,7 +201,7 @@ describe('repo/component', function() {
 
     it ('should load a component given a valid id', async function() {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       const component = await repo.load(testCmpId);
 
@@ -199,7 +218,7 @@ describe('repo/component', function() {
 
     it ('should error when no component is found', function(done) {
 
-      const findSpy = sinon.spy(testDao, 'find');
+      const findSpy = sinon.spy(daoMockObj, 'find');
 
       repo.load('1').catch(e => {
       
@@ -222,28 +241,26 @@ describe('repo/component', function() {
 
     it ('should validate and create a component', async function() {
 
-      const insertSpy = sinon.spy(testDao, 'insert');
+      const insertSpy = sinon.spy(daoMockObj, 'insert');
       const genIdStub = sinon.stub(componentEntity, 'generateId').callsFake(() => {
         return testCmpId;
       });
 
-      const component = await repo.create(newCmp);
+      const componentObj = await repo.create(newCmp);
 
       // call the dao insert 
       sinon.assert.calledOnce(insertSpy);
 
       // dao called with right params
       const insertArg = insertSpy.args[0][0];
-      const insertExpected = Object.assign(
-        {
-          id: testCmpId,
-          created_at: insertArg.created_at,
-          updated_at: insertArg.updated_at,
-          description: null,
-          group_id: null
-        },
-        newCmp
-      );
+      const insertExpected = Object.assign({}, newCmp, {
+        id: testCmpId,
+        created_at: staticCurrentTime,
+        updated_at: staticCurrentTime,
+        description: null,
+        group_id: null
+      });
+
       assert.deepEqual(insertExpected, insertArg);
 
       // check id generation
@@ -251,7 +268,7 @@ describe('repo/component', function() {
 
 
       // returning the res from dao insert
-      assert.deepEqual(component, existingCmpWithoutId);
+      assert.deepEqual(componentObj, existingCmpWithoutId);
 
       insertSpy.restore();
       genIdStub.restore();
@@ -260,20 +277,20 @@ describe('repo/component', function() {
 
     it ('should create a component with group_id', async function() {
 
-      const groupExistsSpy = sinon.spy(testGroupRepo, 'doesIdExists');
-      const insertSpy = sinon.spy(testDao, 'insert');
+      const groupExistsSpy = sinon.spy(testComponentGroupRepoStub, 'doesIdExists');
+      const insertSpy = sinon.spy(daoMockObj, 'insert');
 
-      const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+      const cmpWithId = Object.assign({group_id: 'CG123'}, newCmp);
       const component = await repo.create(cmpWithId);
 
       // group exists fn ..
       sinon.assert.calledOnce(groupExistsSpy);
-      sinon.assert.calledWith(groupExistsSpy, 'test123');
+      sinon.assert.calledWith(groupExistsSpy, 'CG123');
 
       
       // insert fn, right group_id passed ..
       const insertArg = insertSpy.args[0][0];
-      assert.strictEqual('test123', insertArg.group_id);
+      assert.strictEqual('CG123', insertArg.group_id);
       
       groupExistsSpy.restore();
       insertSpy.restore();
@@ -292,11 +309,11 @@ describe('repo/component', function() {
     it ('should fail b/c of a non-existant group id', function(done) {
 
       // return false
-      const groupExistsStub = sinon.stub(testGroupRepo, 'doesIdExists').callsFake((id) => {
+      const groupExistsStub = sinon.stub(testComponentGroupRepoStub, 'doesIdExists').callsFake((id) => {
         return Promise.resolve(false);
       });
 
-      const cmpWithId = Object.assign({group_id: 'test123'}, newCmp);
+      const cmpWithId = Object.assign({ group_id: 'CG123'}, newCmp);
       repo.create(cmpWithId).catch(e => {
         sinon.assert.calledOnce(groupExistsStub);  
         assert.strictEqual(e.name, 'IdNotFoundError');
@@ -313,7 +330,7 @@ describe('repo/component', function() {
 
     it ('should update a component with new data', async function() {
 
-      const updateSpy = sinon.spy(testDao, 'update');
+      const updateSpy = sinon.spy(daoMockObj, 'update');
 
       const updated = {
         name: 'updated name',
@@ -326,22 +343,13 @@ describe('repo/component', function() {
 
       // dao called using the new data
       const updateArg = updateSpy.args[0][0];
-      const updateExpected = Object.assign({group_id: null}, existingCmpWithoutId, updated, {updated_at: updateArg.updated_at});
+      const updateExpected = Object.assign({group_id: null}, existingCmpWithoutId, updated, {updated_at: staticCurrentTime});
       assert.deepEqual(updateExpected, updateArg);
 
       // calling update dao
       sinon.assert.calledOnce(updateSpy);
 
       updateSpy.restore();
-
-    });
-
-    it ('should fail b/c of validation', function(done) {
-
-      repo.update(testCmpId, {}).catch(e => {
-        assert.strictEqual(e.name, 'ValidationError');
-        done();
-      });
 
     });
 
@@ -356,38 +364,11 @@ describe('repo/component', function() {
 
   });
 
-  describe('partialUpdate()', function() {
-
-    it ('should partially update a component', async function() {
-
-      const repoUpdateStub = sinon.stub(repo, 'update');
-
-      const updated = {
-        name: 'partial updated name'
-      };
-
-      const res = await repo.partialUpdate(testCmpId, updated);
-
-      // calling update on repo
-      sinon.assert.calledOnce(repoUpdateStub);
-      sinon.assert.calledWith(repoUpdateStub, testCmpId, {
-        name: 'partial updated name',
-        sort_order: 2,
-        status: 'partial_outage',
-        active: true
-      });
-
-      repoUpdateStub.restore();
-
-    });
-
-  });
-
   describe('remove()', function() {
 
     it ('should remove a component', async function() {
 
-      const removeSpy = sinon.spy(testDao, 'remove');
+      const removeSpy = sinon.spy(daoMockObj, 'remove');
 
       await repo.remove(testCmpId);
 
@@ -402,7 +383,7 @@ describe('repo/component', function() {
 
     it ('should fail b/c of invalid id', function(done) {
 
-      const removeSpy = sinon.spy(testDao, 'remove');
+      const removeSpy = sinon.spy(daoMockObj, 'remove');
 
       repo.remove('1').catch(e => {
       

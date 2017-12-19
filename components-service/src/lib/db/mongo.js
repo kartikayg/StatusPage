@@ -211,6 +211,9 @@ const init = async (endpoint) => {
     },
     dao(collectionName) {
       return getDao(connection, collectionName);
+    },
+    dbConn() {
+      return connection;
     }
   };
 
