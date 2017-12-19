@@ -1,3 +1,7 @@
+/**
+ * Note: THIS TEST WILL SEND OUT EMAILS IF A PROPER STMP SERVER IS SETUP.
+ */
+
 import { assert } from 'chai';
 
 import config from '../config';

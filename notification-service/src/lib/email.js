@@ -1,5 +1,6 @@
 /**
- * @fileoverview
+ * @fileoverview Library to send emails out. It uses nodemailer
+ * as the transporter and ejs for email templates.
  */
 
 import nodemailer from 'nodemailer';

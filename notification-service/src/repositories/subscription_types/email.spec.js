@@ -1,3 +1,10 @@
+/**
+ * TESTING REPO - the idea is to test that the right params are being 
+ * passed to the db dao's and whatever comes back from dao is being returned back.
+ *
+ * Note: There is no real db operations happening.
+ */
+
 import {assert} from 'chai';
 import sinon from 'sinon';
 import MockDate from 'mockdate';

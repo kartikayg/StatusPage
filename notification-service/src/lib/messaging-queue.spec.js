@@ -1,3 +1,11 @@
+/**
+ * Testing to see if we are sending the right parameters on to the queue.
+ *
+ * Note: There is no actual messaging queue operations happening as we have stubbed
+ * the queue.
+ */
+
+
 import {assert, expect} from 'chai';
 import sinon from 'sinon';
 import mockery from 'mockery';

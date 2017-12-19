@@ -1,3 +1,8 @@
+/**
+ * TESTING JOI OBJECT - the idea is to test that the rules set in JOI schema
+ * are correct or not.
+ */
+
 import {assert} from 'chai';
 import joiassert from '../../test/joi-assert';
 

@@ -1,5 +1,7 @@
 /**
- * this test will behave more like an integeration test
+ * These are integration tests and all the components are live (meaning no stubs).
+ * There will be DB operations, messaging queue, etc. All the resources are started 
+ * within docker container and will be handled by docker only.
  */
 
 import {assert} from 'chai';

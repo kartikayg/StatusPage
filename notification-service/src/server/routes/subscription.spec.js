@@ -1,3 +1,10 @@
+/**
+ * TESTING ROUTES - the idea is to test that the right params are being 
+ * passed to the repo and whatever comes back from repo is being returned back.
+ * 
+ * NOTE: There is no real db operations that happening.
+ */
+
 import {assert} from 'chai'
 import request from 'supertest';
 import sinon from 'sinon';
