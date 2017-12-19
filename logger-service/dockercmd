@@ -13,8 +13,10 @@ case "$1" in
     ;;
    
   test)
+    ## stop any old leftover services. there shouldn't be, but still.
+    docker-compose -f test.yml stop && \
     docker-compose -f test.yml run test_logger  && \
-    docker stop loggerservice_test_messagingqueue_1
+    docker-compose -f test.yml stop \
     ;;
    
   lint)

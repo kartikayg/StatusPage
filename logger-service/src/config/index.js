@@ -8,6 +8,9 @@ import * as logger from './logger';
 
 const components = { server, logger };
 
+// {object} application conf. this is populated using the load() fn
+let appConf = {};
+
 /**
  * Loads config for all the components defined in this folder. Each component
  * should have a schema variable to validate and load the config.
@@ -36,8 +39,29 @@ const load = (envVars = {}) => {
 
   Object.keys(components).forEach(loadCmp);
 
+  appConf = config;
+
   return config;
 
 };
 
-export default { load };
+export default {
+
+  load,
+
+  // gets the loaded conf
+  get conf() {
+    // if conf is not loaded, exception is thrown
+    if (Object.keys(appConf).length === 0) {
+      throw new Error('Configuration is not loaded yet.');
+    }
+    return appConf;
+  },
+
+  // resets local conf
+  reset() {
+    appConf = {};
+  }
+
+};
+

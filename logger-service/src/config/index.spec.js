@@ -1,3 +1,8 @@
+/**
+ * Testing to see that the conf is loaded and returned properly.
+ */
+
+
 import {assert} from 'chai';
 import config from './index';
 

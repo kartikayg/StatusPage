@@ -1,3 +1,10 @@
+/**
+ * Testing to see if we are sending the log messages to the winston logger
+ * with the right parameters.
+ *
+ * Note: There is no actual logging happening as we have stubbed winston logger
+ */
+
 import {assert} from 'chai';
 import sinon from 'sinon';
 import mockery from 'mockery';
