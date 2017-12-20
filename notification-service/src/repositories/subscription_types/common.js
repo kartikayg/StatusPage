@@ -18,11 +18,12 @@ const init = (dao) => {
   const repo = {};
 
   /**
-   * Validate the object passed and returns a proper
+   * Validate the subscription object passed.
    * subscription object.
    * @param {object} data
-   * @return {object}
-   * @throws {Error} validation error
+   * @return {promise}
+   *  on success, validated object
+   *  on failure, validation error
    */
   repo.buildValidEntity = async (data) => {
     // build and validate entity
@@ -31,17 +32,36 @@ const init = (dao) => {
   };
 
   /**
-   * Updates the object in db
+   * Saves a subscription object in db
    * @param {object} subscriptionObj
-   * @return {object}
+   * @return {promise}
+   *  on success, saved object
+   *  on failure, error
    */
-  repo.updateDb = async (subscriptionObj) => {
+  repo.saveDb = async (subscriptionObj) => {
 
-    const { id } = subscriptionObj;
-    const validEntity = await repo.buildValidEntity(subscriptionObj);
-    validEntity.updated_at = new Date();
+    const cloned = _cloneDeep(subscriptionObj);
 
-    await dao.update(validEntity, { id });
+    let isNew = false;
+
+    // add id, if new
+    if (!cloned.id) {
+      isNew = true;
+      cloned.id = subscriberEntity.generateId();
+      cloned.created_at = new Date();
+    }
+
+    cloned.updated_at = new Date();
+
+    // validate
+    const validEntity = await repo.buildValidEntity(cloned);
+
+    if (isNew) {
+      await dao.insert(validEntity);
+    }
+    else {
+      await dao.update(validEntity, { id: validEntity.id });
+    }
 
     return validEntity;
 
@@ -50,7 +70,7 @@ const init = (dao) => {
   /**
    * Unsubscribes/removes a subscription
    * @param {object} subscriptionObj
-   * @return {void}
+   * @return {promise}
    */
   repo.unsubscribe = async (subscriptionObj) => {
 
@@ -66,7 +86,9 @@ const init = (dao) => {
   /**
    * Marks the subscription confirmed.
    * @param {object} subscriptionObj
-   * @return {object}
+   * @return {promise}
+   *  on success, updated object
+   *  on failure, error
    */
   repo.markConfirmed = async (subscriptionObj) => {
 
@@ -80,7 +102,7 @@ const init = (dao) => {
       is_confirmed: true
     });
 
-    const updatedObj = await repo.updateDb(newObj);
+    const updatedObj = await repo.saveDb(newObj);
     return updatedObj;
 
   };
@@ -90,7 +112,9 @@ const init = (dao) => {
    * replace whatever is currently there.
    * @param {object} subscriptionObj
    * @param {array} components
-   * @return {object}
+   * @return {promise}
+   *  on success, updated object
+   *  on failure, error
    */
   repo.manageComponents = async (subscriptionObj, components) => {
 
@@ -99,7 +123,7 @@ const init = (dao) => {
       components: components || []
     });
 
-    const updatedObj = await repo.updateDb(newObj);
+    const updatedObj = await repo.saveDb(newObj);
     return updatedObj;
 
   };

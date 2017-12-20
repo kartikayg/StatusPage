@@ -6,7 +6,6 @@ import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
 import { DuplicatedSubscriptionError } from '../errors';
-import { subscriber as subscriberEntity } from '../../entities/index';
 
 import emailLib from '../../lib/email';
 import logger from '../../lib/logger';
@@ -31,20 +30,17 @@ const init = (dao) => {
   /**
    * Adds an email subscription.
    * @param {object} data
-   * @return {object}
+   * @return {promise}
+   *  on sucess, subscription object
+   *  on failure, error
    */
   repo.subscribe = async (data) => {
 
+    // build subscription object
     let subscriptionObj = Object.assign({ components: [] }, _cloneDeep(data), {
-      id: subscriberEntity.generateId(),
-      created_at: new Date(),
-      updated_at: new Date(),
       type: 'email',
       is_confirmed: false
     });
-
-    // validate
-    subscriptionObj = await commonRepo.buildValidEntity(subscriptionObj);
 
     // check for duplication
     const { email } = subscriptionObj;
@@ -53,8 +49,10 @@ const init = (dao) => {
       throw new DuplicatedSubscriptionError(`Email address (${email}) is already subscribed.`);
     }
 
-    await dao.insert(subscriptionObj);
+    // save in db
+    subscriptionObj = await commonRepo.saveDb(subscriptionObj);
 
+    // send a link
     try {
       await repo.sendConfirmationLink(subscriptionObj);
     }

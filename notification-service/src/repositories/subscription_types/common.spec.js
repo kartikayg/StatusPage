@@ -66,7 +66,7 @@ describe('repo/subscription/types/common', function() {
     assert.isFunction(repo.markConfirmed);
     assert.isFunction(repo.manageComponents);
     assert.isFunction(repo.buildValidEntity);
-    assert.isFunction(repo.updateDb);
+    assert.isFunction(repo.saveDb);
 
   });
 

@@ -6,7 +6,6 @@ import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
 import { DuplicatedSubscriptionError } from '../errors';
-import { subscriber as subscriberEntity } from '../../entities/index';
 
 /**
  * Init repo
@@ -27,20 +26,17 @@ const init = (dao) => {
   /**
    * Adds a webhook subscription.
    * @param {object} data
-   * @return {object}
+   * @return {promise}
+   *  on sucess, subscription object
+   *  on failure, error
    */
   repo.subscribe = async (data) => {
 
+    // build subscription object
     let subscriptionObj = Object.assign({ components: [] }, _cloneDeep(data), {
-      id: subscriberEntity.generateId(),
       type: 'webhook',
-      created_at: new Date(),
-      updated_at: new Date(),
       is_confirmed: true // for webhook, there is no confirmation needed
     });
-
-    // validate
-    subscriptionObj = await commonRepo.buildValidEntity(subscriptionObj);
 
     // check for duplication
     const { uri } = subscriptionObj;
@@ -49,7 +45,8 @@ const init = (dao) => {
       throw new DuplicatedSubscriptionError(`Webhook endpoint (${uri}) is already subscribed.`);
     }
 
-    await dao.insert(subscriptionObj);
+    // save in db
+    subscriptionObj = await commonRepo.saveDb(subscriptionObj);
 
     return subscriptionObj;
 
