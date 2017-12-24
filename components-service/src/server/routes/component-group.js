@@ -81,7 +81,6 @@ export default (componentGroupRepo) => {
     /** PATCH /api/component_groups/:componentGroupId - Updates properties of a component group */
     .patch((req, res, next) => {
 
-      const groupId = req.sanitizedParams.componentGroupId;
       const data = req.sanitizedBody.componentgroup;
 
       // not a valid component group object sent

@@ -80,7 +80,6 @@ const init = (dao) => {
   };
 
 
-
   const repo = {
     name: dao.name
   };

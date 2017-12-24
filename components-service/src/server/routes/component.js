@@ -79,7 +79,6 @@ export default (componentRepo) => {
     /** PATCH /api/components/:componentId - Update properties of a component */
     .patch((req, res, next) => {
 
-      const cmpId = req.sanitizedParams.componentId;
       const data = req.sanitizedBody.component;
 
       // not a valid component object sent
