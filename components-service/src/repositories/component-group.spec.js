@@ -339,7 +339,7 @@ describe('repo/component_groups', function() {
         description: 'desc'
       };
 
-      await repo.update(testCmpGrpId, updated);
+      await repo.update(existingCmpGroupWithoutId, updated);
 
       // dao called using the new data
       const updateArg = updateSpy.args[0][0];
@@ -353,15 +353,6 @@ describe('repo/component_groups', function() {
 
     });
 
-    it ('should fail b/c of invalid group id', function(done) {
-
-      repo.update('123', {}).catch(e => {
-        assert.strictEqual(e.name, 'IdNotFoundError');
-        done();
-      });
-
-    });
-
   });
 
 
@@ -371,7 +362,7 @@ describe('repo/component_groups', function() {
 
       const removeSpy = sinon.spy(daoMockObj, 'remove');
 
-      await repo.remove(testCmpGrpId);
+      await repo.remove(existingCmpGroupWithoutId);
 
       // its calling dao remove
       // its calling with the right pred
@@ -386,7 +377,7 @@ describe('repo/component_groups', function() {
 
       const removeSpy = sinon.spy(daoMockObj, 'remove');
 
-      repo.remove('1').catch(e => {
+      repo.remove({}).catch(e => {
       
         // its calling dao remove
         // returning the error  

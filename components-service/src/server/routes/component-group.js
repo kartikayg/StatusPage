@@ -10,18 +10,31 @@ import {params as sanitizeParams} from '../middleware/sanitize';
 
 /**
  * Export the routes
- * @param {object} repo - component group repo
+ * @param {object} componentGroupRepo - component group repo
  * @return {object} router
  */
-export default (repo) => {
-
-  if (repo.name !== 'component_groups') {
-    throw new Error(`Invalid repo passed to this router. Passed repo name: ${repo.name}`);
-  }
-
+export default (componentGroupRepo) => {
 
   // express router
   const router = express.Router();
+
+  // set variables in req object based on the componentGroup id in the
+  // url. the param() doesn't accept multiple route parameters, so some
+  // funky code is done to get around it.
+  router.param('componentGroupId', (req, res, next) => {
+
+    const load = () => {
+      const { componentGroupId } = req.sanitizedParams;
+      componentGroupRepo.load(componentGroupId).then(o => {
+        req.componentGroupObj = o;
+        next();
+      }).catch(next);
+    };
+
+    sanitizeParams()(req, res, load);
+
+  });
+
 
   // build routes
   router.route('/')
@@ -35,7 +48,7 @@ export default (repo) => {
         query.active = boolean(query.active);
       }
 
-      repo.list(query).then(groups => {
+      componentGroupRepo.list(query).then(groups => {
         res.json(groups);
       }).catch(next);
 
@@ -51,7 +64,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component group data sent in this request.' });
       }
       else {
-        repo.create(data).then(group => {
+        componentGroupRepo.create(data).then(group => {
           res.json(group);
         }).catch(next);
       }
@@ -60,14 +73,9 @@ export default (repo) => {
 
   router.route('/:componentGroupId')
 
-    // sanitize the params
-    .all(sanitizeParams())
-
     /** GET /api/component_groups/:componentGroupId - Gets a component group */
     .get((req, res, next) => {
-      repo.load(req.sanitizedParams.componentGroupId).then(group => {
-        res.json(group);
-      }).catch(next);
+      res.json(req.componentGroupObj);
     })
 
     /** PATCH /api/component_groups/:componentGroupId - Updates properties of a component group */
@@ -81,7 +89,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component group data sent in this request.' });
       }
       else {
-        repo.update(groupId, data).then(group => {
+        componentGroupRepo.update(req.componentGroupObj, data).then(group => {
           res.json(group);
         }).catch(next);
       }
@@ -90,7 +98,7 @@ export default (repo) => {
 
     /** DELETE /api/component_groups/:componentGroupId - Deletes a component group */
     .delete((req, res, next) => {
-      repo.remove(req.sanitizedParams.componentGroupId).then(() => {
+      componentGroupRepo.remove(req.componentGroupObj).then(() => {
         res.json({ message: 'Component Group deleted'});
       }).catch(next);
     });

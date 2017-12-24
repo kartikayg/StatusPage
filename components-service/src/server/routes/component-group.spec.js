@@ -49,11 +49,11 @@ describe('routes/component_groups', function() {
       return Promise.resolve(testCmpGroup);
     },
 
-    update(id, data) {
+    update(obj, data) {
       return Promise.resolve(testCmpGroup);
     },
 
-    remove(id) {
+    remove(obj) {
       return Promise.resolve();
     }
 
@@ -78,22 +78,6 @@ describe('routes/component_groups', function() {
    /**
     * TEST CASES
     */
-
-  describe('init', function() {
-
-    it ('should error if invalid repo passed', function(done) {
-
-      try {
-        componentGroupRoute({ name: 'bogus' });
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'Invalid repo passed to this router. Passed repo name: bogus');
-        done();
-      }
-
-    });
-
-  });
   
   describe('GET /component_groups', function() {
 
@@ -299,7 +283,7 @@ describe('routes/component_groups', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
+          sinon.assert.calledWith(updateSpy, testCmpGroup, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -310,7 +294,7 @@ describe('routes/component_groups', function() {
 
     it ('should return 422 b/c of invalid component group id', function(done) {
 
-      const updateSpy = sinon.stub(testRepoStub, 'update').callsFake((id, data) => {
+      const loadStub = sinon.stub(testRepoStub, 'load').callsFake((id, data) => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -325,16 +309,7 @@ describe('routes/component_groups', function() {
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
-            
-           const expected = {
-            name: 'widget',
-            sort_order: '2'
-          };
-
-          sinon.assert.calledWith(updateSpy, testCmpGroup.id, expected);
-          sinon.assert.calledOnce(updateSpy);
-
-          updateSpy.restore();
+          loadStub.restore();
           done();
         });
 
@@ -370,7 +345,7 @@ describe('routes/component_groups', function() {
         .expect(200, {message: 'Component Group deleted'})
         .then(res => {
             
-          sinon.assert.calledWith(removeSpy, testCmpGroup.id);
+          sinon.assert.calledWith(removeSpy, testCmpGroup);
           sinon.assert.calledOnce(removeSpy);
           
           removeSpy.restore();
@@ -381,7 +356,7 @@ describe('routes/component_groups', function() {
 
     it ('should return 422 b/c of invalid component group id', function(done) {
 
-      const removeStub = sinon.stub(testRepoStub, 'remove').callsFake(id => {
+      const loadStub = sinon.stub(testRepoStub, 'load').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -390,11 +365,7 @@ describe('routes/component_groups', function() {
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
-            
-          sinon.assert.calledWith(removeStub, testCmpGroup.id);
-          sinon.assert.calledOnce(removeStub);
-          
-          removeStub.restore();
+          loadStub.restore();
           done();
         });
 

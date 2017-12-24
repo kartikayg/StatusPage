@@ -52,11 +52,11 @@ describe('routes/component', function() {
       return Promise.resolve(testCmp);
     },
 
-    update(id, data) {
+    update(obj, data) {
       return Promise.resolve(testCmp);
     },
 
-    remove(id) {
+    remove(obj) {
       return Promise.resolve();
     }
 
@@ -82,22 +82,6 @@ describe('routes/component', function() {
     * TEST CASES
     */
 
-  describe('init', function() {
-
-    it ('should error if invalid repo passed', function(done) {
-
-      try {
-        componentRoute({ name: 'bogus' });
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'Invalid repo passed to this router. Passed repo name: bogus');
-        done();
-      }
-
-    });
-
-  });
-  
   describe('GET /components', function() {
 
     it ('should return components and 200 response, when no filters passed', function(done) {
@@ -302,7 +286,7 @@ describe('routes/component', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
+          sinon.assert.calledWith(updateSpy, testCmp, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -313,7 +297,7 @@ describe('routes/component', function() {
 
     it ('should return 422 b/c of invalid component id', function(done) {
 
-      const updateSpy = sinon.stub(testRepo, 'update').callsFake((id, data) => {
+      const loadStub = sinon.stub(testRepo, 'load').callsFake((id, data) => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -334,10 +318,7 @@ describe('routes/component', function() {
             sort_order: '2'
           };
 
-          sinon.assert.calledWith(updateSpy, testCmp.id, expected);
-          sinon.assert.calledOnce(updateSpy);
-
-          updateSpy.restore();
+          loadStub.restore();
           done();
         });
 
@@ -373,7 +354,7 @@ describe('routes/component', function() {
         .expect(200, {message: 'Component deleted'})
         .then(res => {
             
-          sinon.assert.calledWith(removeSpy, testCmp.id);
+          sinon.assert.calledWith(removeSpy, testCmp);
           sinon.assert.calledOnce(removeSpy);
           
           removeSpy.restore();
@@ -384,7 +365,7 @@ describe('routes/component', function() {
 
     it ('should return 422 b/c of invalid component id', function(done) {
 
-      const removeStub = sinon.stub(testRepo, 'remove').callsFake(id => {
+      const loadStub = sinon.stub(testRepo, 'load').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -393,11 +374,7 @@ describe('routes/component', function() {
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
-            
-          sinon.assert.calledWith(removeStub, testCmp.id);
-          sinon.assert.calledOnce(removeStub);
-          
-          removeStub.restore();
+          loadStub.restore();
           done();
         });
 

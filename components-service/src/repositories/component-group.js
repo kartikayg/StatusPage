@@ -22,10 +22,6 @@ const init = (dao) => {
     throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}.`);
   }
 
-  const repo = {
-    name: dao.name
-  };
-
   /**
    * Validates a component group data before saving it.
    * @param {object} data to validate
@@ -33,7 +29,7 @@ const init = (dao) => {
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
-  const buildValidateEntity = async (data) => {
+  const buildValidEntity = async (data) => {
     const validEntity = await componentGroupEntity.validate(data);
     return validEntity;
   };
@@ -45,6 +41,48 @@ const init = (dao) => {
    */
   const format = (componentGroup) => {
     return _omit(['_id'])(componentGroup);
+  };
+
+  /**
+   * Saves a component-group object in db
+   * @param {object} componentGrpObj
+   * @return {promise}
+   *  on success, saved object
+   *  on failure, error
+   */
+  const saveDb = async (componentGrpObj) => {
+
+    const cloned = _cloneDeep(componentGrpObj);
+
+    let isNew = false;
+
+    // add id, if new
+    if (!cloned.id) {
+      isNew = true;
+      cloned.id = componentGroupEntity.generateId();
+      cloned.created_at = new Date();
+    }
+
+    cloned.updated_at = new Date();
+
+    // validate
+    const validEntity = await buildValidEntity(cloned);
+
+    if (isNew) {
+      await dao.insert(validEntity);
+    }
+    else {
+      await dao.update(validEntity, { id: validEntity.id });
+    }
+
+    return validEntity;
+
+  };
+
+
+
+  const repo = {
+    name: dao.name
   };
 
   /**
@@ -115,16 +153,10 @@ const init = (dao) => {
       sort_order: 1
     };
 
-    let groupObj = Object.assign({}, defaultValues, _cloneDeep(data), {
-      id: componentGroupEntity.generateId(),
-      created_at: new Date(),
-      updated_at: new Date()
-    });
+    let groupObj = Object.assign({}, defaultValues, _cloneDeep(data));
 
     // validate, save and return the formatted data
-    groupObj = await buildValidateEntity(groupObj);
-
-    await dao.insert(groupObj);
+    groupObj = await saveDb(groupObj);
 
     return format(groupObj);
 
@@ -132,43 +164,34 @@ const init = (dao) => {
 
   /**
    * Updates a component group.
-   * @param {string} id - component group id
+   * @param {object} componentGrpObj
    * @param {object} data - data for the component group. This will merge with the
    *   existing data.
    * @return {Promise}
    *  if fulfilled, {object} component group object
    *  if rejected, {Error} error
    */
-  repo.update = async (id, data) => {
-
-    // load the component group
-    const currentGroupObj = await repo.load(id);
-
-    let updatedObj = Object.assign({}, _cloneDeep(currentGroupObj), data);
-
-    updatedObj = await buildValidateEntity(updatedObj);
-    updatedObj.updated_at = new Date();
-
-    await dao.update(updatedObj, { id });
-
+  repo.update = async (componentGrpObj, data) => {
+    let updatedObj = Object.assign({}, _cloneDeep(componentGrpObj), data);
+    updatedObj = await saveDb(updatedObj);
     return format(updatedObj);
-
   };
 
   /**
    * Removes a component group.
-   * @param {string} id - component group id
+   * @param {object} componentGrpObj
    * @return {Promise}
    *  if fulfilled, void
    *  if rejected, {Error} error
    */
-  repo.remove = async (id) => {
+  repo.remove = async (componentGrpObj) => {
 
-    // remove the component
+    const { id } = componentGrpObj;
+
     const cnt = await dao.remove({ id });
 
     if (cnt !== 1) {
-      throw new IdNotFoundError(`Invalid component group id passed: ${id}.`);
+      throw new IdNotFoundError(`Invalid component id passed: ${id}.`);
     }
 
   };

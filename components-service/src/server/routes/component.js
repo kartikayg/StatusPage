@@ -10,18 +10,30 @@ import {params as sanitizeParams} from '../middleware/sanitize';
 
 /**
  * Export the routes
- * @param {object} repo - component repo
+ * @param {object} componentRepo - component repo
  * @return {object} router
  */
-export default (repo) => {
-
-  if (repo.name !== 'components') {
-    throw new Error(`Invalid repo passed to this router. Passed repo name: ${repo.name}`);
-  }
-
+export default (componentRepo) => {
 
   // express router
   const router = express.Router();
+
+  // set variables in req object based on the component id in the
+  // url. the param() doesn't accept multiple route parameters, so some
+  // funky code is done to get around it.
+  router.param('componentId', (req, res, next) => {
+
+    const load = () => {
+      const { componentId } = req.sanitizedParams;
+      componentRepo.load(componentId).then(o => {
+        req.componentObj = o;
+        next();
+      }).catch(next);
+    };
+
+    sanitizeParams()(req, res, load);
+
+  });
 
   // build routes
   router.route('/')
@@ -35,7 +47,7 @@ export default (repo) => {
         query.active = boolean(query.active);
       }
 
-      repo.list(query).then(components => {
+      componentRepo.list(query).then(components => {
         res.json(components);
       }).catch(next);
 
@@ -50,7 +62,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
       }
       else {
-        repo.create(data).then(component => {
+        componentRepo.create(data).then(component => {
           res.json(component);
         }).catch(next);
       }
@@ -59,14 +71,9 @@ export default (repo) => {
 
   router.route('/:componentId')
 
-    // sanitize the params
-    .all(sanitizeParams())
-
     /** GET /api/components/:componentId - Get component */
     .get((req, res, next) => {
-      repo.load(req.sanitizedParams.componentId).then(component => {
-        res.json(component);
-      }).catch(next);
+      res.json(req.componentObj);
     })
 
     /** PATCH /api/components/:componentId - Update properties of a component */
@@ -80,7 +87,7 @@ export default (repo) => {
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: 'No component data sent in this request.' });
       }
       else {
-        repo.update(cmpId, data).then(component => {
+        componentRepo.update(req.componentObj, data).then(component => {
           res.json(component);
         }).catch(next);
       }
@@ -89,7 +96,7 @@ export default (repo) => {
 
     /** DELETE /api/components/:componentId - Delete component */
     .delete((req, res, next) => {
-      repo.remove(req.sanitizedParams.componentId).then(() => {
+      componentRepo.remove(req.componentObj).then(() => {
         res.json({ message: 'Component deleted'});
       }).catch(next);
     });

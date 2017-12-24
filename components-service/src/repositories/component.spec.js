@@ -339,7 +339,7 @@ describe('repo/component', function() {
         description: 'desc'
       };
 
-      await repo.update(testCmpId, updated);
+      await repo.update(existingCmpWithoutId, updated);
 
       // dao called using the new data
       const updateArg = updateSpy.args[0][0];
@@ -353,15 +353,6 @@ describe('repo/component', function() {
 
     });
 
-    it ('should fail b/c of invalid id', function(done) {
-
-      repo.update('1234', {}).catch(e => {
-        assert.strictEqual(e.name, 'IdNotFoundError');
-        done();
-      });
-
-    });
-
   });
 
   describe('remove()', function() {
@@ -370,7 +361,7 @@ describe('repo/component', function() {
 
       const removeSpy = sinon.spy(daoMockObj, 'remove');
 
-      await repo.remove(testCmpId);
+      await repo.remove(existingCmpWithoutId);
 
       // its calling dao remove
       // its calling with the right pred
@@ -385,7 +376,7 @@ describe('repo/component', function() {
 
       const removeSpy = sinon.spy(daoMockObj, 'remove');
 
-      repo.remove('1').catch(e => {
+      repo.remove({}).catch(e => {
       
         // its calling dao remove
         // returning the error  

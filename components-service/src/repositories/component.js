@@ -9,6 +9,7 @@ import _cloneDeep from 'lodash/fp/cloneDeep';
 import {component as componentEntity} from '../entities/index';
 import {IdNotFoundError} from './errors';
 
+
 /**
  * Initializes the repo
  * @param {object} dao - database access object
@@ -22,10 +23,6 @@ const init = (dao, groupRepo) => {
     throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
   }
 
-  const repo = {
-    name: dao.name
-  };
-
   /**
    * Validates a component data before saving it.
    * @param {object} data to validate
@@ -33,7 +30,7 @@ const init = (dao, groupRepo) => {
    *  if fulfilled, {object} validated component data
    *  if rejected, {Error} Error
    */
-  const buildValidateEntity = async (data) => {
+  const buildValidEntity = async (data) => {
 
     // basic validation.
     const component = await componentEntity.validate(data);
@@ -57,6 +54,48 @@ const init = (dao, groupRepo) => {
    */
   const format = (component) => {
     return _omit(['_id'])(component);
+  };
+
+  /**
+   * Saves a component object in db
+   * @param {object} componentObj
+   * @return {promise}
+   *  on success, saved object
+   *  on failure, error
+   */
+  const saveDb = async (componentObj) => {
+
+    const cloned = _cloneDeep(componentObj);
+
+    let isNew = false;
+
+    // add id, if new
+    if (!cloned.id) {
+      isNew = true;
+      cloned.id = componentEntity.generateId();
+      cloned.created_at = new Date();
+    }
+
+    cloned.updated_at = new Date();
+
+    // validate
+    const validEntity = await buildValidEntity(cloned);
+
+    if (isNew) {
+      await dao.insert(validEntity);
+    }
+    else {
+      await dao.update(validEntity, { id: validEntity.id });
+    }
+
+    return validEntity;
+
+  };
+
+
+  // repo object
+  const repo = {
+    name: dao.name
   };
 
   /**
@@ -117,16 +156,10 @@ const init = (dao, groupRepo) => {
       sort_order: 1
     };
 
-    let componentObj = Object.assign({}, defaultValues, _cloneDeep(data), {
-      id: componentEntity.generateId(),
-      created_at: new Date(),
-      updated_at: new Date()
-    });
+    let componentObj = Object.assign({}, defaultValues, _cloneDeep(data));
 
     // validate, save and return the formatted data
-    componentObj = await buildValidateEntity(componentObj);
-
-    await dao.insert(componentObj);
+    componentObj = await saveDb(componentObj);
 
     return format(componentObj);
 
@@ -134,39 +167,30 @@ const init = (dao, groupRepo) => {
 
   /**
    * Updates a component.
-   * @param {string} id - component id
+   * @param {object} componentObj
    * @param {object} data - Data for the component. This will merge with the
    *   existing data.
    * @return {Promise}
    *  if fulfilled, {object} component object
    *  if rejected, {Error} error
    */
-  repo.update = async (id, data) => {
-
-    // load the component
-    const currentComponentObj = await repo.load(id);
-
-    let updatedObj = Object.assign({}, _cloneDeep(currentComponentObj), data);
-
-    updatedObj = await buildValidateEntity(updatedObj);
-    updatedObj.updated_at = new Date();
-
-    await dao.update(updatedObj, { id });
-
+  repo.update = async (componentObj, data) => {
+    let updatedObj = Object.assign({}, _cloneDeep(componentObj), data);
+    updatedObj = await saveDb(updatedObj);
     return format(updatedObj);
-
   };
 
   /**
    * Removes a component.
-   * @param {string} id - component id
+   * @param {object} componentObj
    * @return {Promise}
    *  if fulfilled, void
    *  if rejected, {Error} error
    */
-  repo.remove = async (id) => {
+  repo.remove = async (componentObj) => {
 
-    // remove the component
+    const { id } = componentObj;
+
     const cnt = await dao.remove({ id });
 
     if (cnt !== 1) {
