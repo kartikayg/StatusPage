@@ -17,7 +17,7 @@ export default (incidentRepo) => {
   // express router
   const router = express.Router();
 
-  // set variables in req object based on the subscription id in the
+  // set variables in req object based on the incident id in the
   // url. the param() doesn't accept multiple route parameters, so some
   // funky code is done to get around it.
   router.param('incidentId', (req, res, next) => {
@@ -84,7 +84,6 @@ export default (incidentRepo) => {
     /** PATCH /api/incidents/:incidentId - Updates an incident */
     .patch((req, res, next) => {
 
-      const { incidentId } = req.sanitizedParams;
       const data = req.sanitizedBody.incident;
 
       // not a valid incident object sent
@@ -123,7 +122,7 @@ export default (incidentRepo) => {
     /** PATCH - Updates incident-update */
     .patch((req, res, next) => {
 
-      const { incidentId, incidentUpdateId } = req.sanitizedParams;
+      const { incidentUpdateId } = req.sanitizedParams;
       const data = req.sanitizedBody.update;
 
       // not a valid incident object sent
@@ -138,9 +137,11 @@ export default (incidentRepo) => {
           data.message = req.body.update.message;
         }
 
-        req.repo.changeIncidentUpdateEntry(req.incidentObj, incidentUpdateId, data).then(updIncident => {
-          res.json(updIncident);
-        }).catch(next);
+        req.repo.changeIncidentUpdateEntry(req.incidentObj, incidentUpdateId, data)
+          .then(updIncident => {
+            res.json(updIncident);
+          })
+          .catch(next);
 
       }
 
