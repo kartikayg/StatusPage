@@ -16,7 +16,6 @@ describe('entity/incident', function() {
     updated_at: new Date(),
     message: 'a new incident update',
     status: 'investigating',
-    do_twitter_update: false,
     do_notify_subscribers: true,
     displayed_at: new Date()
   };
@@ -51,14 +50,8 @@ describe('entity/incident', function() {
 
   it ('should throw error for missing required values', function () {
 
-    const requiredErr = [
-      '"id" is required',
-      '"created_at" is required',
-      '"updated_at" is required',
-      '"name" is required',
-      '"type" is required',
-      '"updates" is required'
-    ];
+    const reqFields = ['id', 'created_at', 'updated_at', 'name', 'type', 'is_resolved', 'updates'];
+    const requiredErr = reqFields.map(f => `"${f}" is required`);
 
     joiassert.error(incident.schema, {}, requiredErr);
 
@@ -92,30 +85,6 @@ describe('entity/incident', function() {
     data['updates'] = [ incidentUpdateTestData ];
 
     joiassert.error(incident.schema, data, '"resolved_at" is required');
-
-  });
-
-  it ('should throw error for misc invalid values', function () {
-
-    const data = Object.assign({}, incidentTestData, {
-      id: 123,
-      created_at: 'time',
-      updated_at: 'time',
-      name: 123,
-      type: 'type'
-    });
-
-    data['updates'] = [ incidentUpdateTestData ];
-
-    const invalidValuesErr = [
-      '"id" must be a string',
-      '"created_at" must be a valid ISO 8601 date',
-      '"updated_at" must be a valid ISO 8601 date',
-      '"name" must be a string',
-      '"type" must be one of [realtime, scheduled, backfilled]'
-    ];
-
-    joiassert.error(incident.schema, data, invalidValuesErr);
 
   });
 

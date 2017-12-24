@@ -11,7 +11,7 @@ import httpStatus from 'http-status';
 
 import incidentRoute from './incident';
 import server from '../../server/index';
-import {IdNotFoundError, UpdateNotAllowedError} from '../../repositories/errors';
+import {IdNotFoundError, InvalidSubscriptionTypeError} from '../../repositories/errors';
 
 
 describe('routes/incident', function() {
@@ -77,7 +77,28 @@ describe('routes/incident', function() {
     }]
   };
 
-  let testRepoStub = {
+  // realtime incident repo
+  const testRealtimeRepoStub = {
+
+    create(data) {
+      return Promise.resolve(testIncidentObj);
+    },
+
+    update(obj, data) {
+      return Promise.resolve(testIncidentObj);
+    },
+
+    remove(obj) {
+      return Promise.resolve(1);
+    },
+
+    changeIncidentUpdateEntry(obj, incidentId, data) {
+      return Promise.resolve(testIncidentObj);
+    }
+
+  };
+
+  let testIncidentRepoStub = {
     
     name: 'incidents',
 
@@ -89,20 +110,17 @@ describe('routes/incident', function() {
       return Promise.resolve([testIncidentObj]);
     },
 
-    create(data) {
-      return Promise.resolve(testIncidentObj);
-    },
-
-    update(id, data) {
-      return Promise.resolve(testIncidentObj);
-    },
-
-    remove(id) {
-      return Promise.resolve();
-    },
-
-    changeIncidentUpdateEntry(id, incidentId, data) {
-      return Promise.resolve(testIncidentObj);
+    ofType(type) {
+      switch (type) {
+        case 'realtime':
+          return Promise.resolve(testRealtimeRepoStub);
+        case 'backfilled':
+        case 'scheduled':
+          break;
+        default:
+           return Promise.reject(new InvalidSubscriptionTypeError(type));
+          break;
+      }
     }
 
   };
@@ -114,7 +132,7 @@ describe('routes/incident', function() {
       PORT: process.env.PORT,
       NODE_ENV: process.env.NODE_ENV
     }, {
-      repos: { incident: testRepoStub }
+      repos: { incident: testIncidentRepoStub }
     })
   });
 
@@ -130,27 +148,11 @@ describe('routes/incident', function() {
   // the idea is to test that the right params are being passed to the repo
   // and whatever comes back from repo is being returned back. 
 
-  describe('init', function() {
-
-    it ('should error if invalid repo passed', function(done) {
-
-      try {
-        incidentRoute({ name: 'bogus' });
-      }
-      catch (e) {
-        assert.strictEqual(e.message, 'Invalid repo passed to this router. Passed repo name: bogus');
-        done();
-      }
-
-    });
-
-  });
-  
   describe('GET /incidents', function() {
 
     it ('should return incidents and 200 response, when no filters passed', function(done) {
 
-      const listSpy = sinon.spy(testRepoStub, 'list');
+      const listSpy = sinon.spy(testIncidentRepoStub, 'list');
 
       request(app)
         .get('/api/incidents')
@@ -169,7 +171,7 @@ describe('routes/incident', function() {
 
     it ('should return incidents and 200 response, when multiple filters passed', function(done) {
 
-      const listSpy = sinon.spy(testRepoStub, 'list');
+      const listSpy = sinon.spy(testIncidentRepoStub, 'list');
 
       request(app)
         .get('/api/incidents?type=realtime&is_resolved=false')
@@ -189,7 +191,7 @@ describe('routes/incident', function() {
     it ('should return 500 response when exception thrown from repo', function (done) {
 
       // throw error
-      const listStub = sinon.stub(testRepoStub, 'list').callsFake((filter) => {
+      const listStub = sinon.stub(testIncidentRepoStub, 'list').callsFake((filter) => {
         return Promise.reject({ message: 'error' });
       });
 
@@ -212,7 +214,7 @@ describe('routes/incident', function() {
 
     it ('should create and return incident object', function(done) {
 
-      const createSpy = sinon.spy(testRepoStub, 'create');
+      const createSpy = sinon.spy(testRealtimeRepoStub, 'create');
 
       request(app)
         .post('/api/incidents')
@@ -232,7 +234,7 @@ describe('routes/incident', function() {
     it ('should return 422 b/c of validation error', function(done) {
 
       // forcing an error from repo
-      const createStub = sinon.stub(testRepoStub, 'create').callsFake(data => {
+      const createStub = sinon.stub(testRealtimeRepoStub, 'create').callsFake(data => {
         const e = new Error('validation');
         e.name = 'ValidationError';
         return Promise.reject(e);
@@ -255,7 +257,7 @@ describe('routes/incident', function() {
 
     it ('should fail b/c of no incident objected posted', function(done) {
 
-      const createSpy = sinon.spy(testRepoStub, 'create');
+      const createSpy = sinon.spy(testRealtimeRepoStub, 'create');
 
       request(app)
         .post('/api/incidents')
@@ -275,7 +277,7 @@ describe('routes/incident', function() {
 
     it ('should return the incident based on the id', function(done) {
 
-      const loadSpy = sinon.spy(testRepoStub, 'load');
+      const loadSpy = sinon.spy(testIncidentRepoStub, 'load');
 
       request(app)
         .get(`/api/incidents/${testIncidentObj.id}`)
@@ -295,7 +297,7 @@ describe('routes/incident', function() {
     it ('should return 422 b/c of invalid incident id', function(done) {
 
       // force an error
-      const loadStub = sinon.stub(testRepoStub, 'load').callsFake(id => {
+      const loadStub = sinon.stub(testIncidentRepoStub, 'load').callsFake(id => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -321,7 +323,7 @@ describe('routes/incident', function() {
 
     it ('should update a incident and return a 200', function(done) {
 
-      const updateSpy = sinon.spy(testRepoStub, 'update');
+      const updateSpy = sinon.spy(testRealtimeRepoStub, 'update');
 
       const updateData = {
         message: 'message',
@@ -340,7 +342,7 @@ describe('routes/incident', function() {
             status: 'resolved'
           };
 
-          sinon.assert.calledWith(updateSpy, testIncidentObj.id, expected);
+          sinon.assert.calledWith(updateSpy, testIncidentObj, expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -352,8 +354,9 @@ describe('routes/incident', function() {
 
     it ('should return 422 b/c of invalid incident id', function(done) {
 
-      const updateSpy = sinon.stub(testRepoStub, 'update').callsFake((id, data) => {
-        throw new IdNotFoundError('Id not found');
+       // force an error
+      const loadStub = sinon.stub(testIncidentRepoStub, 'load').callsFake(id => {
+        return Promise.reject(new IdNotFoundError('Id not found'));
       });
 
       const updateData = {
@@ -366,22 +369,16 @@ describe('routes/incident', function() {
         .send({ incident: updateData })
         .expect('Content-Type', /json/)
         .expect(422)
-        .then(res => {
-            
-
-          sinon.assert.calledWith(updateSpy, testIncidentObj.id, updateData);
-          sinon.assert.calledOnce(updateSpy);
-
-          updateSpy.restore();
+        .then(res => {  
+          loadStub.restore();
           done();
-
         });
 
     });
 
     it ('should fail b/c of no incident data posted', function(done) {
 
-      const updateSpy = sinon.spy(testRepoStub, 'update');
+      const updateSpy = sinon.spy(testRealtimeRepoStub, 'update');
 
       request(app)
         .patch(`/api/incidents/${testIncidentObj.id}`)
@@ -401,7 +398,7 @@ describe('routes/incident', function() {
 
     it ('should delete an incident based on the id', function(done) {
 
-      const removeSpy = sinon.spy(testRepoStub, 'remove');
+      const removeSpy = sinon.spy(testRealtimeRepoStub, 'remove');
 
       request(app)
         .delete(`/api/incidents/${testIncidentObj.id}`)
@@ -409,7 +406,7 @@ describe('routes/incident', function() {
         .expect(200, {message: 'Incident deleted'})
         .then(res => {
             
-          sinon.assert.calledWith(removeSpy, testIncidentObj.id);
+          sinon.assert.calledWith(removeSpy, testIncidentObj);
           sinon.assert.calledOnce(removeSpy);
           
           removeSpy.restore();
@@ -418,10 +415,11 @@ describe('routes/incident', function() {
 
     });
 
-    it ('should return 422 b/c of invalid component group id', function(done) {
+    it ('should return 422 b/c of invalid id', function(done) {
 
-      const removeStub = sinon.stub(testRepoStub, 'remove').callsFake(id => {
-        throw new IdNotFoundError('Id not found');
+      // force an error
+      const loadStub = sinon.stub(testIncidentRepoStub, 'load').callsFake(id => {
+        return Promise.reject(new IdNotFoundError('Id not found'));
       });
 
       request(app)
@@ -429,11 +427,7 @@ describe('routes/incident', function() {
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
-            
-          sinon.assert.calledWith(removeStub, testIncidentObj.id);
-          sinon.assert.calledOnce(removeStub);
-          
-          removeStub.restore();
+          loadStub.restore();
           done();
         });
 
@@ -445,7 +439,7 @@ describe('routes/incident', function() {
 
     it ('should update an incident-entry and return a 200', function(done) {
 
-      const updateSpy = sinon.spy(testRepoStub, 'changeIncidentUpdateEntry');
+      const updateSpy = sinon.spy(testRealtimeRepoStub, 'changeIncidentUpdateEntry');
 
       const updateData = {
         message: '<b>message</b>',
@@ -464,7 +458,7 @@ describe('routes/incident', function() {
             status: 'resolved'
           };
 
-          sinon.assert.calledWith(updateSpy, testIncidentObj.id, 'updId', expected);
+          sinon.assert.calledWith(updateSpy, testIncidentObj, 'updId', expected);
           sinon.assert.calledOnce(updateSpy);
 
           updateSpy.restore();
@@ -476,7 +470,7 @@ describe('routes/incident', function() {
 
     it ('should return 422 b/c of invalid incident-update id', function(done) {
 
-      const updateSpy = sinon.stub(testRepoStub, 'changeIncidentUpdateEntry').callsFake((id, data) => {
+      const updateSpy = sinon.stub(testRealtimeRepoStub, 'changeIncidentUpdateEntry').callsFake((id, data) => {
         throw new IdNotFoundError('Id not found');
       });
 
@@ -503,7 +497,7 @@ describe('routes/incident', function() {
 
     it ('should fail b/c of no data posted', function(done) {
 
-      const updateSpy = sinon.spy(testRepoStub, 'changeIncidentUpdateEntry');
+      const updateSpy = sinon.spy(testRealtimeRepoStub, 'changeIncidentUpdateEntry');
 
       request(app)
         .patch(`/api/incidents/${testIncidentObj.id}/incident_updates/updId`)

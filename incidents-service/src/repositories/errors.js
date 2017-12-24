@@ -18,6 +18,24 @@ export class IdNotFoundError extends Error {
   }
 }
 
+
+/**
+ * Class representing InvalidIncidentTypeError.
+ * @extends Error
+ */
+export class InvalidIncidentTypeError extends Error {
+
+  /**
+   * Creates an error.
+   * @param {string} type - invalid type.
+   */
+  constructor(type) {
+    super(`Invalid Incident type: ${type}`);
+    this.name = this.constructor.name;
+  }
+}
+
+
 /**
  * Class representing UpdateNotAllowedError.
  * @extends Error

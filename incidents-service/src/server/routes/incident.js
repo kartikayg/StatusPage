@@ -12,22 +12,37 @@ import {params as sanitizeParams} from '../middleware/sanitize';
  * @param {object} repo - incidents repo
  * @return {object} router
  */
-export default (repo) => {
-
-  if (repo.name !== 'incidents') {
-    throw new Error(`Invalid repo passed to this router. Passed repo name: ${repo.name}`);
-  }
-
+export default (incidentRepo) => {
 
   // express router
   const router = express.Router();
+
+  // set variables in req object based on the subscription id in the
+  // url. the param() doesn't accept multiple route parameters, so some
+  // funky code is done to get around it.
+  router.param('incidentId', (req, res, next) => {
+
+    const load = () => {
+      const { incidentId } = req.sanitizedParams;
+      incidentRepo.load(incidentId).then(o => {
+        req.incidentObj = o;
+        incidentRepo.ofType(o.type).then(t => {
+          req.repo = t;
+          next();
+        });
+      }).catch(next);
+    };
+
+    sanitizeParams()(req, res, load);
+
+  });
 
   // build routes
   router.route('/')
 
     /** GET /api/incidents - list of incidents */
     .get((req, res, next) => {
-      repo.list(req.sanitizedQuery).then(incidents => {
+      incidentRepo.list(req.sanitizedQuery).then(incidents => {
         res.json(incidents);
       }).catch(next);
     })
@@ -49,23 +64,21 @@ export default (repo) => {
           data.message = req.body.incident.message;
         }
 
-        repo.create(data).then(newIncident => {
+        incidentRepo.ofType(data.type).then(repo => {
+          return repo.create(data);
+        }).then(newIncident => {
           res.json(newIncident);
         }).catch(next);
+
       }
 
     });
 
   router.route('/:incidentId')
 
-    // sanitize the params
-    .all(sanitizeParams())
-
     /** GET /api/incidents/:incidentId - Gets an incident */
     .get((req, res, next) => {
-      repo.load(req.sanitizedParams.incidentId).then(incidentObj => {
-        res.json(incidentObj);
-      }).catch(next);
+      res.json(req.incidentObj);
     })
 
     /** PATCH /api/incidents/:incidentId - Updates an incident */
@@ -86,7 +99,7 @@ export default (repo) => {
           data.message = req.body.incident.message;
         }
 
-        repo.update(incidentId, data).then(updIncident => {
+        req.repo.update(req.incidentObj, data).then(updIncident => {
           res.json(updIncident);
         }).catch(next);
 
@@ -96,7 +109,7 @@ export default (repo) => {
 
     /** DELETE /api/incidents/:incidentId - Deletes an incident */
     .delete((req, res, next) => {
-      repo.remove(req.sanitizedParams.incidentId).then(() => {
+      req.repo.remove(req.incidentObj).then(() => {
         res.json({ message: 'Incident deleted'});
       }).catch(next);
     });
@@ -125,7 +138,7 @@ export default (repo) => {
           data.message = req.body.update.message;
         }
 
-        repo.changeIncidentUpdateEntry(incidentId, incidentUpdateId, data).then(updIncident => {
+        req.repo.changeIncidentUpdateEntry(req.incidentObj, incidentUpdateId, data).then(updIncident => {
           res.json(updIncident);
         }).catch(next);
 

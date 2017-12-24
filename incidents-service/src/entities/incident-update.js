@@ -7,11 +7,6 @@ import Joi from 'joi';
 
 const htmlJoi = Joi.extend(htmlInput);
 
-// returns the current date & time
-const currentTime = () => {
-  return new Date();
-};
-
 const prefix = 'IU';
 
 const schema = {
@@ -32,13 +27,9 @@ const schema = {
   status: Joi.string()
     .required(),
   displayed_at: Joi.date()
-    .iso()
-    .default(currentTime, 'the current date and time'),
+    .iso(),
 
-  do_twitter_update: Joi.boolean()
-    .default(false),
   do_notify_subscribers: Joi.boolean()
-    .default(false)
 
 };
 
