@@ -106,7 +106,7 @@ describe('routes/incident', function() {
       return Promise.resolve(testIncidentObj);
     },
 
-    list(filter = {}) {
+    list(filter) {
       return Promise.resolve([testIncidentObj]);
     },
 
@@ -114,11 +114,6 @@ describe('routes/incident', function() {
       switch (type) {
         case 'realtime':
           return Promise.resolve(testRealtimeRepoStub);
-        case 'backfilled':
-        case 'scheduled':
-          break;
-        default:
-           return Promise.reject(new InvalidSubscriptionTypeError(type));
           break;
       }
     }

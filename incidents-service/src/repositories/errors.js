@@ -51,3 +51,25 @@ export class UpdateNotAllowedError extends Error {
     this.name = this.constructor.name;
   }
 }
+
+/**
+ * Class representing InvalidDateError.
+ * @extends Error
+ */
+export class InvalidDateError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+/**
+ * Class representing InvalidIncidentStatusError.
+ * @extends Error
+ */
+export class InvalidIncidentStatusError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}

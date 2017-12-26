@@ -13,7 +13,7 @@ import thisPackage from '../../../package.json';
 /**
  * Return routes
  */
-export default (repos = {}) => {
+export default (repos) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
@@ -43,6 +43,8 @@ export default (repos = {}) => {
       case 'ValidationError':
       case 'IdNotFoundError':
       case 'UpdateNotAllowedError':
+      case 'InvalidDateError':
+      case 'InvalidIncidentStatusError':
         res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: err.message });
         break;
 

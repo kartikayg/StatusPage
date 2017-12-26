@@ -1,7 +1,7 @@
 {
-  "name": "components-service",
+  "name": "incidents-service",
   "version": "1.0.0",
-  "description": "components-service",
+  "description": "incidents-service",
   "main": "src/index.js",
   "engines": {
     "node": ">=4.8.0",
@@ -42,6 +42,7 @@
     "joi-html-input": "^1.1.5",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
+    "moment": "^2.20.1",
     "mongodb": "^2.2.33",
     "morgan": "^1.9.0",
     "morgan-json": "^1.1.0",

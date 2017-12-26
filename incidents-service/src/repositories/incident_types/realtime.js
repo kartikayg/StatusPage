@@ -78,7 +78,7 @@ const init = (dao, messagingQueue) => {
     // if the incident is not resolved, then update whatever fields are
     // allowed.
     if (updatedObj.is_resolved !== true) {
-      Object.assign(updatedObj, _pick(['components'])(data));
+      Object.assign(updatedObj, _pick(['components', 'name'])(data));
     }
 
     // if either of them are present, create a new incident-update
@@ -98,7 +98,7 @@ const init = (dao, messagingQueue) => {
     }
 
     // save in db
-    updatedObj = commonRepo.saveDb(updatedObj);
+    updatedObj = await commonRepo.saveDb(updatedObj);
 
     return updatedObj;
 

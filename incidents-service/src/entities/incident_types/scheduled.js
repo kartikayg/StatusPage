@@ -17,7 +17,8 @@ const schema = Joi.object({
     .required(),
   scheduled_end_time: Joi.date()
     .iso()
-    .required(),
+    .required()
+    .min(Joi.ref('scheduled_start_time')),
   scheduled_auto_status_updates: Joi.boolean()
     .required(),
   scheduled_auto_updates_send_notifications: Joi.boolean()

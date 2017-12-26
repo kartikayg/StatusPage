@@ -9,6 +9,8 @@ import sinon from 'sinon';
 import request from 'supertest';
 import MockDate from 'mockdate';
 
+import moment from 'moment';
+
 import amqp from 'amqp';
 import isJSON from 'is-json';
 import httpStatus from 'http-status';
@@ -555,6 +557,213 @@ describe('app - integration tests', function () {
 
     });
 
+    describe('type#scheduled', function () {
+
+      let scheduledIncidentObj;
+
+      it ('should create a scheduled incident', function (done) {
+
+        const newPartialIncidentObj = {
+          name: 'incident',
+          components: ['component_id'],
+          message: 'this is scheduled',
+          type: 'scheduled',
+          do_notify_subscribers: true,
+          scheduled_start_time: moment().add(1, 'h').toDate(),
+          scheduled_end_time: moment().add(2, 'h').toDate(),
+          scheduled_auto_updates_send_notifications: true
+        };
+
+        request(app)
+          .post('/api/incidents')
+          .send({ incident: newPartialIncidentObj })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+            scheduledIncidentObj = res.body;
+            assert.isObject(scheduledIncidentObj);
+
+            assert.strictEqual(scheduledIncidentObj.type, 'scheduled');
+
+            done();
+
+          });
+
+      });
+
+      it ('should update name and components on the incident', function (done) {
+
+        const updateData = {
+          name: 'scheduled-incident',
+          components: ['cid_1', 'cid_2']
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+            scheduledIncidentObj = res.body;
+
+            assert.strictEqual(scheduledIncidentObj.name, updateData.name);
+            assert.deepEqual(scheduledIncidentObj.components, updateData.components);
+
+            done();
+
+          });
+      });
+
+      it ('should put the incident in in_progress', function (done) {
+
+        const updateData = {
+          status: 'in_progress',
+          message: 'it is in progress now'
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+            scheduledIncidentObj = res.body;
+
+            assert.strictEqual(scheduledIncidentObj.scheduled_status, 'in_progress');
+
+            assert.equal(scheduledIncidentObj.updates.length, 2);
+
+            assert.equal(scheduledIncidentObj.updates[1].status, 'in_progress');
+            assert.equal(scheduledIncidentObj.updates[1].message, updateData.message);
+
+            done();
+
+          });
+
+      });
+
+      it ('should fail to cancel the incident once in progress', function (done) {
+
+        const updateData = {
+          status: 'cancelled',
+          message: 'cancelling'
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(422)
+          .then(res => {
+            assert.equal(res.body.message, 'Status: cancelled is not allowed for this incident.');
+            done();
+          });
+
+      });
+
+      it ('should fail b/c of invalid end time being posted', function(done) {
+
+        const updateData = {
+          scheduled_end_time: moment(scheduledIncidentObj.scheduled_start_time).subtract(10, 'M').toISOString()
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(422)
+          .then(res => {
+            assert.equal(res.body.message, 'End time must be after the start time');
+            done();
+          });
+
+      });
+
+      it ('should add the update with verifying status', function (done) {
+
+        const updateData = {
+          status: 'verifying',
+          message: 'it is in progress now'
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+            scheduledIncidentObj = res.body;
+
+            assert.strictEqual(scheduledIncidentObj.scheduled_status, 'in_progress');
+
+            assert.equal(scheduledIncidentObj.updates.length, 3);
+
+            assert.equal(scheduledIncidentObj.updates[2].status, 'verifying');
+            assert.equal(scheduledIncidentObj.updates[2].message, updateData.message);
+
+            done();
+
+          });
+
+      });
+
+      it ('should resolve the incident', function (done) {
+
+        const updateData = {
+          status: 'resolved',
+          message: 'it is resolved now'
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: updateData })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+            scheduledIncidentObj = res.body;
+
+            assert.strictEqual(scheduledIncidentObj.scheduled_status, 'completed');
+
+            assert.equal(scheduledIncidentObj.updates.length, 4);
+
+            assert.equal(scheduledIncidentObj.updates[3].status, 'resolved');
+            assert.equal(scheduledIncidentObj.updates[3].message, updateData.message);
+
+            assert.equal(scheduledIncidentObj.is_resolved, true);
+            assert.equal(scheduledIncidentObj.resolved_at, staticCurrentTime.toISOString());
+
+            done();
+
+          });
+
+      });
+
+      it ('should add a new incident-update with "update" status', function(done) {
+
+        const incidentUpdate = {
+          message: 'this is what happened'
+        };
+
+        request(app)
+          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .send({ incident: incidentUpdate })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .then(res => {
+
+            scheduledIncidentObj = res.body;
+
+            assert.strictEqual(scheduledIncidentObj.updates.length, 5);
+            assert.strictEqual(scheduledIncidentObj['updates'][4].status, 'update');
+
+            done();
+
+          });
+
+      });
+
+    });
+
     describe('misc', function() {
 
       it ('should return all incidents', function(done) {
@@ -568,14 +777,14 @@ describe('app - integration tests', function () {
             const incidents = res.body;
 
             assert.isArray(incidents);
-            assert.strictEqual(incidents.length, 2);
+            assert.strictEqual(incidents.length, 3);
 
             assert.strictEqual(incidents[0].type, 'realtime');
             assert.strictEqual(incidents[1].type, 'backfilled');
 
             // lets check in db also
             dbConnection.collection('incidents').count({}, (err, cnt) => {
-              assert.strictEqual(cnt, 2);
+              assert.strictEqual(cnt, 3);
               done();
             });
 
@@ -661,6 +870,15 @@ describe('app - integration tests', function () {
       require('./app').shutdown();
       require('./lib/logger').resetToConsole();
       setTimeout(done, 2000);
+    });
+
+    it ('should return 200 on health check', function(done) {
+
+      request(app)
+        .get('/api/health-check')
+        .expect('Content-Type', /json/)
+        .expect(200, done);
+
     });
 
     it ('should return 404 on invalid url', function(done) {
