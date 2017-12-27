@@ -185,7 +185,10 @@ const init = (dao, messagingQueue) => {
     validateStartEndTime(incidentObj);
 
     // save in db
-    incidentObj = commonRepo.saveDb(incidentObj);
+    incidentObj = await commonRepo.saveDb(incidentObj);
+
+    // fire for new incident-update
+    await commonRepo.fireNewIncidentUpdate(incidentObj);
 
     return incidentObj;
 
@@ -291,6 +294,12 @@ const init = (dao, messagingQueue) => {
 
     // save in db
     updatedObj = await commonRepo.saveDb(updatedObj);
+
+    // a new incident-update added
+    if (incidentObj.updates.length < updatedObj.updates.length) {
+      // fire for new incident-update
+      await commonRepo.fireNewIncidentUpdate(incidentObj);
+    }
 
     return updatedObj;
 

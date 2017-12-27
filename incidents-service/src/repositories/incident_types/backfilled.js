@@ -51,8 +51,6 @@ const init = (dao, messagingQueue) => {
     // save in db
     incidentObj = commonRepo.saveDb(incidentObj);
 
-    // messagingQueue.publish(validIncident, 'incidents', { routingKey: 'upsert' });
-
     return incidentObj;
 
   };

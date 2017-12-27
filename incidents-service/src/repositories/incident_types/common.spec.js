@@ -365,4 +365,19 @@ describe('repo/incident', function() {
 
   });
 
+  describe ('fireNewIncidentUpdate', function () {
+
+    it ('should call publish on message queue', async function () {
+
+      messagingQueueMockObj.publish.reset();
+
+      await repo.fireNewIncidentUpdate(existingRealtimeIncident);
+
+      sinon.assert.calledOnce(messagingQueueMockObj.publish);
+      sinon.assert.calledWith(messagingQueueMockObj.publish, existingRealtimeIncident, 'incidents', { routingKey: 'new-update' });
+
+    });
+
+  });
+
 });

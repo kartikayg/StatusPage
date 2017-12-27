@@ -12,9 +12,10 @@ import { incident as incidentEntity, incidentUpdate as incidentUpdateEntity } fr
 /**
  * Init repo
  * @param {object} dao
+ * @param {object} messagingQueue
  * @return {object}
  */
-const init = (dao) => {
+const init = (dao, messagingQueue) => {
 
   // repo object
   const repo = {};
@@ -178,6 +179,21 @@ const init = (dao) => {
     /* eslint-enable no-param-reassign */
 
     return incidentObj;
+
+  };
+
+  /**
+   * Fires a message on queue about a new incident-update
+   * @param {object} incidentObj
+   * @return {void}
+   */
+  repo.fireNewIncidentUpdate = async (incidentObj) => {
+
+    // validate
+    await repo.buildValidEntity(incidentObj);
+
+    // fire away
+    await messagingQueue.publish(incidentObj, 'incidents', { routingKey: 'new-update' });
 
   };
 

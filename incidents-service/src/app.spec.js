@@ -29,7 +29,7 @@ describe('app - integration tests', function () {
 
   const appLogQueueCallbackSpy = sinon.spy();
   const reqLogQueueCallbackSpy = sinon.spy();
-  const upsertIncidentQueueCallbackSpy = sinon.spy();
+  const newIncidentUpdateQueueCallbackSpy = sinon.spy();
 
   let dbConnection;
 
@@ -77,9 +77,9 @@ describe('app - integration tests', function () {
 
         // setup app log queue to listen on the exchange
         messagingQueue.queue('newincident', (q) => {
-          q.bind('incidents', 'upsert');
+          q.bind('incidents', 'new-update');
           q.subscribe((msg) => {
-            upsertIncidentQueueCallbackSpy(msg.data.toString());
+            newIncidentUpdateQueueCallbackSpy(msg.data.toString());
           });
         });
 
@@ -116,7 +116,7 @@ describe('app - integration tests', function () {
       setTimeout(() => {
         reqLogQueueCallbackSpy.reset();
         appLogQueueCallbackSpy.reset();
-        upsertIncidentQueueCallbackSpy.reset();
+        newIncidentUpdateQueueCallbackSpy.reset();
         done();
       }, 500);
     });
@@ -198,7 +198,7 @@ describe('app - integration tests', function () {
       setTimeout(() => {
         reqLogQueueCallbackSpy.reset();
         appLogQueueCallbackSpy.reset();
-        upsertIncidentQueueCallbackSpy.reset();
+        newIncidentUpdateQueueCallbackSpy.reset();
         done();
       }, 500);
     });
@@ -276,7 +276,7 @@ describe('app - integration tests', function () {
 
 
               // it should be send a message to the queue for a new incident
-              // sinon.assert.calledOnce(upsertIncidentQueueCallbackSpy);
+              sinon.assert.calledOnce(newIncidentUpdateQueueCallbackSpy);
 
               done();
 
@@ -313,10 +313,8 @@ describe('app - integration tests', function () {
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
-              //sinon.assert.calledOnce(upsertIncidentQueueCallbackSpy);
-
+              sinon.assert.calledOnce(newIncidentUpdateQueueCallbackSpy);
               done();
-
             }, 2000);
 
           });
@@ -347,10 +345,9 @@ describe('app - integration tests', function () {
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
-              //sinon.assert.calledOnce(upsertIncidentQueueCallbackSpy);
-
+              // as we are not adding new update, this shouldn't be called.
+              sinon.assert.notCalled(newIncidentUpdateQueueCallbackSpy);
               done();
-
             }, 2000);
 
           });
@@ -386,7 +383,7 @@ describe('app - integration tests', function () {
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
-              //sinon.assert.calledOnce(upsertIncidentQueueCallbackSpy);
+              sinon.assert.calledOnce(newIncidentUpdateQueueCallbackSpy);
               done();
             }, 2000);
 
@@ -416,7 +413,7 @@ describe('app - integration tests', function () {
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
-              //sinon.assert.calledOnce(upsertIncidentQueueCallbackSpy);
+              sinon.assert.calledOnce(newIncidentUpdateQueueCallbackSpy);
               done();
             }, 2000);
 
@@ -449,7 +446,7 @@ describe('app - integration tests', function () {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
               
               // no event fired in this case
-              //sinon.assert.notCalled(upsertIncidentQueueCallbackSpy);
+              sinon.assert.notCalled(newIncidentUpdateQueueCallbackSpy);
 
               done();
 
@@ -512,8 +509,17 @@ describe('app - integration tests', function () {
             // lets check in db also
             dbConnection.collection('incidents').count({id: incidentId}, (err, cnt) => {
               assert.strictEqual(cnt, 1);
-              done();
             });
+
+            setTimeout(() => {
+              sinon.assert.calledOnce(reqLogQueueCallbackSpy);
+              
+              // no event fired in this case
+              sinon.assert.notCalled(newIncidentUpdateQueueCallbackSpy);
+
+              done();
+
+            }, 2000);
 
           });
 
@@ -568,7 +574,11 @@ describe('app - integration tests', function () {
 
             assert.strictEqual(scheduledIncidentObj.type, 'scheduled');
 
-            done();
+            setTimeout(() => {
+              sinon.assert.calledOnce(reqLogQueueCallbackSpy);
+              sinon.assert.calledOnce(newIncidentUpdateQueueCallbackSpy);
+              done();
+            }, 2000);
 
           });
 
@@ -592,7 +602,11 @@ describe('app - integration tests', function () {
             assert.strictEqual(scheduledIncidentObj.name, updateData.name);
             assert.deepEqual(scheduledIncidentObj.components, updateData.components);
 
-            done();
+             setTimeout(() => {
+              // not called in this case
+              sinon.assert.notCalled(newIncidentUpdateQueueCallbackSpy);
+              done();
+            }, 2000);
 
           });
       });
