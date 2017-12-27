@@ -30,12 +30,17 @@ describe('app - integration tests', function () {
 
   let dbConnection;
 
+  let app, agent;
+
   before(function (done) {
 
     MockDate.set(staticCurrentTime);
 
     MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
       dbConnection = db;
+      // as it runs the db in docker container, the db is never destroyed. so for each test run,
+      // drop the table and re-create it.
+      dbConnection.collection('subscriptions').drop().catch(e => {});
     });
 
     messagingQueue = amqp.createConnection({url: process.env.RABBMITMQ_CONN_ENDPOINT});
@@ -82,32 +87,27 @@ describe('app - integration tests', function () {
 
     });
 
-    setTimeout(done, 2000);
+    setTimeout(() => {
+      require('./app').start().then(r => {
+        app = r;
+        agent = request.agent(app);
+      });
+    }, 1000);
+
+    setTimeout(done, 3000);
 
   });
 
-  after(function () {
+  after(function (done) {
     dbConnection.close();
     MockDate.reset();
     messagingQueue.disconnect();
+    require('./app').shutdown();
+    require('./lib/logger').resetToConsole();
+    setTimeout(done, 2000);
   });
 
   describe ('lib/logger', function () {
-
-    let app;
-
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
-      });
-      setTimeout(done, 2000);
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
 
     beforeEach(function (done) {
       setTimeout(function () {
@@ -186,31 +186,6 @@ describe('app - integration tests', function () {
 
   describe('/subscriptions endpoint', function () {
 
-    let app;
-
-    before(function (done) {
-
-      // as it runs the db in docker container, the db is never destroyed. so for each test run,
-      // drop the table and re-create it.
-      dbConnection.collection('subscriptions').drop();
-
-      setTimeout(() => {
-        require('./app').start().then(r => {
-          app = r;
-        });
-      }, 500);
-
-      setTimeout(done, 3000);
-
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      // this is important for other test cases outside of this file.
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
-
     beforeEach(function (done) {
       setTimeout(() => {
         reqLogQueueCallbackSpy.reset();
@@ -234,7 +209,7 @@ describe('app - integration tests', function () {
 
         // make a call to create a subscription
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -292,7 +267,7 @@ describe('app - integration tests', function () {
           email: 'test2@gmail.com'
         };
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -331,7 +306,7 @@ describe('app - integration tests', function () {
           components: ['cid_1', 'cid_2']
         };
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -341,7 +316,7 @@ describe('app - integration tests', function () {
 
       it ('should confirm an email subscription', function (done) {
 
-        request(app)
+        agent
           .patch(`/api/subscriptions/${emailSubscriptionId}/confirm`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -364,7 +339,7 @@ describe('app - integration tests', function () {
           is_confirmed: true // it got confirmed in the prev test case
         };
 
-        request(app)
+        agent
           .get(`/api/subscriptions/${emailSubscriptionId}`)
           .expect('Content-Type', /json/)
           .expect(200, expected, done);
@@ -373,7 +348,7 @@ describe('app - integration tests', function () {
 
       it ('should return 422 for an invalid subscription id', function (done) {
 
-        request(app)
+        agent
           .get(`/api/subscriptions/123`)
           .expect('Content-Type', /json/)
           .expect(422, done);
@@ -394,7 +369,7 @@ describe('app - integration tests', function () {
 
         // make a call to create a subscription
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -454,7 +429,7 @@ describe('app - integration tests', function () {
 
         // make a call to create a subscription
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -470,7 +445,7 @@ describe('app - integration tests', function () {
           components: ['cid_1']
         };
 
-        request(app)
+        agent
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
@@ -480,7 +455,7 @@ describe('app - integration tests', function () {
 
       it ('should update components', function (done) {
 
-        request(app)
+        agent
           .patch(`/api/subscriptions/${webhookSubscriptionId}/manage_components`)
           .send({ components: ['cid_1', 'cid_2'] })
           .expect('Content-Type', /json/)
@@ -497,7 +472,7 @@ describe('app - integration tests', function () {
     describe ('misc', function () {
 
       it ('should return all subscriptions', function(done) {
-        request(app)
+        agent
           .get(`/api/subscriptions`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -516,7 +491,7 @@ describe('app - integration tests', function () {
       });
 
       it ('should return subscriptions with filter type=webhook', function(done) {
-        request(app)
+        agent
           .get(`/api/subscriptions?type=webhook`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -534,7 +509,7 @@ describe('app - integration tests', function () {
       });
 
       it ('should return subscriptions with filter type=email,is_confirmed=true', function(done) {
-        request(app)
+        agent
           .get(`/api/subscriptions?type=email&is_confirmed=true`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -553,7 +528,7 @@ describe('app - integration tests', function () {
 
       it ('should return subscriptions with filter component=cid_2', function(done) {
 
-        request(app)
+        agent
           .get(`/api/subscriptions?components=cid_2`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -580,7 +555,7 @@ describe('app - integration tests', function () {
 
       it ('should delete a subscription', function(done) {
 
-        request(app)
+        agent
           .delete(`/api/subscriptions/${emailSubscriptionId}`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -603,24 +578,18 @@ describe('app - integration tests', function () {
 
   describe ('misc', function () {
 
-    let app;
+    it ('should return 200 on health check', function(done) {
 
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
-      });
-      setTimeout(done, 2000);
+      agent
+        .get('/api/health-check')
+        .expect('Content-Type', /json/)
+        .expect(200, done);
+
     });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
-
+    
     it ('should return 404 on invalid url', function(done) {
 
-      request(app)
+      agent
         .get('/api/subscriptions/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
