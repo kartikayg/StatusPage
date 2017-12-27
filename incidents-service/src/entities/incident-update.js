@@ -30,6 +30,7 @@ const schema = {
     .iso(),
 
   do_notify_subscribers: Joi.boolean()
+    .required()
 
 };
 

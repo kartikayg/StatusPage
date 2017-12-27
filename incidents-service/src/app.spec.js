@@ -33,12 +33,19 @@ describe('app - integration tests', function () {
 
   let dbConnection;
 
+  let app, agent;
+
   before(function (done) {
 
     MockDate.set(staticCurrentTime);
 
     MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
       dbConnection = db;
+
+      // as it runs the db in docker container, the db is never destroyed. so for each test run,
+      // drop the table and re-create it.
+      dbConnection.collection('incidents').drop();
+
     });
 
     // create a logs exchange on the messaging queue
@@ -80,36 +87,36 @@ describe('app - integration tests', function () {
 
     });
 
+
+    setTimeout(() => {
+      require('./app').start().then(r => {
+        app = r;
+        agent = request.agent(app);
+      });
+    }, 1000);
+
+    setTimeout(done, 3000);
+
+  });
+
+  after(function (done) {
+    dbConnection.close();
+    MockDate.reset();
+    messagingQueue.disconnect();
+    require('./app').shutdown();
+    require('./lib/logger').resetToConsole();
+
     setTimeout(done, 2000);
 
   });
 
-  after(function () {
-    dbConnection.close();
-    MockDate.reset();
-    messagingQueue.disconnect();
-  });
-
   describe ('logger', function () {
 
-    let app;
-
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
-      });
-      setTimeout(done, 2000);
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
-
     beforeEach(function (done) {
-      setTimeout(function () {
+      setTimeout(() => {
+        reqLogQueueCallbackSpy.reset();
         appLogQueueCallbackSpy.reset();
+        upsertIncidentQueueCallbackSpy.reset();
         done();
       }, 500);
     });
@@ -182,31 +189,10 @@ describe('app - integration tests', function () {
 
   });
 
-  describe('/incidents endpoint', function () {
 
-    let app;
+  describe('endpoints', function () {
 
-    before(function (done) {
-      
-      // as it runs the db in docker container, the db is never destroyed. so for each test run,
-      // drop the table and re-create it.
-      dbConnection.collection('incidents').drop();
-
-      setTimeout(() => {
-        require('./app').start().then(r => {
-          app = r;
-        });
-      }, 500);
-
-      setTimeout(done, 3000);
-
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
+    let realtimeIncidentId;
 
     beforeEach(function (done) {
       setTimeout(() => {
@@ -216,8 +202,6 @@ describe('app - integration tests', function () {
         done();
       }, 500);
     });
-
-    let realtimeIncidentId;
 
     describe('type#realtime', function () {
 
@@ -235,7 +219,7 @@ describe('app - integration tests', function () {
           do_notify_subscribers: true
         };
 
-        request(app)
+        agent
           .post('/api/incidents')
           .send({ incident: newIncidentObj })
           .expect('Content-Type', /json/)
@@ -309,7 +293,7 @@ describe('app - integration tests', function () {
           message: 'the error has been identified'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -345,7 +329,7 @@ describe('app - integration tests', function () {
           components: ['cid_1', 'cid_2']
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -380,7 +364,7 @@ describe('app - integration tests', function () {
           message: 'the issue is fixed'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -416,7 +400,7 @@ describe('app - integration tests', function () {
           message: 'this is what happened'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -447,7 +431,7 @@ describe('app - integration tests', function () {
           displayed_at: new Date()
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${incidentId}/incident_updates/${incidentUpdateId}`)
           .send({ update: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -490,7 +474,7 @@ describe('app - integration tests', function () {
           type: 'backfilled'
         };
 
-        request(app)
+        agent
           .post('/api/incidents')
           .send({ incident: newIncidentObj })
           .expect('Content-Type', /json/)
@@ -537,7 +521,7 @@ describe('app - integration tests', function () {
 
       it ('should load backfilled incident', function(done) {
 
-        request(app)
+        agent
           .get(`/api/incidents/${incidentId}`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -570,11 +554,10 @@ describe('app - integration tests', function () {
           type: 'scheduled',
           do_notify_subscribers: true,
           scheduled_start_time: moment().add(1, 'h').toDate(),
-          scheduled_end_time: moment().add(2, 'h').toDate(),
-          scheduled_auto_updates_send_notifications: true
+          scheduled_end_time: moment().add(2, 'h').toDate()
         };
 
-        request(app)
+        agent
           .post('/api/incidents')
           .send({ incident: newPartialIncidentObj })
           .expect('Content-Type', /json/)
@@ -598,7 +581,7 @@ describe('app - integration tests', function () {
           components: ['cid_1', 'cid_2']
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -621,7 +604,7 @@ describe('app - integration tests', function () {
           message: 'it is in progress now'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -649,7 +632,7 @@ describe('app - integration tests', function () {
           message: 'cancelling'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -664,10 +647,10 @@ describe('app - integration tests', function () {
       it ('should fail b/c of invalid end time being posted', function(done) {
 
         const updateData = {
-          scheduled_end_time: moment(scheduledIncidentObj.scheduled_start_time).subtract(10, 'M').toISOString()
+          scheduled_end_time: moment(scheduledIncidentObj.scheduled_start_time).subtract(10, 'm').toISOString()
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -686,7 +669,7 @@ describe('app - integration tests', function () {
           message: 'it is in progress now'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -714,7 +697,7 @@ describe('app - integration tests', function () {
           message: 'it is resolved now'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
@@ -744,7 +727,7 @@ describe('app - integration tests', function () {
           message: 'this is what happened'
         };
 
-        request(app)
+        agent
           .patch(`/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
@@ -768,7 +751,7 @@ describe('app - integration tests', function () {
 
       it ('should return all incidents', function(done) {
 
-        request(app)
+        agent
           .get(`/api/incidents`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -794,7 +777,7 @@ describe('app - integration tests', function () {
 
       it ('should return incidents with type realtime', function(done) {
 
-        request(app)
+        agent
           .get(`/api/incidents?type=realtime`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -815,7 +798,7 @@ describe('app - integration tests', function () {
 
       it ('should return incidents based on query search', function(done) {
 
-        request(app)
+        agent
           .get(`/api/incidents?query=api`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -834,7 +817,7 @@ describe('app - integration tests', function () {
 
       it ('should delete an incident', function(done) {
 
-        request(app)
+        agent
           .delete(`/api/incidents/${realtimeIncidentId}`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -851,42 +834,23 @@ describe('app - integration tests', function () {
 
       });
 
-    });
+      it ('should return 200 on health check', function(done) {
 
-  });
+        request(app)
+          .get('/api/health-check')
+          .expect('Content-Type', /json/)
+          .expect(200, done);
 
-  describe ('misc', function () {
-
-    let app;
-
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
       });
-      setTimeout(done, 2000);
-    });
 
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
+      it ('should return 404 on invalid url', function(done) {
 
-    it ('should return 200 on health check', function(done) {
+        request(app)
+          .get('/api/incidents/test/test')
+          .expect('Content-Type', /json/)
+          .expect(404, done);
 
-      request(app)
-        .get('/api/health-check')
-        .expect('Content-Type', /json/)
-        .expect(200, done);
-
-    });
-
-    it ('should return 404 on invalid url', function(done) {
-
-      request(app)
-        .get('/api/incidents/test/test')
-        .expect('Content-Type', /json/)
-        .expect(404, done);
+      });
 
     });
 

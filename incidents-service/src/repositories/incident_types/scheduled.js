@@ -4,10 +4,13 @@
 
 import moment from 'moment';
 import _pick from 'lodash/fp/pick';
+import _omit from 'lodash/fp/omit';
 import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
 import { InvalidDateError, InvalidIncidentStatusError } from '../errors';
+
+import logger from '../../lib/logger';
 
 const INCIDENT_TYPE = 'scheduled';
 
@@ -59,6 +62,90 @@ const init = (dao, messagingQueue) => {
   });
 
   /**
+   * Auto updates any incidents ready to be started (in progress)
+   */
+  const autoUpdateScheduledIncidents = async () => {
+
+    // find incidents to put in progress
+    const pred = {
+      type: 'scheduled',
+      scheduled_status: 'scheduled',
+      scheduled_auto_status_updates: true,
+      scheduled_start_time: { $lte: new Date() }
+    };
+
+    let incidents = await dao.find(pred);
+
+    // remove db prop _id
+    incidents = incidents.map(_omit(['_id']));
+
+    const baseData = {
+      status: 'in_progress',
+      message: 'The scheduled maintenance is in progress now.'
+    };
+
+    const updates = incidents.map(i => {
+
+      const updateData = Object.assign({}, baseData, {
+        do_notify_subscribers: i.scheduled_auto_updates_send_notifications
+      });
+
+      return repo.update(i, updateData);
+
+    });
+
+    const updatedIncidents = await Promise.all(updates);
+
+    // return the ids of incidents updated
+    return updatedIncidents.map(i => {
+      return i.id;
+    });
+
+  };
+
+  /**
+   * Auto updates any incidents ready to be completed
+   */
+  const autoUpdateInProgressIncidents = async () => {
+
+    // find incidents to put in progress
+    const pred = {
+      type: 'scheduled',
+      scheduled_status: 'in_progress',
+      scheduled_auto_status_updates: true,
+      scheduled_end_time: { $lte: new Date() }
+    };
+
+    let incidents = await dao.find(pred);
+
+    // remove db prop _id
+    incidents = incidents.map(_omit(['_id']));
+
+    const baseData = {
+      status: 'resolved',
+      message: 'The schedule maintenance is now completed.'
+    };
+
+    const updates = incidents.map(i => {
+
+      const updateData = Object.assign({}, baseData, {
+        do_notify_subscribers: i.scheduled_auto_updates_send_notifications
+      });
+
+      return repo.update(i, updateData);
+
+    });
+
+    const updatedIncidents = await Promise.all(updates);
+
+    // return the ids of incidents updated
+    return updatedIncidents.map(i => {
+      return i.id;
+    });
+
+  };
+
+  /**
    * Creates a scheduled incident
    * @param {object} data
    * @return {promise}
@@ -83,8 +170,8 @@ const init = (dao, messagingQueue) => {
     ];
 
     const defaultValues = {
-      scheduled_auto_status_updates: true,
-      scheduled_auto_updates_send_notifications: true
+      scheduled_auto_status_updates: false,
+      scheduled_auto_updates_send_notifications: false
     };
 
     let incidentObj = Object.assign({}, defaultValues, _pick(props)(data), {
@@ -169,7 +256,7 @@ const init = (dao, messagingQueue) => {
         // depending on the current scheduled status, only certain
         // statuses are allowed for the updates
         const allowedStatuses = {
-          scheduled: ['in_progress', 'cancelled'],
+          scheduled: ['scheduled', 'in_progress', 'cancelled'],
           in_progress: ['in_progress', 'verifying', 'resolved']
         };
 
@@ -209,9 +296,28 @@ const init = (dao, messagingQueue) => {
 
   };
 
+  /**
+   * Auto-updates the incidents to in_progress or completed
+   * based on some criteria. Usually this fn() is called from the
+   * cron.
+   */
+  repo.autoUpdate = () => {
+
+    return Promise.all([autoUpdateScheduledIncidents(), autoUpdateInProgressIncidents()])
+      .then(r => {
+        return { inProgress: r[0], completed: r[1] };
+      })
+      .catch(e => {
+        logger.error(e);
+        return { inProgress: [], completed: [] };
+      });
+
+  };
+
   return repo;
 
 };
+
 
 export default {
   init

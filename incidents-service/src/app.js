@@ -9,12 +9,27 @@ import {initMQLogger} from './lib/logger';
 import {init as initDb} from './lib/db/mongo';
 import respository from './repositories';
 import server from './server';
+import cron from './lib/cron';
 
 // {object} - messaging queue used for this app
 let messagingQueue;
 
 // {object} express application
 let app;
+
+/**
+ * Add cron jobs
+ */
+const setupCron = async (repos) => {
+
+  const scheduleRepo = await repos.incident.ofType('scheduled');
+
+  // auto update scheduled incidents every minute
+  cron.addJob(
+    '00 * * * * *', scheduleRepo.autoUpdate
+  );
+
+};
 
 /**
  * Initalizes the microservice. Here are the main steps in this function:
@@ -45,16 +60,22 @@ const start = async () => {
   // start the server
   app = await server.start(conf.server, { repos, messagingQueue });
 
-  logger.debug('incidents-service application has started ...');
+  // setup the cron
+  await setupCron(repos);
+
+  logger.debug('incidents-service has started ...');
 
   return app;
 
 };
 
+
 /**
  * Shuts down the microservice
  */
 const shutdown = () => {
+
+  cron.stopAll();
 
   if (messagingQueue) {
     messagingQueue.disconnect();

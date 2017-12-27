@@ -65,7 +65,7 @@ describe('entity/incident-update', function() {
 
   it ('should throw error for missing required values', function () {
 
-    const reqFields = ['id', 'created_at', 'updated_at', 'message', 'status'];
+    const reqFields = ['id', 'created_at', 'updated_at', 'message', 'status', 'do_notify_subscribers'];
     const requiredErr = reqFields.map(f => `"${f}" is required`);
 
     joiassert.error(incidentUpdate.schema, {}, requiredErr);

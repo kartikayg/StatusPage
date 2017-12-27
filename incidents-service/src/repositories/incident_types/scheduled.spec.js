@@ -2,7 +2,8 @@
  * TESTING REPO - the idea is to test that the right params are being 
  * passed to the db dao's and whatever comes back from dao is being returned back.
  *
- * Note: There is no real db operations happening.
+ * Note: There is no real db operations happening EXCEPT for testing the autoUpdate fn.
+ * It's a special case.
  */
 
 import {assert} from 'chai';
@@ -10,7 +11,7 @@ import sinon from 'sinon';
 import MockDate from 'mockdate';
 import mockery from 'mockery';
 
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import _find from 'lodash/fp/find';
 import _pick from 'lodash/fp/pick';
@@ -19,6 +20,10 @@ import _cloneDeep from 'lodash/fp/cloneDeep';
 import commonRepo from './common';
 
 import {incident as incidentEntity, incidentUpdate as incidentUpdateEntity } from '../../entities/index';
+
+import {init as initDb} from '../../lib/db/mongo';
+
+import config from '../../config';
 
 describe('repo/incidents/type/scheduled', function() {
 
@@ -94,7 +99,7 @@ describe('repo/incidents/type/scheduled', function() {
       do_notify_subscribers: true,
       scheduled_start_time: staticCurrentTime,
       scheduled_end_time: staticCurrentTime,
-      scheduled_auto_updates_send_notifications: false
+      scheduled_auto_updates_send_notifications: true
     };
 
     it ('should create a scheduled incident', async function () {
@@ -112,8 +117,8 @@ describe('repo/incidents/type/scheduled', function() {
       const expectedArg = {
         name: newPartialIncidentObj.name,
         components: newPartialIncidentObj.components,
+        scheduled_auto_status_updates: false, // default value
         scheduled_auto_updates_send_notifications: newPartialIncidentObj.scheduled_auto_updates_send_notifications,
-        scheduled_auto_status_updates: true, // default value
         scheduled_start_time: newPartialIncidentObj.scheduled_start_time,
         scheduled_end_time: newPartialIncidentObj.scheduled_end_time,
         type: 'scheduled',
@@ -170,8 +175,8 @@ describe('repo/incidents/type/scheduled', function() {
       id: 'IC123',
       name: 'incident',
       components: ['component_id'],
-      scheduled_auto_updates_send_notifications: true,
       scheduled_auto_status_updates: true,
+      scheduled_auto_updates_send_notifications: true,
       scheduled_start_time: staticCurrentTime,
       scheduled_end_time: staticCurrentTime,
       type: 'scheduled',
@@ -402,6 +407,130 @@ describe('repo/incidents/type/scheduled', function() {
       assert.strictEqual(lastUpdate.message, updateData.message);
 
       assert.strictEqual(upd.scheduled_status, 'cancelled');
+
+    });
+
+  });
+
+  describe('autoUpdate()', function () {
+
+    this.timeout(10000);
+
+    let dbObj, liveRepo, firstIncident;
+
+    // get live dao
+    before(function(done) {
+      
+      const conf = config.load(process.env);
+
+      MockDate.reset();
+
+      // get a live db connection
+      initDb(conf.db.MONGO_ENDPOINT).then(db => {
+        
+        dbObj = db;
+
+        // setup
+        dbObj.setup().then(() => {
+
+          // disable mockery for common repo
+          mockery.disable();
+
+          // delete cache in case
+          delete require.cache[require.resolve('./scheduled')];
+
+          // build the repo with actual db conn
+          liveRepo = require('./scheduled').init(db.dao('incidents'), messagingQueueMockObj);
+
+          done();
+
+        });
+
+      });
+
+    });
+
+    after(function(done) {
+
+      config.reset();
+
+      MockDate.set(staticCurrentTime);
+
+      dbObj.dbConn().collection('incidents').drop();
+  
+      setTimeout(() => {
+        dbObj.dbConn().close();
+        done();
+      }, 500);
+
+    });
+
+    beforeEach(function(done) {
+      setTimeout(done, 6000);
+    })
+
+
+    it ('should create three scheduled incidents', async function () {
+
+      const newPartialIncidentObj = {
+        name: 'incident',
+        components: ['cid_1'],
+        message: 'this is scheduled',
+        do_notify_subscribers: true,
+        scheduled_auto_updates_send_notifications: true
+      };
+
+      // // create three incidents
+        //   1. auto update true with start time current
+        //   2. auto update false with start time current
+        //   3. auto update true with start in future
+
+      const firstIncidentData = Object.assign({}, newPartialIncidentObj, {
+        scheduled_auto_status_updates: true,
+        scheduled_start_time: moment().add(5, 's').tz("America/New_York").format(),
+        scheduled_end_time: moment().add(10, 's').tz("America/New_York").format()
+      });
+
+      firstIncident = await liveRepo.create(firstIncidentData);
+
+      const secondIncidentData = Object.assign({}, newPartialIncidentObj, {
+        scheduled_auto_status_updates: false,
+        scheduled_start_time: moment().add(5, 's').toDate(),
+        scheduled_end_time: moment().add(10, 's').toDate()
+      });
+
+      const secondIncident = await liveRepo.create(secondIncidentData);
+
+
+      const thirdIncidentData = Object.assign({}, newPartialIncidentObj, {
+        scheduled_auto_status_updates: true,
+        scheduled_start_time: moment().add(5, 'm').toDate(),
+        scheduled_end_time: moment().add(15, 'm').toDate()
+      });
+
+      const thirdIncident = await liveRepo.create(thirdIncidentData);
+
+    });
+
+    it ('should put the first incident in-progress', async function () {
+      
+      const updated = await liveRepo.autoUpdate();
+        
+      // according to our setup, the first incident should be auto updated
+      // and no incidents qualify to be completed
+      assert.deepEqual(updated.inProgress, [firstIncident.id]);
+      assert.deepEqual(updated.completed, []);
+
+    });
+
+    it ('should put the first incident in completed', async function () {
+      
+      const updated = await liveRepo.autoUpdate();
+        
+      // according to our setup, the first incident should be auto completed
+      // now
+      assert.deepEqual(updated.inProgress, []);
+      assert.deepEqual(updated.completed, [firstIncident.id]);
 
     });
 

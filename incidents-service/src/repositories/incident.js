@@ -33,10 +33,6 @@ const format = (incidentDb) => {
  */
 const init = (dao, messagingQueue) => {
 
-  if (dao.name !== 'incidents') {
-    throw new Error(`Invalid DAO passed to this repo. Passed dao name: ${dao.name}`);
-  }
-
   // caches the repo for each type
   const typesRepo = [];
 
