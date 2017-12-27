@@ -44,7 +44,7 @@ describe('app - integration tests', function () {
 
       // as it runs the db in docker container, the db is never destroyed. so for each test run,
       // drop the table and re-create it.
-      dbConnection.collection('incidents').drop();
+      dbConnection.collection('incidents').drop().catch(e => {});
 
     });
 
@@ -836,7 +836,7 @@ describe('app - integration tests', function () {
 
       it ('should return 200 on health check', function(done) {
 
-        request(app)
+        agent
           .get('/api/health-check')
           .expect('Content-Type', /json/)
           .expect(200, done);
@@ -845,7 +845,7 @@ describe('app - integration tests', function () {
 
       it ('should return 404 on invalid url', function(done) {
 
-        request(app)
+        agent
           .get('/api/incidents/test/test')
           .expect('Content-Type', /json/)
           .expect(404, done);
