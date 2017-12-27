@@ -30,12 +30,20 @@ describe('app - integration tests', function () {
 
   let dbConnection;
 
+  let app, agent;
+
   before(function (done) {
 
     MockDate.set(staticCurrentTime);
 
     MongoClient.connect(process.env.MONGO_ENDPOINT, (err, db) => {
       dbConnection = db;
+
+      // as it runs the db in docker container, the db is never destroyed. so for each test run,
+      // drop the table and re-create it.
+      dbConnection.collection('components').drop().catch(e => {});
+      dbConnection.collection('component_groups').drop().catch(e => {});
+
     });
 
     // create a logs exchange on the messaging queue
@@ -64,32 +72,28 @@ describe('app - integration tests', function () {
 
     });
 
+    setTimeout(() => {
+      require('./app').start().then(r => {
+        app = r;
+        agent = request.agent(app);
+      });
+    }, 1000);
+
+    setTimeout(done, 3000);
+
+  });
+
+  after(function (done) {
+    dbConnection.close();
+    MockDate.reset();
+    messagingQueue.disconnect();
+    require('./app').shutdown();
+    require('./lib/logger').resetToConsole();
     setTimeout(done, 2000);
 
   });
 
-  after(function () {
-    dbConnection.close();
-    MockDate.reset();
-    messagingQueue.disconnect();
-  });
-
   describe ('logger', function () {
-
-    let app;
-
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
-      });
-      setTimeout(done, 2000);
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
 
     beforeEach(function (done) {
       setTimeout(function () {
@@ -162,32 +166,7 @@ describe('app - integration tests', function () {
 
   });
 
-
   describe('component_groups endpoint', function () {
-
-    let app;
-
-    before(function (done) {
-      
-      // as it runs the db in docker container, the db is never destroyed. so for each test run,
-      // drop the table and re-create it.
-      dbConnection.collection('component_groups').drop();
-
-      setTimeout(() => {
-        require('./app').start().then(r => {
-          app = r;
-        });
-      }, 500);
-
-      setTimeout(done, 2000);
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      // this is important for other test cases outside of this file.
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
 
     beforeEach(function (done) {
       setTimeout(function () {
@@ -205,7 +184,7 @@ describe('app - integration tests', function () {
 
     it ('should create and return a component group object', function (done) {
 
-      request(app)
+      agent
         .post('/api/component_groups')
         .send({ componentgroup: newComponentGroupTestObj })
         .expect('Content-Type', /json/)
@@ -246,7 +225,7 @@ describe('app - integration tests', function () {
 
     it ('should fail b/c of no component group posted', function (done) {
 
-      request(app)
+      agent
         .post('/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component group data sent in this request.'})
@@ -262,7 +241,7 @@ describe('app - integration tests', function () {
         status: 'partial_outage'
       };
 
-      request(app)
+      agent
         .patch(`/api/component_groups/${componentGroupId}`)
         .send({ componentgroup: group })
         .expect('Content-Type', /json/)
@@ -272,7 +251,7 @@ describe('app - integration tests', function () {
 
     it ('should return the component group by id with updated data', function (done) {
 
-      request(app)
+      agent
         .get(`/api/component_groups/${componentGroupId}`)
         .expect('Content-Type', /json/)
         .expect(200)
@@ -291,7 +270,7 @@ describe('app - integration tests', function () {
 
     it ('should return all component groups created', function (done) {
 
-      request(app)
+      agent
           .get(`/api/component_groups`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -316,26 +295,6 @@ describe('app - integration tests', function () {
 
     let app;
 
-    before(function (done) {
-
-      // as it runs the db in docker container, the db is never destroyed. so for each test run,
-      // drop the table and re-create it.
-      dbConnection.collection('components').drop();
-
-      require('./app').start().then(r => {
-        app = r;
-      });
-
-      setTimeout(done, 2000);
-
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
-
     beforeEach(function (done) {
       setTimeout(() => {
         reqLogQueueCallbackSpy.reset();
@@ -355,7 +314,7 @@ describe('app - integration tests', function () {
 
     it ('should create and return a component object', function (done) {
 
-      request(app)
+      agent
         .post('/api/components')
         .send({ component: newComponentTestObj })
         .expect('Content-Type', /json/)
@@ -408,7 +367,7 @@ describe('app - integration tests', function () {
 
       this.timeout(2500);
 
-      request(app)
+      agent
         .post('/api/components')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component data sent in this request.'})
@@ -433,7 +392,7 @@ describe('app - integration tests', function () {
         status: 'partial_outage'
       };
 
-      request(app)
+      agent
         .patch(`/api/components/${componentObjId}`)
         .send({ component })
         .expect('Content-Type', /json/)
@@ -443,7 +402,7 @@ describe('app - integration tests', function () {
 
     it ('should return the component by id with updated data', function (done) {
 
-      request(app)
+      agent
         .get(`/api/components/${componentObjId}`)
         .expect('Content-Type', /json/)
         .expect(200)
@@ -459,7 +418,7 @@ describe('app - integration tests', function () {
 
     it ('should create a component with group_id', function (done) {
 
-       request(app)
+       agent
         .post('/api/components')
         .send({ component: Object.assign({ group_id: componentGroupId }, newComponentTestObj) })
         .expect('Content-Type', /json/)
@@ -492,7 +451,7 @@ describe('app - integration tests', function () {
 
     it ('should return all components created', function (done) {
 
-      request(app)
+      agent
           .get(`/api/components`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -512,7 +471,7 @@ describe('app - integration tests', function () {
 
     it ('should return only 1 component, with status filter ', function (done) {
 
-      request(app)
+      agent
           .get(`/api/components?status=partial_outage`)
           .expect('Content-Type', /json/)
           .expect(200)
@@ -529,29 +488,23 @@ describe('app - integration tests', function () {
 
   describe ('misc', function () {
 
-    let app;
-
-    before(function (done) {
-      require('./app').start().then(r => {
-        app = r;
-      });
-      setTimeout(done, 2000);
-    });
-
-    after(function (done) {
-      require('./app').shutdown();
-      require('./lib/logger').resetToConsole();
-      setTimeout(done, 2000);
-    });
-
     it ('should return 404 on invalid url', function(done) {
 
-      request(app)
+      agent
         .get('/api/components/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 
     });
+
+    it ('should return 200 on health check', function(done) {
+
+        agent
+          .get('/api/health-check')
+          .expect('Content-Type', /json/)
+          .expect(200, done);
+
+      });
 
   });
 
