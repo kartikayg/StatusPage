@@ -108,7 +108,7 @@ const queueWrapper = (connection) => {
   };
 
   /**
-   * Subscribes to a queue
+   * Subscribes to messages on an exchange via a queue
    * @param {string} queueName - name of the queue
    * @param {object} options
    *   exchangeName

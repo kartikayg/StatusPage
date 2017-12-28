@@ -2,6 +2,7 @@
  * @fileoverview Specific functions related to webhook subscriptions
  */
 
+import axios from 'axios';
 import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
@@ -53,9 +54,27 @@ const init = (dao) => {
   };
 
   /**
-   *
+   * Notifies all the endpoints of this latest incident update
+   * @param {object} latestUpdate
+   *  name: incident name
+   *  id: incident id
+   *  status
+   *  message
+   *  displayed_at
+   * @param {array} subscription
+   * @return {promise}
+   *  on success, void
+   *  on failure, error
    */
-  repo.notifyOfNewIncidentUpdate = async (subscriptions) => {
+  repo.notifyOfNewIncidentUpdate = async (latestUpdate, subscriptions) => {
+
+    // send out posts
+    const posts = subscriptions.map(s => {
+      return axios.post(s.uri, latestUpdate, { 'timeout': 15000 })
+        .catch(e => {});
+    });
+
+    await Promise.all(posts);
 
   };
 

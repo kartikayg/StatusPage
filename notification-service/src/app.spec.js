@@ -23,7 +23,7 @@ describe('app - integration tests', function () {
 
   const staticCurrentTime = new Date();
 
-  let messagingQueue;
+  let messagingQueue, incidentsExchange;
 
   const appLogQueueCallbackSpy = sinon.spy();
   const reqLogQueueCallbackSpy = sinon.spy();
@@ -72,18 +72,9 @@ describe('app - integration tests', function () {
 
       });
 
-      // // setup the exchange
-      // messagingQueue.exchange('incidents', {durable: true, autoDelete: false, type: 'direct'}, () => {
-
-      //   // setup app log queue to listen on the exchange
-      //   messagingQueue.queue('newincident', (q) => {
-      //     q.bind('incidents', 'upsert');
-      //     q.subscribe((msg) => {
-      //       upsertIncidentQueueCallbackSpy(msg.data.toString());
-      //     });
-      //   });
-
-      // });
+      // setup the incidents exchange. we will push message manually and see if
+      // its processed by the service
+      incidentsExchange = messagingQueue.exchange('incidents', { type: 'direct' });
 
     });
 
@@ -92,9 +83,9 @@ describe('app - integration tests', function () {
         app = r;
         agent = request.agent(app);
       });
-    }, 1000);
+    }, 1500);
 
-    setTimeout(done, 3000);
+    setTimeout(done, 2500);
 
   });
 
@@ -104,7 +95,7 @@ describe('app - integration tests', function () {
     messagingQueue.disconnect();
     require('./app').shutdown();
     require('./lib/logger').resetToConsole();
-    setTimeout(done, 2000);
+    setTimeout(done, 1000);
   });
 
   describe ('lib/logger', function () {
@@ -140,7 +131,7 @@ describe('app - integration tests', function () {
 
         done();
 
-      }, 2000);
+      }, 1000);
 
     });
 
@@ -167,7 +158,7 @@ describe('app - integration tests', function () {
 
         done();
 
-      }, 2000);
+      }, 1000);
 
     });
 
@@ -178,7 +169,7 @@ describe('app - integration tests', function () {
       setTimeout(function() {
         sinon.assert.notCalled(appLogQueueCallbackSpy);
         done();
-      }, 2000);
+      }, 1000);
 
     });
 
@@ -575,6 +566,8 @@ describe('app - integration tests', function () {
     });
 
   });
+
+  
 
   describe ('misc', function () {
 

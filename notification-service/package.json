@@ -17,7 +17,7 @@
     "dev": "gulp dev",
     "build": "gulp",
     "lint": "eslint --fix 'src/**/*.js'",
-    "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
+    "test": "mocha --reporter spec --require babel-core/register 'src/repositories/subscription_types/*.spec.js'",
     "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register 'src/**/*.spec.js'"
   },
   "keywords": [
@@ -41,6 +41,7 @@
     "express": "^4.16.2",
     "helmet": "^3.9.0",
     "http-status": "^1.0.1",
+    "is-json": "^2.0.1",
     "joi": "^13.0.2",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
@@ -49,10 +50,10 @@
     "morgan-json": "^1.1.0",
     "nodemailer": "^4.4.1",
     "striptags": "^3.1.0",
-    "uniqid": "^4.1.1",
-    "is-json": "^2.0.1"
+    "uniqid": "^4.1.1"
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.10.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.2",

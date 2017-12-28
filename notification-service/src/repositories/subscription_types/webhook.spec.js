@@ -9,6 +9,9 @@ import {assert} from 'chai';
 import sinon from 'sinon';
 import MockDate from 'mockdate';
 
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+
 import webhookRepo from './webhook';
 import { DuplicatedSubscriptionError } from '../errors';
 
@@ -133,6 +136,72 @@ describe('repo/subscription/types/webhook', function() {
         insertSpy.restore();
         done();
       })
+
+    });
+
+  });
+
+  describe('notifyOfNewIncidentUpdate()', function () {
+
+    let axiosMock;
+    let axiosPostSpy;
+
+    const incidentUpdate = {
+      id: 'IC123',
+      name: 'incident-name',
+      status: 'status',
+      message: 'message',
+      displayed_at: new Date()
+    };
+
+    before(function() {
+      axiosMock = new MockAdapter(axios);
+      axiosPostSpy = sinon.spy(axios, 'post');
+    });
+
+    after(function() {
+      axiosMock.restore();
+      axiosPostSpy.restore();
+    });
+
+    afterEach(function() {
+      axiosMock.reset();
+      axiosPostSpy.reset();
+    });
+
+    
+    it ('should make a post call on subscriptions endpoint', async function () {
+      
+      // fake all calls to return 200
+      axiosMock.onPost().reply(200);
+
+      await repo.notifyOfNewIncidentUpdate(incidentUpdate, [existingSubscriptionObj, existingSubscriptionObj]);
+
+      sinon.assert.calledTwice(axiosPostSpy);
+
+      sinon.assert.calledWith(axiosPostSpy, existingSubscriptionObj.uri, incidentUpdate, {timeout: 15000});
+
+    });
+
+    it ('should not cause any error if the post call timedout', async function () {
+
+      // timeout
+      axiosMock.onPost().timeout();
+
+      await repo.notifyOfNewIncidentUpdate(incidentUpdate, [existingSubscriptionObj]);
+
+      sinon.assert.calledOnce(axiosPostSpy);
+
+    });
+
+    it ('should not cause any error if the post call has network error', async function () {
+
+      // network error
+      axiosMock.onPost().networkError();
+
+      await repo.notifyOfNewIncidentUpdate(incidentUpdate, [existingSubscriptionObj]);
+
+      sinon.assert.calledOnce(axiosPostSpy);
 
     });
 

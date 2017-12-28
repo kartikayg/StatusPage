@@ -73,7 +73,7 @@ const send = async (template, to, vars, from, transporter) => {
   // prepare template vars
   const templateVars = Object.assign(_cloneDeep(vars || {}), {
     template,
-    company_name: conf.email.EMAIL_HEADER_COMPANY_NAME
+    company_name: conf.email.COMPANY_NAME
   });
 
   const response = await emailTpl.send({

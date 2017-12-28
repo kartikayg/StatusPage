@@ -3,7 +3,8 @@
  */
 
 import _groupBy from 'lodash/fp/groupBy';
-import _map from 'lodash/fp/map';
+
+const _map = require('lodash/fp/map').convert({ cap: false });
 
 /**
  * Init repo.
@@ -21,14 +22,34 @@ const init = (subscriptionRepo) => {
    */
   repo.onNewIncidentUpdate = async (incidentObj) => {
 
+    if (!incidentObj || !incidentObj.updates) {
+      return;
+    }
+
+    // get the last incident-update
+    const latestUpdate = incidentObj.updates[incidentObj.updates.length - 1];
+
+    if (!latestUpdate || latestUpdate.do_notify_subscribers !== true) {
+      return;
+    }
+
     // find subscriptions for the components under this incident
-    const subscriptions = subscriptionRepo.list({
-      components: incidentObj.components
+    const subscriptions = await subscriptionRepo.list({
+      components: incidentObj.components,
+      is_confirmed: true
     });
 
     if (subscriptions.length === 0) {
       return;
     }
+
+    const objToSend = {
+      id: incidentObj.id,
+      name: incidentObj.name,
+      status: latestUpdate.status,
+      message: latestUpdate.message,
+      displayed_at: latestUpdate.displayed_at
+    };
 
     // group subscriptions by type
     const subsByType = _groupBy('type')(subscriptions);
@@ -36,8 +57,11 @@ const init = (subscriptionRepo) => {
     // send notification. per type, call a fn with all the
     // subscriptions.
     const notify = (subs, t) => {
-      return subscriptionRepo.ofType(t).notifyOfNewIncidentUpdate(subs);
+      return subscriptionRepo.ofType(t).then(tRepo => {
+        return tRepo.notifyOfNewIncidentUpdate(subs, objToSend);
+      });
     };
+
     await Promise.all(_map(notify)(subsByType));
 
   };

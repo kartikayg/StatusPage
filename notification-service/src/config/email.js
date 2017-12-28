@@ -21,7 +21,7 @@ export const schema = Joi.object({
   SYSTEM_EMAIL_FROM_ADDRESS: Joi.string()
     .email()
     .required(),
-  EMAIL_HEADER_COMPANY_NAME: Joi.string()
+  COMPANY_NAME: Joi.string()
     .required()
 
 });

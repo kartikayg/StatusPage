@@ -11,6 +11,13 @@ import emailLib from '../../lib/email';
 import logger from '../../lib/logger';
 
 /**
+ *
+ */
+const getFooterLinks = (subscriptionObj) => {
+  return {};
+};
+
+/**
  * Init repo
  * @param {object} dao
  * @return {object}
@@ -65,17 +72,57 @@ const init = (dao) => {
   };
 
   /**
-   *
+   * Send a confirmation link for the subscription if not
+   * confirmed.
+   * @param {object} subscriptionObj
+   * @return {promise}
+   *  on success, void
+   *  on failure, error
    */
   repo.sendConfirmationLink = async (subscriptionObj) => {
-    // send a confirmation email out
-    await emailLib.send('confirmation_email_subscription', subscriptionObj.email, subscriptionObj);
+
+    if (subscriptionObj.is_confirmed === false) {
+      // send a confirmation email out
+      await emailLib.send('confirmation_email_subscription', subscriptionObj.email, subscriptionObj);
+    }
+
   };
 
   /**
-   *
+   * Notifies all the email subscriptions of this latest incident update
+   * @param {object} latestUpdate
+   *  name: incident name
+   *  id: incident id
+   *  status
+   *  message
+   *  displayed_at
+   * @param {array} subscription
+   * @return {promise}
+   *  on success, void
+   *  on failure, error
    */
-  repo.notifyOfNewIncidentUpdate = async (subscriptions) => {
+  repo.notifyOfNewIncidentUpdate = async (latestUpdate, subscriptions) => {
+
+    // send out emails
+    const emails = subscriptions.map(s => {
+
+      const params = {
+        links: {
+          footer: getFooterLinks(s),
+          incident: '',
+        },
+        incidentUpdate: latestUpdate
+      };
+
+      return emailLib.send(
+        'new_incident_update_notification', 
+        s.email,
+        params
+      );
+
+    });
+
+    await Promise.all(emails);
 
   };
 
