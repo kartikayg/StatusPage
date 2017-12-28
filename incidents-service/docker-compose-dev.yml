@@ -7,7 +7,7 @@ services:
       - .:/app
     working_dir: /app
     ports:
-      - "6030:6030"
+      - "6020:6020"
     command: ["npm", "run", "dev"]
     env_file:
       - .env
@@ -18,4 +18,4 @@ services:
     volumes:
       - ./mongodata:/data/db
     ports:
-      - 6031:27017
+      - 6021:27017
