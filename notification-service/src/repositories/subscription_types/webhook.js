@@ -70,7 +70,7 @@ const init = (dao) => {
 
     // send out posts
     const posts = subscriptions.map(s => {
-      return axios.post(s.uri, latestUpdate, { 'timeout': 15000 })
+      return axios.post(s.uri, latestUpdate, { timeout: 15000 })
         .catch(e => {});
     });
 

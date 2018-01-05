@@ -109,13 +109,13 @@ const init = (dao) => {
       const params = {
         links: {
           footer: getFooterLinks(s),
-          incident: '',
+          incident: ''
         },
         incidentUpdate: latestUpdate
       };
 
       return emailLib.send(
-        'new_incident_update_notification', 
+        'new_incident_update_notification',
         s.email,
         params
       );

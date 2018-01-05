@@ -8,7 +8,9 @@ import * as logger from './logger';
 import * as db from './db';
 import * as email from './email';
 
-const components = { server, logger, db, email };
+const components = {
+  server, logger, db, email
+};
 
 // {object} application conf. this is populated using the load() fn
 let appConf = {};
@@ -28,7 +30,8 @@ const load = (envVars = {}) => {
   const loadCmp = (c) => {
 
     const {error, value} = components[c].schema.validate(
-      envVars, { allowUnknown: true, abortEarly: false, stripUnknown: true }
+      envVars,
+      { allowUnknown: true, abortEarly: false, stripUnknown: true }
     );
 
     if (error) {
