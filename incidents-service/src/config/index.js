@@ -26,7 +26,8 @@ const load = (envVars = {}) => {
   const loadCmp = (c) => {
 
     const {error, value} = components[c].schema.validate(
-      envVars, { allowUnknown: true, abortEarly: false, stripUnknown: true }
+      envVars,
+      { allowUnknown: true, abortEarly: false, stripUnknown: true }
     );
 
     if (error) {

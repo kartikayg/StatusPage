@@ -25,9 +25,7 @@ const setupCron = async (repos) => {
   const scheduleRepo = await repos.incident.ofType('scheduled');
 
   // auto update scheduled incidents every minute
-  cron.addJob(
-    '00 * * * * *', scheduleRepo.autoUpdate
-  );
+  cron.addJob('00 * * * * *', scheduleRepo.autoUpdate);
 
 };
 
