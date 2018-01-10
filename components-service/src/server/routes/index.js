@@ -9,6 +9,8 @@ import {request as sanitizeRequest} from '../middleware/sanitize';
 import componentRoutes from './component';
 import componentGroupRoutes from './component-group';
 
+import thisPackage from '../../../package.json';
+
 /**
  * Return routes
  */
@@ -23,8 +25,8 @@ export default (repos = {}) => {
   router.get('/health-check', (req, res) => {
     res.json({
       status: 'RUNNING',
-      name: 'Components Service',
-      version: '1.0',
+      name: thisPackage.name,
+      version: thisPackage.version,
       environment: process.env.NODE_ENV
     });
   });
