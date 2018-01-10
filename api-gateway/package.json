@@ -1,0 +1,83 @@
+{
+  "name": "api-gateway",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Kartikay Gupta <kartikayg@gmail.com>",
+  "scripts": {
+    "dev": "gulp dev",
+    "build": "gulp",
+    "lint": "eslint --fix 'src/**/*.js'",
+    "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register 'src/**/*.spec.js'"
+  },
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [
+    "logger"
+  ],
+  "dependencies": {
+    "amqp": "^0.2.6",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "helmet": "^3.9.0",
+    "http-status": "^1.0.1",
+    "ioredis": "^3.2.2",
+    "joi": "^13.0.1",
+    "jsonwebtoken": "^8.1.0",
+    "lodash": "^4.17.4",
+    "method-override": "^2.3.10",
+    "morgan": "^1.9.0",
+    "morgan-json": "^1.1.0",
+    "striptags": "^3.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "chai": "^4.1.2",
+    "del": "^3.0.0",
+    "eslint": "^4.15.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-lodash-fp": "^2.1.3",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-eslint": "^4.0.0",
+    "gulp-file-cache": "0.0.1",
+    "gulp-nodemon": "^2.2.1",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^4.0.1",
+    "mockery": "^2.1.0",
+    "run-sequence": "^2.2.0",
+    "sinon": "^4.1.3"
+  },
+  "private": true,
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "add-module-exports"
+    ]
+  },
+  "license": "MIT"
+}

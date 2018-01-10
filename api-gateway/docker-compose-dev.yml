@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  api-gateway:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - 6040:6040
+    command: ["npm", "run", "dev"]
+    env_file:
+      - .env
+    environment:
+      COMPONENTS_URI: http://localhost:6010/api
+      INCIDENTS_URI: http://localhost:6020/api
+      NOTIFICATION_URI: http://localhost:6030/api
+  redis:
+    image: "redis"
+    ports:
+      - 6041:6379

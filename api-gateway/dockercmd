@@ -1,0 +1,29 @@
+#!/bin/bash
+
+## This script provides wrapper over docker-compose commands related to this project. ##
+## There is really nothing special happening than that. ##
+
+case "$1" in
+  start)
+    docker-compose -f docker-compose-dev.yml up --remove-orphans
+    ;;
+
+  stop)
+    docker-compose -f docker-compose-dev.yml stop
+    ;;
+   
+  test)
+    ## stop any old leftover services. there shouldn't be, but still.
+    docker-compose -f test.yml stop && \
+    docker-compose -f test.yml run test_api_gateway  && \
+    docker-compose -f test.yml stop \
+    ;;
+   
+  lint)
+    docker-compose -f docker-compose-dev.yml run --rm --no-deps api-gateway npm run lint
+    ;; 
+  *)
+    echo $"Usage: $0 {start|stop|test|lint}"
+    exit 1
+
+esac
