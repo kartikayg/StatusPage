@@ -8,6 +8,15 @@ import incidentUpdate from '../incident-update';
 
 const schema = Joi.object({
 
+  components: Joi.array()
+    .required(),
+
+  // the highest status from all of the impacted components.
+  // this kind of defines the impact status of this incident.
+  components_impact_status: Joi.string()
+    .only(['degraded_performance', 'partial_outage', 'major_outage'])
+    .required(),
+
   // add incident updates
   updates: Joi.array()
     .required()

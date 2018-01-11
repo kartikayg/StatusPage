@@ -213,6 +213,7 @@ describe('app - integration tests', function () {
         const newIncidentObj = {
           name: 'realtime api incident',
           components: ['CM123'],
+          components_impact_status: 'partial_outage',
           message: 'API is not working',
           status: 'investigating',
           type: 'realtime',
@@ -238,6 +239,7 @@ describe('app - integration tests', function () {
               name: 'realtime api incident',
               type: 'realtime',
               components: [ 'CM123' ],
+              components_impact_status: 'partial_outage',
               id: incidentId,
               created_at: staticCurrentTime.toISOString(),
               updated_at: staticCurrentTime.toISOString(),
@@ -466,7 +468,6 @@ describe('app - integration tests', function () {
 
         const newIncidentObj = {
           name: 'backfilled incident',
-          components: ['CM123'],
           message: 'API was not working',
           type: 'backfilled'
         };
@@ -487,8 +488,8 @@ describe('app - integration tests', function () {
             const expectedObj = {
               name: 'backfilled incident',
               type: 'backfilled',
-              components: [ 'CM123' ],
               id: incidentId,
+              components: null,
               created_at: staticCurrentTime.toISOString(),
               updated_at: staticCurrentTime.toISOString(),
               updates:[{

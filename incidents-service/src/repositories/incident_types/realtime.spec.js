@@ -88,6 +88,7 @@ describe('repo/incidents/type/realtime', function() {
     const newPartialIncidentObj = {
       name: 'incident',
       components: ['component_id'],
+      components_impact_status: 'partial_outage',
       message: 'message',
       status: 'investigating',
       do_notify_subscribers: true
@@ -107,7 +108,7 @@ describe('repo/incidents/type/realtime', function() {
 
     });
 
-     it ('should create a realtime incident with resolved status', async function () {
+    it ('should create a realtime incident with resolved status', async function () {
 
       const saveDbSpy = sinon.spy(commonRepoMockObj, 'saveDb');
 
@@ -137,6 +138,7 @@ describe('repo/incidents/type/realtime', function() {
       id: testRealtimeIncidentId,
       name: 'incident',
       components: ['component_id'],
+      components_impact_status: 'partial_outage',
       is_resolved: false,
       resolved_at: null,
       type: 'realtime',
@@ -258,6 +260,40 @@ describe('repo/incidents/type/realtime', function() {
 
       // also see components were updated
       assert.deepEqual(savedArg.components, ['cid_1', 'cid_2']);
+
+      saveDbSpy.restore();
+
+    });
+
+     it ('should update components_impact_status as its higher than current value', async function () {
+
+      const saveDbSpy = sinon.spy(commonRepoMockObj, 'saveDb');
+
+      await repo.update(existingPendingRealtimeIncident, {
+        components_impact_status: 'major_outage'
+      });
+
+      const savedArg = saveDbSpy.args[0][0];
+
+      // the value was updated
+      assert.equal(savedArg.components_impact_status, 'major_outage');
+
+      saveDbSpy.restore();
+
+    });
+
+    it ('should not update components_impact_status as its lower than current value', async function () {
+
+      const saveDbSpy = sinon.spy(commonRepoMockObj, 'saveDb');
+
+      await repo.update(existingPendingRealtimeIncident, {
+        components_impact_status: 'degraded_performance'
+      });
+
+      const savedArg = saveDbSpy.args[0][0];
+
+      // the value was not updated
+      assert.equal(savedArg.components_impact_status, existingPendingRealtimeIncident.components_impact_status);
 
       saveDbSpy.restore();
 

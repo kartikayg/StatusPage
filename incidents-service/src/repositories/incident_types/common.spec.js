@@ -36,6 +36,7 @@ describe('repo/incident', function() {
   const newPartialIncidentObj = {
     name: 'incident',
     components: ['component_id'],
+    components_impact_status: 'partial_outage',
     type: 'realtime',
     is_resolved: false,
     resolved_at: null,
@@ -54,6 +55,7 @@ describe('repo/incident', function() {
     id: testRealtimeIncidentId,
     name: 'incident',
     components: ['component_id'],
+    components_impact_status: 'partial_outage',
     is_resolved: true,
     resolved_at: staticCurrentTime,
     type: 'realtime',
@@ -82,6 +84,7 @@ describe('repo/incident', function() {
     id: testRealtimeIncidentId,
     name: 'incident',
     components: ['component_id'],
+    components_impact_status: 'partial_outage',
     is_resolved: false,
     resolved_at: null,
     type: 'realtime',

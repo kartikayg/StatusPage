@@ -39,7 +39,8 @@ const init = (dao, messagingQueue) => {
     const incUpdateObj = commonRepo.buildIncidentUpdateObj(data);
 
     // build incident object
-    let incidentObj = Object.assign(_pick(['name', 'components'])(data), {
+    const props = ['name', 'components', 'components_impact_status'];
+    let incidentObj = Object.assign(_pick(props)(data), {
       type: INCIDENT_TYPE,
       updates: [incUpdateObj]
     });
@@ -81,7 +82,23 @@ const init = (dao, messagingQueue) => {
     // if the incident is not resolved, then update whatever fields are
     // allowed.
     if (updatedObj.is_resolved !== true) {
-      Object.assign(updatedObj, _pick(['components', 'name'])(data));
+
+      const props = ['name', 'components', 'components_impact_status'];
+      Object.assign(updatedObj, _pick(props)(data));
+
+      // if the values have changed, keep the highest status
+      if (updatedObj.components_impact_status !== incidentObj.components_impact_status) {
+
+        const impactStatsus = ['degraded_performance', 'partial_outage', 'major_outage'];
+
+        const originalPos = impactStatsus.indexOf(incidentObj.components_impact_status);
+        const updatedPos = impactStatsus.indexOf(updatedObj.components_impact_status);
+
+        if (updatedPos !== -1 && originalPos > updatedPos) {
+          updatedObj.components_impact_status = incidentObj.components_impact_status;
+        }
+
+      }
     }
 
     // if either of them are present, create a new incident-update

@@ -26,8 +26,7 @@ const schema = Joi.object({
     .only(['realtime', 'scheduled', 'backfilled']),
   components: Joi.array()
     .items(Joi.string())
-    .unique()
-    .allow(null),
+    .unique(),
   is_resolved: Joi.boolean()
     .required(),
   resolved_at: Joi.date()

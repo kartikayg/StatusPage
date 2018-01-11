@@ -8,6 +8,9 @@ import incidentUpdate from '../incident-update';
 
 const schema = Joi.object({
 
+  components: Joi.array()
+    .required(),
+
   // scheduled incident related fields
   scheduled_status: Joi.string()
     .only(['scheduled', 'in_progress', 'completed', 'cancelled'])

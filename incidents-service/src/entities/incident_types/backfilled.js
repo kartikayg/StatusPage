@@ -8,6 +8,9 @@ import incidentUpdate from '../incident-update';
 
 const schema = Joi.object({
 
+  components: Joi.array()
+    .allow(null),
+
   // add incident updates
   updates: Joi.array()
     .required()

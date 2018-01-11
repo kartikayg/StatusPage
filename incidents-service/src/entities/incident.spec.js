@@ -25,115 +25,75 @@ describe('entity/incident', function() {
     created_at: new Date(),
     updated_at: new Date(),
     name: 'a new incident',
-    type: 'realtime',
-    components: ['component_id'],
     resolved_at: new Date(),
     is_resolved: true 
   };
 
-  it ('should validate the object', function () {
-    const data = Object.assign({}, incidentTestData);
-    data['updates'] = [ incidentUpdateTestData ];
-    joiassert.equal(incident.schema, data, data);
-  });
-
-  it ('should validate the object with multiple updates', function () {
-
-    const data = Object.assign({}, incidentTestData);
-    const anotherUpdate = Object.assign({}, incidentUpdateTestData, {id: 'IU345'});
-
-    data['updates'] = [incidentUpdateTestData, anotherUpdate];
-
-    joiassert.equal(incident.schema, data, data);
-
-  });
-
-  it ('should throw error for missing required values', function () {
-
-    const reqFields = ['id', 'created_at', 'updated_at', 'name', 'type', 'is_resolved', 'updates'];
-    const requiredErr = reqFields.map(f => `"${f}" is required`);
-
-    joiassert.error(incident.schema, {}, requiredErr);
-
-  });
-
-  it ('should throw an error for when same incident update is added twice', function () {
-
-    const data = Object.assign({}, incidentTestData);
-    const anotherUpdate = Object.assign({}, incidentUpdateTestData);
-
-    data['updates'] = [incidentUpdateTestData, anotherUpdate];
-
-    joiassert.error(incident.schema, data, '"updates" position 1 contains a duplicate value');
-
-  });
-
-  it ('should throw error if resolved_at is set if is_resolved is false', function () {
-
-    const data = Object.assign({}, incidentTestData);
-    data.is_resolved = false;
-    data['updates'] = [ incidentUpdateTestData ];
-
-    joiassert.error(incident.schema, data, '"resolved_at" must be one of [null]');
-
-  });
-
-  it ('should throw error if resolved_at is not set if is_resolved is true', function () {
-
-    const data = Object.assign({}, incidentTestData);
-    delete data.resolved_at;
-    data['updates'] = [ incidentUpdateTestData ];
-
-    joiassert.error(incident.schema, data, '"resolved_at" is required');
-
-  });
-
-  it ('should return a prefix', function () {
-    assert.strictEqual(incident.prefix, 'IC');
-  });
-
-  describe ('type#backfilled', function () {
-
-    const bfIncidentTestData = Object.assign({}, incidentTestData, { type: 'backfilled' });
-    const bfIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
-
-    it ('should validate the incident object', function () {
-      const data = Object.assign({}, bfIncidentTestData);
-      data['updates'] = [ bfIncidentUpdateTestData ];
-      joiassert.equal(incident.schema, data, data);
-    });
-
-    it ('should only allow 1 incident update entry', function () {
-
-      const data = Object.assign({}, bfIncidentTestData);
-      const anotherUpdate = Object.assign({}, bfIncidentUpdateTestData, {id: 'IU345'});
-
-      data['updates'] = [ bfIncidentUpdateTestData, anotherUpdate ];
-      
-      joiassert.error(incident.schema, data, '"updates" must contain 1 items');
-
-    });
-
-    it ('should allow only resolved status for incident update', function () {
-
-      const data = Object.assign({}, bfIncidentTestData);
-      data['updates'] = [ Object.assign({}, bfIncidentUpdateTestData, {status: 'completed'}) ];
-      
-      joiassert.error(incident.schema, data, '"status" must be one of [resolved]');
-
-    });
-
-  });
-
   describe ('type#realtime', function () {
 
-    const rlIncidentTestData = Object.assign({}, incidentTestData, { type: 'realtime' });
+    const rlIncidentTestData = Object.assign({
+      type: 'realtime',
+      components: ['cid_1'],
+      'components_impact_status': 'partial_outage'
+    }, incidentTestData);
+
     const rlIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
 
-    it ('should validate the incident object', function () {
+    it ('should validate the object', function () {
       const data = Object.assign({}, rlIncidentTestData);
-      data['updates'] = [ rlIncidentUpdateTestData ];
+      data['updates'] = [ incidentUpdateTestData ];
       joiassert.equal(incident.schema, data, data);
+    });
+
+    it ('should validate the object with multiple updates', function () {
+
+      const data = Object.assign({}, rlIncidentTestData);
+      const anotherUpdate = Object.assign({}, incidentUpdateTestData, {id: 'IU345'});
+
+      data['updates'] = [incidentUpdateTestData, anotherUpdate];
+
+      joiassert.equal(incident.schema, data, data);
+
+    });
+
+    it ('should throw error for missing required values', function () {
+
+      const reqFields = ['id', 'created_at', 'updated_at', 'name', 'type', 'components', 'is_resolved', 'components_impact_status', 'updates', ];
+      const requiredErr = reqFields.map(f => `"${f}" is required`);
+
+      joiassert.error(incident.schema, {}, requiredErr);
+
+    });
+
+    it ('should throw an error for when same incident update is added twice', function () {
+
+      const data = Object.assign({}, rlIncidentTestData);
+      const anotherUpdate = Object.assign({}, incidentUpdateTestData);
+
+      data['updates'] = [incidentUpdateTestData, anotherUpdate];
+
+      joiassert.error(incident.schema, data, '"updates" position 1 contains a duplicate value');
+
+    });
+
+    it ('should throw error if resolved_at is set if is_resolved is false', function () {
+
+      const data = Object.assign({}, rlIncidentTestData);
+      data.is_resolved = false;
+      data['updates'] = [ incidentUpdateTestData ];
+
+      joiassert.error(incident.schema, data, '"resolved_at" must be one of [null]');
+
+    });
+
+    it ('should throw error if resolved_at is not set if is_resolved is true', function () {
+
+      const data = Object.assign({}, rlIncidentTestData);
+      delete data.resolved_at;
+      data['updates'] = [ incidentUpdateTestData ];
+
+      joiassert.error(incident.schema, data, '"resolved_at" is required');
+
     });
 
     it ('should fail if no update entry', function () {
@@ -167,6 +127,40 @@ describe('entity/incident', function() {
 
   });
 
+  describe ('type#backfilled', function () {
+
+    const bfIncidentTestData = Object.assign({ type: 'backfilled' }, incidentTestData);
+
+    const bfIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
+
+    it ('should validate the incident object', function () {
+      const data = Object.assign({}, bfIncidentTestData);
+      data['updates'] = [ bfIncidentUpdateTestData ];
+      joiassert.equal(incident.schema, data, data);
+    });
+
+    it ('should only allow 1 incident update entry', function () {
+
+      const data = Object.assign({}, bfIncidentTestData);
+      const anotherUpdate = Object.assign({}, bfIncidentUpdateTestData, {id: 'IU345'});
+
+      data['updates'] = [ bfIncidentUpdateTestData, anotherUpdate ];
+      
+      joiassert.error(incident.schema, data, '"updates" must contain 1 items');
+
+    });
+
+    it ('should allow only resolved status for incident update', function () {
+
+      const data = Object.assign({}, bfIncidentTestData);
+      data['updates'] = [ Object.assign({}, bfIncidentUpdateTestData, {status: 'completed'}) ];
+      
+      joiassert.error(incident.schema, data, '"status" must be one of [resolved]');
+
+    });
+
+  });
+
   describe ('type#scheduled', function () {
 
     const scIncidentTestData = Object.assign({}, incidentTestData, { 
@@ -175,7 +169,8 @@ describe('entity/incident', function() {
       scheduled_start_time: new Date(),
       scheduled_end_time: new Date(),
       scheduled_auto_status_updates: true,
-      scheduled_auto_updates_send_notifications: true
+      scheduled_auto_updates_send_notifications: true,
+      components: ['cid_1']
     });
     const scIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
 
@@ -231,6 +226,10 @@ describe('entity/incident', function() {
 
     });
 
+  });
+
+  it ('should return a prefix', function () {
+    assert.strictEqual(incident.prefix, 'IC');
   });
 
 });
