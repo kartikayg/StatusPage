@@ -152,8 +152,7 @@ const init = (dao, groupRepo) => {
       active: true,
       description: null,
       group_id: null,
-      status: 'operational',
-      sort_order: 1
+      status: 'operational'
     };
 
     let componentObj = Object.assign({}, defaultValues, _cloneDeep(data));

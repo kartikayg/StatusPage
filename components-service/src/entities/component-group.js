@@ -21,13 +21,6 @@ const schema = {
     .max(32),
   description: Joi.string()
     .allow(null),
-  status: Joi.string()
-    .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage'])
-    .required(),
-  sort_order: Joi.number()
-    .integer()
-    .required()
-    .min(1),
   active: Joi.boolean()
     .required()
 

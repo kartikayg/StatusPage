@@ -118,7 +118,7 @@ const init = (dao) => {
   /**
    * Returns a list of component groups based on filters
    * @param {object} filter
-   *   fields: active, status
+   *   fields: active
    * @return {Promise}
    *  if fulfilled, {array} array of component groups
    *  if rejected, {Error} error
@@ -126,10 +126,10 @@ const init = (dao) => {
   repo.list = async (filter) => {
 
     // sort by sort order and then id
-    const sortBy = { sort_order: 1, _id: 1 };
+    const sortBy = { _id: 1 };
 
     // build predicate
-    const pred = _pick(['active', 'status'])(filter);
+    const pred = _pick(['active'])(filter);
 
     const groups = await dao.find(pred, sortBy);
     return groups.map(format);
@@ -147,9 +147,7 @@ const init = (dao) => {
 
     const defaultValues = {
       active: true,
-      description: null,
-      status: 'operational',
-      sort_order: 1
+      description: null
     };
 
     let groupObj = Object.assign({}, defaultValues, _cloneDeep(data));

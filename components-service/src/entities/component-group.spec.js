@@ -29,8 +29,6 @@ describe('entity/component-group', function() {
       updated_at: staticCurrentTime,
       name: 'API-Group',
       description: 'group',
-      status: 'operational',
-      sort_order: 3,
       active: true
     };
 
@@ -40,31 +38,10 @@ describe('entity/component-group', function() {
 
   it ('should throw error for missing required values', function () {
 
-    const reqFields = ['id', 'created_at', 'updated_at', 'name', 'status', 'sort_order', 'active'];
+    const reqFields = ['id', 'created_at', 'updated_at', 'name', 'active'];
     const requiredErr = reqFields.map(f => `"${f}" is required`);
 
     joiassert.error(componentGroup.schema, {}, requiredErr);
-
-  });
-
-  it('should throw an error on invalid data', function() {
-
-    const data = {
-      id: 'CG123',
-      created_at: staticCurrentTime,
-      updated_at: staticCurrentTime,
-      name: 'API-group',
-      active: 'true',
-      sort_order: 'error',
-      status: 'not operational'
-    };
-
-    const expectedErrors = [
-      '"status" must be one of [operational, degraded_performance, partial_outage, major_outage]',
-      '"sort_order" must be a number'
-    ];
-
-    joiassert.error(componentGroup.schema, data, expectedErrors);
 
   });
 

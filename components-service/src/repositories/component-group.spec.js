@@ -26,8 +26,6 @@ describe('repo/component_groups', function() {
 
   const newCmpGroup = {
     name: 'widget',
-    sort_order: 2,
-    status: 'partial_outage',
     active: true
   };
 
@@ -187,7 +185,7 @@ describe('repo/component_groups', function() {
 
       const findSpy = sinon.spy(daoMockObj, 'find');
 
-      const sortBy = { sort_order: 1, _id: 1 };
+      const sortBy = {  _id: 1 };
 
       // one filter
       let pred = { active: true };
@@ -201,29 +199,12 @@ describe('repo/component_groups', function() {
 
     });
 
-    it ('should return component groups, with multiple filters', async function() {
-
-      const findSpy = sinon.spy(daoMockObj, 'find');
-
-      const sortBy = { sort_order: 1, _id: 1 };
-
-      // one filter
-      let pred = { active: true, status: 'good' };
-      const groups = await repo.list(pred);
-
-      sinon.assert.calledOnce(findSpy);
-      sinon.assert.calledWith(findSpy, pred, sortBy);
-      assert.deepEqual(groups, [existingCmpGroupWithoutId]);
-
-      findSpy.restore();
-
-    });
 
     it ('should return component groups, with extra filters but no error', async function() {
 
       const findSpy = sinon.spy(daoMockObj, 'find');
 
-      const sortBy = { sort_order: 1, _id: 1 };
+      const sortBy = {  _id: 1 };
 
       // one filter
       let pred = { active: true, filter: 'test' };
@@ -241,10 +222,10 @@ describe('repo/component_groups', function() {
 
       const findSpy = sinon.spy(daoMockObj, 'find');
 
-      const sortBy = { sort_order: 1, _id: 1 };
+      const sortBy = {  _id: 1 };
 
       // one filter
-      let pred = { active: false, status: 'operational'};
+      let pred = { active: false };
       const groups = await repo.list(pred);
 
       sinon.assert.calledOnce(findSpy);
@@ -261,8 +242,8 @@ describe('repo/component_groups', function() {
         throw new Error('db error');
       });
 
-      const sortBy = { sort_order: 1, _id: 1 };
-      const pred = { active: false, status: 'operational'};
+      const sortBy = {  _id: 1 };
+      const pred = { active: false };
       
       repo.list(pred).catch(e => {
 
@@ -334,8 +315,6 @@ describe('repo/component_groups', function() {
 
       const updated = {
         name: 'updated name',
-        sort_order: 1,
-        status: 'operational',
         description: 'desc'
       };
 

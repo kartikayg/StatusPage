@@ -177,9 +177,7 @@ describe('app - integration tests', function () {
     });
 
     const newComponentGroupTestObj = {
-      name: 'Widget API group test',
-      status: 'operational',
-      sort_order: 1
+      name: 'Widget API group test'
     };
 
     it ('should create and return a component group object', function (done) {
@@ -238,7 +236,7 @@ describe('app - integration tests', function () {
     it ('should partial update the component group', function (done) {
 
       const group = {
-        status: 'partial_outage'
+        active: false
       };
 
       agent
@@ -261,7 +259,7 @@ describe('app - integration tests', function () {
 
           assert.isObject(c);
           assert.strictEqual(c.id, componentGroupId);
-          assert.strictEqual(c.status, 'partial_outage');
+          assert.strictEqual(c.active, false);
           done();
 
         });
