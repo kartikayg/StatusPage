@@ -64,7 +64,7 @@ describe('entity/component', function() {
     };
 
     const expectedErrors = [
-      '"status" must be one of [operational, degraded_performance, partial_outage, major_outage]',
+      '"status" must be one of [operational, degraded_performance, partial_outage, major_outage, maintenance]',
       '"sort_order" must be a number'
     ];
 

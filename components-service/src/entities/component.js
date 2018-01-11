@@ -23,7 +23,7 @@ const schema = {
     .allow(null)
     .default(null),
   status: Joi.string()
-    .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage'])
+    .only(['operational', 'degraded_performance', 'partial_outage', 'major_outage', 'maintenance'])
     .required(),
   sort_order: Joi.number()
     .integer()
