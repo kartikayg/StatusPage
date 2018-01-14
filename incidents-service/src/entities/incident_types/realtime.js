@@ -14,7 +14,7 @@ const schema = Joi.object({
   // the highest status from all of the impacted components.
   // this kind of defines the impact status of this incident.
   components_impact_status: Joi.string()
-    .only(['degraded_performance', 'partial_outage', 'major_outage'])
+    .only(['operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'])
     .required(),
 
   // add incident updates

@@ -89,10 +89,10 @@ const init = (dao, messagingQueue) => {
       // if the values have changed, keep the highest status
       if (updatedObj.components_impact_status !== incidentObj.components_impact_status) {
 
-        const impactStatsus = ['degraded_performance', 'partial_outage', 'major_outage'];
+        const impactStatuses = ['operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'];
 
-        const originalPos = impactStatsus.indexOf(incidentObj.components_impact_status);
-        const updatedPos = impactStatsus.indexOf(updatedObj.components_impact_status);
+        const originalPos = impactStatuses.indexOf(incidentObj.components_impact_status);
+        const updatedPos = impactStatuses.indexOf(updatedObj.components_impact_status);
 
         if (updatedPos !== -1 && originalPos > updatedPos) {
           updatedObj.components_impact_status = incidentObj.components_impact_status;
