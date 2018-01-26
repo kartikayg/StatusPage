@@ -3,7 +3,9 @@
  */
 
 import express from 'express';
-import httpStatus from 'http-status';
+
+import componentRoutes from './components';
+import authRoutes from './auth';
 
 /**
  * Return routes
@@ -11,6 +13,12 @@ import httpStatus from 'http-status';
 export default (repos) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
+
+  // auth
+  router.use(authRoutes(repos.auth));
+
+  // add routes for external microservices
+  router.use(componentRoutes(repos.components));
 
   return router;
 

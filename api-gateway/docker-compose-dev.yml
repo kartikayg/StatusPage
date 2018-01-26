@@ -12,10 +12,19 @@ services:
     env_file:
       - .env
     environment:
-      COMPONENTS_URI: http://localhost:6010/api
-      INCIDENTS_URI: http://localhost:6020/api
-      NOTIFICATION_URI: http://localhost:6030/api
+      COMPONENTS_URI: http://components_service:6010/api
+      INCIDENTS_URI: http://incidents_service:6020/api
+      NOTIFICATION_URI: http://notification_service:6030/api
+    networks:
+      default:
+        aliases:
+          - api_gateway
   redis:
     image: "redis"
     ports:
       - 6041:6379
+
+networks:
+  default:
+    external:
+      name: status_page_app

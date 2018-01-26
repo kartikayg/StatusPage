@@ -45,12 +45,12 @@ gulp.task('compile', () =>
 );
 
 // Start server with restart on file changes
-gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
+gulp.task('nodemon', runSequence(['copy', 'compile']), () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
-    ext: 'js json env',
+    ext: 'js',
     ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'src/**/*.spec.js', 'gulpfile.js', 'test/**/*.js'],
-    tasks: ['lint', 'compile']
+    tasks: ['compile']
   })
 );
 

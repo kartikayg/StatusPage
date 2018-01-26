@@ -47,26 +47,8 @@ export default (repos) => {
     });
   });
 
-
-  /** POST auth/login - Logs the user in and returns a token */
-  router.post('auth/login', (req, res, next) => {
-
-    const username = sanitizeString(req.body.username);
-    const password = sanitizeString(req.body.password);
-
-    // login user and gen token
-    repos.auth.login(username, password).then(token => {
-      res.json({
-        token,
-        message: 'Login successful'
-      });
-    }).catch(next);
-
-  });
-
   // API routes
   router.use('/api', apiRoutes(repos));
-
 
   // generic error handler. if there is any special case/override, it should be
   // handled by the route.

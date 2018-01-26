@@ -44,7 +44,7 @@ const start = async () => {
   // start the server
   app = await server.start(conf.server, { repos, messagingQueue });
 
-  logger.debug(`${process.env.SERVICE_NAME} has started ...`);
+  logger.debug(`${process.env.SERVICE_NAME} has started on ${conf.server.PORT}.`);
 
   return app;
 
