@@ -4,6 +4,7 @@
 
 import React, { Component } from 'react';
 import classNames from 'classnames';
+import { Helmet } from "react-helmet";
 
 import { execute } from '../lib/ajaxActions';
 import auth from '../lib/auth';
@@ -106,49 +107,54 @@ class LoginForm extends Component {
     });
 
     return (
-      <div className="ui middle aligned center aligned grid" style={gridStyle}>
-        <div className="column" style={columnStyle}>
-          <h2 className="ui teal image header">
-            <div className="content">
-              Log-in to your account
-            </div>
-          </h2>
-          <form className="ui large form" onSubmit={this.onLoginClick}>
-            <div className="ui stacked segment">
-              <div className={`field ${this.state.inputs.username.state}`}>
-                <div className="ui left icon input">
-                  <i className="user icon"></i>
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
-                    onChange={this.onInputChange}
-                    value={this.state.inputs.username.value}
-                  />
+      <div>
+        <Helmet>
+          <title>Login</title>
+        </Helmet>
+        <div className="ui middle aligned center aligned grid" style={gridStyle}>
+          <div className="column" style={columnStyle}>
+            <h2 className="ui teal image header">
+              <div className="content">
+                Log-in to your account
+              </div>
+            </h2>
+            <form className="ui large form" onSubmit={this.onLoginClick}>
+              <div className="ui stacked segment">
+                <div className={`field ${this.state.inputs.username.state}`}>
+                  <div className="ui left icon input">
+                    <i className="user icon"></i>
+                    <input
+                      type="text"
+                      name="username"
+                      placeholder="Username"
+                      onChange={this.onInputChange}
+                      value={this.state.inputs.username.value}
+                    />
+                  </div>
+                </div>
+                <div className={`field ${this.state.inputs.password.state}`}>
+                  <div className="ui left icon input">
+                    <i className="lock icon"></i>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      onChange={this.onInputChange}
+                      value={this.state.inputs.password.value}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          this.onLoginClick(e);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className={submitBtnClasses} onClick={this.onLoginClick}>
+                  Login
                 </div>
               </div>
-              <div className={`field ${this.state.inputs.password.state}`}>
-                <div className="ui left icon input">
-                  <i className="lock icon"></i>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    onChange={this.onInputChange}
-                    value={this.state.inputs.password.value}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        this.onLoginClick(e);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={submitBtnClasses} onClick={this.onLoginClick}>
-                Login
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     );

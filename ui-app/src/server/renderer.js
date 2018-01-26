@@ -32,6 +32,9 @@ export default (req, store, context) => {
   return `
     <html>
       <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="description" content="Status Page App">
+        <meta name="language" content="en">
         ${helmet.title.toString()}
         ${helmet.meta.toString()}
         ${helmet.link.toString()}
