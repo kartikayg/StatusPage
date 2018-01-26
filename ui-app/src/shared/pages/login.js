@@ -4,10 +4,10 @@
 
 import React, { Component } from 'react';
 import classNames from 'classnames';
-import { Helmet } from "react-helmet";
+import { Helmet } from 'react-helmet';
 
 import { execute } from '../lib/ajaxActions';
-import auth from '../lib/auth';
+import auth from '../../client/auth';
 
 class LoginForm extends Component {
 
@@ -55,7 +55,7 @@ class LoginForm extends Component {
     execute('/login', 'post', { data: toSave })
       .then(res => {
         // save the token and redirect to admin
-        auth.setToken(res.token);
+        auth.token = res.token;
         location.href = '/admin'; // eslint-disable-line
       })
       .catch(err => {

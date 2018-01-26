@@ -75,7 +75,7 @@ const RedirectWithStatus = ({ from, to, status }) => { // eslint-disable-line re
 const render = (routes, redirects = []) => {
 
   // render routes
-  const r = routes.map(({ exact, path, auth, component }) => {
+  const r = routes.map(({ exact, path, component }) => {
     return <Route key={`ROUTE_${Math.random()}`} exact={exact} path={path} component={component} />;
   });
 

@@ -12,7 +12,7 @@ import { configure as configureStore } from '../shared/redux/store';
 import { raw as routes } from '../shared/routes';
 import renderer from './renderer';
 
-import auth from '../shared/lib/auth';
+import auth from './auth';
 import { apiGateway } from '../shared/lib/ajaxActions';
 
 /**
@@ -21,6 +21,14 @@ import { apiGateway } from '../shared/lib/ajaxActions';
 const setupServer = () => {
 
   const app = express();
+
+  let authAdapter;
+
+  // initialize auth adapter
+  app.use((req, res, next) => {
+    authAdapter = auth.init(req, res);
+    next();
+  });
 
   app.use(cookieParser());
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,7 +49,7 @@ const setupServer = () => {
     // use the api-gateway to get the login token
     apiGateway.post('/login_token', data).then(msg => {
       // set the cookie. this is used to authenticate for SSR
-      auth.setToken(msg.token, res);
+      authAdapter.token = msg.token;
       res.json(msg);
     }).catch(e => {
       const status = e.status || e.httpStatus || 500;
@@ -52,7 +60,7 @@ const setupServer = () => {
 
   // on logout
   app.get('/logout', (req, res) => {
-    auth.logout(res);
+    authAdapter.logout();
     res.redirect('/login');
   });
 
