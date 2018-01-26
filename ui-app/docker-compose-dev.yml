@@ -12,4 +12,13 @@ services:
     env_file:
       - .env
     environment:
-      API_GATEWAY_URI: http://localhost:6040
+      API_GATEWAY_URI: http://api_gateway:6040
+    networks:
+      default:
+        aliases:
+          - ui_app
+
+networks:
+  default:
+    external:
+      name: status_page_app

@@ -5,11 +5,15 @@
 
 import express from 'express';
 import { matchRoutes } from 'react-router-config';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 import { configure as configureStore } from '../shared/redux/store';
 import { raw as routes } from '../shared/routes';
 import renderer from './renderer';
 
+import auth from '../shared/lib/auth';
+import { apiGateway } from '../shared/lib/ajaxActions';
 
 /**
  * Sets up the express server
@@ -18,8 +22,9 @@ const setupServer = () => {
 
   const app = express();
 
-  // app.use(bodyParser.urlencoded({ extended: true }));
-  // app.use(bodyParser.json());
+  app.use(cookieParser());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
 
   // static files
   app.use('/public', express.static('./dist/public'));
@@ -28,7 +33,30 @@ const setupServer = () => {
     res.status(204);
   });
 
-  // all the page loads
+  // login call
+  app.post('/login', (req, res, next) => {
+
+    const data = { username: req.body.username, password: req.body.password };
+
+    // use the api-gateway to get the login token
+    apiGateway.post('/login_token', data).then(msg => {
+      // set the cookie. this is used to authenticate for SSR
+      auth.setToken(msg.token, res);
+      res.json(msg);
+    }).catch(e => {
+      const status = e.status || e.httpStatus || 500;
+      res.status(status).json({ message: e.message });
+    });
+
+  });
+
+  // on logout
+  app.get('/logout', (req, res) => {
+    auth.logout(res);
+    res.redirect('/login');
+  });
+
+  // all the other page loads
   app.get('*', (req, res, next) => {
 
     try {

@@ -1,6 +1,7 @@
 /**
- * @fileoverview
+ * @fileoverview Entry point for the application (client or SSR)
  */
+
 import React from 'react';
 import { Switch } from 'react-router-dom';
 

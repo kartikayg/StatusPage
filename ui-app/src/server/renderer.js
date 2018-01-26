@@ -11,13 +11,21 @@ import { Helmet } from 'react-helmet';
 
 import App from '../shared/app';
 
+/**
+ * @param {object} req - express req object
+ * @param {object} store - redux store
+ * @param {object} context - react router context
+ */
 export default (req, store, context) => {
 
-  const html = renderToString(<Provider store={store}>
+  // render the app as html
+  const html = renderToString( // eslint-disable-line function-paren-newline
+    <Provider store={store}>
       <StaticRouter location={req.path} context={context}>
         <App />
       </StaticRouter>
-    </Provider>);
+    </Provider>
+  ); // eslint-disable-line function-paren-newline
 
   const helmet = Helmet.renderStatic();
 
