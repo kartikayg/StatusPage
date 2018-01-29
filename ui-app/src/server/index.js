@@ -61,7 +61,7 @@ const setupServer = () => {
   // on logout
   app.get('/logout', (req, res) => {
     authAdapter.logout();
-    res.redirect('/login');
+    res.redirect(302, '/login');
   });
 
   // all the other page loads

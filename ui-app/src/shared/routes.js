@@ -30,15 +30,24 @@ const raw = {
       auth: true,
       routes: [
         {
+          path: '/admin/dashboard',
+          component: ComponentsPage,
+          exact: true,
+          title: 'Dashboard',
+          iconCls: 'dashboard'
+        },
+        {
           path: '/admin/components',
           component: ComponentsPage,
-          exact: true
+          exact: true,
+          title: 'Components',
+          iconCls: 'browser'
         }
       ],
       redirects: [
         {
           from: '/admin/*',
-          to: '/admin/components',
+          to: '/admin/dashboard',
           exact: true
         }
       ]
