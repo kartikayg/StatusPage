@@ -33,5 +33,6 @@ module.exports = {
         }
       }],
     }]
-  }
+  },
+  devtool: process.env.NODE_ENV === 'dev' ? '#cheap-module-eval-source-map' : '#source-map'
 };

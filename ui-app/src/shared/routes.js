@@ -10,6 +10,7 @@ import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 
 import ComponentsPage from './pages/admin/components';
+import { apiGateway } from '../shared/lib/ajaxActions';
 
 // raw routes array
 const raw = {
@@ -41,14 +42,20 @@ const raw = {
           component: ComponentsPage,
           exact: true,
           title: 'Components',
-          iconCls: 'browser'
+          iconCls: 'browser',
+          initialLoad: () => {
+            return apiGateway.get('/components').then(res => {
+              return { components: res };
+            });
+          }
         }
       ],
       redirects: [
         {
           from: '/admin/*',
           to: '/admin/dashboard',
-          exact: true
+          exact: true,
+          status: 302
         }
       ]
     }

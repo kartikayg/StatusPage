@@ -38,7 +38,7 @@ const setupServer = () => {
   app.use('/public', express.static('./dist/public'));
 
   app.get('/favicon.ico', (req, res) => {
-    res.status(204);
+    res.send('icon');
   });
 
   // login call
@@ -65,13 +65,28 @@ const setupServer = () => {
   });
 
   // all the other page loads
-  app.get('*', (req, res, next) => {
+  app.get('*', async (req, res, next) => {
 
     try {
 
+      // match the route(s) for the current path. more than one can
+      // match depending on the router config
       const route = matchRoutes(routes.routes, req.path);
 
-      const store = configureStore({});
+      // validate if route needs to be authenticated
+      const authenticate = route.some(r => r.route.auth === true);
+      if (authenticate && authAdapter.isAuthenticated() === false) {
+        return res.redirect('/login');
+      }
+
+      // load data based on the routes load
+      const initialLoads = route.map(r => {
+        return r.route.initialLoad ? r.route.initialLoad() : Promise.resolve({});
+      });
+
+      const initialData = await Promise.all(initialLoads);
+
+      const store = configureStore(...initialData);
 
       const context = {};
       const content = renderer(req, store, context);
@@ -84,6 +99,7 @@ const setupServer = () => {
       }
 
       return res.send(content);
+
     }
     catch (e) {
       return next(e);
