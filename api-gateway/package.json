@@ -8,7 +8,7 @@
     "build": "gulp",
     "lint": "eslint --fix 'src/**/*.js'",
     "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
-    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register 'src/**/*.spec.js'"
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register --exit 'src/**/*.spec.js'"
   },
   "main": "src/index.js",
   "repository": {
