@@ -3,6 +3,7 @@
  */
 
 import express from 'express';
+import httpStatus from 'http-status';
 import striptags from 'striptags';
 
 /**
@@ -45,7 +46,15 @@ export default (repo) => {
         token,
         message: 'Login successful'
       });
-    }).catch(next);
+    }).catch(err => {
+
+      if (err.name === 'InvalidCredentialsError') {
+        return res.status(httpStatus.UNPROCESSABLE_ENTITY).json({ message: err.message });
+      }
+
+      return next(err);
+
+    });
 
   });
 

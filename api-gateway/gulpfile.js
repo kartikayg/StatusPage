@@ -40,17 +40,19 @@ gulp.task('copy', () =>
 // Compile ES6 to ES5 and copy to dist
 gulp.task('compile', () =>
   gulp.src([...paths.js], { base: '.' }) // your ES2015 code 
+    .pipe(cache.filter()) // remember files 
     .pipe(babel()) // compile new ones 
+    .pipe(cache.cache()) // cache them 
     .pipe(gulp.dest('dist')) // write them 
 );
 
 // Start server with restart on file changes
-gulp.task('nodemon', runSequence(['copy', 'compile']), () =>
+gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
     ext: 'js',
     ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'src/**/*.spec.js', 'gulpfile.js', 'test/**/*.js'],
-    tasks: ['compile']
+    tasks: ['lint', 'compile']
   })
 );
 

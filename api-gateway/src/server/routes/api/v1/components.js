@@ -4,15 +4,21 @@
 
 import express from 'express';
 
-export default (repo) => {
+export default (componentRepo) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
   router.route('/components')
 
     .get((req, res, next) => {
-      repo.get().then(components => {
+      componentRepo.get().then(components => {
         return res.json(components);
+      }).catch(next);
+    })
+
+    .post((req, res, next) => {
+      componentRepo.create(req.body.component).then(component => {
+        res.json(component);
       }).catch(next);
     });
 

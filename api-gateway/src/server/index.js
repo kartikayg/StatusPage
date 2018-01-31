@@ -10,7 +10,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import httpStatus from 'http-status';
 
-import v1Routes from './routes/v1';
+import apiRoutes from './routes/api';
 import logger from '../lib/logger';
 import logRequest from './middleware/log-request';
 
@@ -49,7 +49,7 @@ const start = (conf, options) => {
   }
 
   // setup routes
-  app.use('/v1', v1Routes(options.repos));
+  app.use('/api', apiRoutes(options.repos));
 
   // if there is an error at this point, it means it is unexpected like db
   // or some system error and should be logged.
