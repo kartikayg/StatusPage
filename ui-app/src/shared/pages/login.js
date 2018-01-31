@@ -5,6 +5,7 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
+import { NotificationManager } from 'react-notifications';
 
 import { execute } from '../lib/ajaxActions';
 import auth from '../../client/auth';
@@ -59,7 +60,7 @@ class LoginForm extends Component {
         location.href = '/admin'; // eslint-disable-line
       })
       .catch(err => {
-        // flash error message
+        NotificationManager.error(err.message);
         this.setState({ saving: false });
       });
 
