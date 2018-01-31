@@ -1,5 +1,8 @@
 {
   "parser": "babel-eslint",
+  "plugins": [
+    "lodash-fp"
+  ],
   "rules": {
     "comma-dangle": ["error", "never"],
     "padded-blocks": 0,
@@ -13,7 +16,8 @@
     "func-names": "off",
     "react/display-name": "off",
     "object-curly-newline": "off",
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "no-restricted-globals": "off"
   },
   "extends": [
     "eslint:recommended",

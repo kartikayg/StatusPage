@@ -70,19 +70,34 @@ const execute = async (url, method, opts = {}, instance = null) => {
 const apiGateway = (function () {
 
   // Create an axios instance
-  const instance = axios.create({
+  const serverInstance = axios.create({
     timeout: CALL_TIMEOUT,
-    baseURL: `${process.env.API_GATEWAY_URI}/v1/api`
+    baseURL: `${process.env.API_GATEWAY_URI}/api/v1`
   });
+
+  const clientInstance = axios.create({
+    timeout: CALL_TIMEOUT,
+    baseURL: 'http://localhost:6040/api/v1'
+  });
+
+  const getInstance = () => {
+
+    if (__CLIENT__ === true) { // eslint-disable-line no-undef
+      return clientInstance;
+    }
+
+    return serverInstance;
+
+  };
 
   return {
 
     get(url, opts = {}) {
-      return execute(url, 'get', opts, instance);
+      return execute(url, 'get', opts, getInstance());
     },
 
     post(url, data, opts = {}) {
-      return execute(url, 'post', { data, ...opts }, instance);
+      return execute(url, 'post', { data, ...opts }, getInstance());
     }
 
   };

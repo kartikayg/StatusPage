@@ -74,7 +74,9 @@ const setupServer = () => {
       const route = matchRoutes(routes.routes, req.path);
 
       // validate if route needs to be authenticated
-      const authenticate = route.some(r => r.route.auth === true);
+      const authenticate = route.some(r => {
+        return r.route.auth === true;
+      });
       if (authenticate && authAdapter.isAuthenticated() === false) {
         return res.redirect('/login');
       }
@@ -86,8 +88,10 @@ const setupServer = () => {
 
       const initialData = await Promise.all(initialLoads);
 
-      const store = configureStore(...initialData);
+      // create store with initial state
+      const store = configureStore(Object.assign({}, ...initialData));
 
+      // render on server side and response accordingly
       const context = {};
       const content = renderer(req, store, context);
 

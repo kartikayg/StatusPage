@@ -1,15 +1,10 @@
 import { combineReducers } from 'redux';
 
-// reducers.js
+import components from './components';
+import componentGroups from './componentGroups';
 
-const firstNamedReducer = (state = 1, action) => {
-  return state;
-};
-const secondNamedReducer = (state = 2, action) => {
-  return state;
-};
-
+// combine all reducers
 export default combineReducers({
-  firstNamedReducer,
-  secondNamedReducer
+  components,
+  componentGroups
 });

@@ -6,7 +6,6 @@ import React from 'react';
 import { Switch, Redirect } from 'react-router-dom';
 import { matchRoutes } from 'react-router-config';
 import PropTypes from 'prop-types';
-import Transition from 'react-transition-group/Transition';
 
 import Sidebar from './admin/sidebar';
 import Topbar from './admin/topbar';
@@ -30,7 +29,7 @@ class AdminPage extends React.Component {
   // on logout button click, logout from client and then server
   onLogoutClick = () => {
     auth.logout();
-    location.href = '/logout';
+    location.href = '/logout'; // eslint-disable-line no-undef
   }
 
   // on sidebar toggle from topbar
@@ -38,11 +37,13 @@ class AdminPage extends React.Component {
     this.setState(prevState => {
       return {
         sidebarActive: !prevState.sidebarActive
-      }
+      };
     });
   }
 
   componentDidMount() {
+
+    /* eslint-disable no-undef */
 
     // add handling for resizing of window and mobile
 
@@ -51,11 +52,11 @@ class AdminPage extends React.Component {
     const RATIO = 3;
 
     const handler = () => {
-      if (!document.hidden) {
-        let rect = body.getBoundingClientRect();
-        let isMobile = rect.width - RATIO < WIDTH;
+      if (!document.hidden) { // eslint-disable-line no-undef
+        const rect = body.getBoundingClientRect();
+        const isMobile = rect.width - RATIO < WIDTH;
 
-        this.setState({ 
+        this.setState({
           sidebarActive: !isMobile,
           isMobile
         });
@@ -67,6 +68,8 @@ class AdminPage extends React.Component {
     window.addEventListener('DOMContentLoaded', handler);
     window.addEventListener('resize', handler);
 
+    /* eslint-enable no-undef */
+
   }
 
   render() {
@@ -75,7 +78,7 @@ class AdminPage extends React.Component {
 
     // sidebar styles. use transform css property to show/hide
     const sidebarStyle = {
-      transition: `transform 300ms ease-in`,
+      transition: 'transform 300ms ease-in',
       position: 'fixed',
       left: 0,
       height: '100%',
@@ -87,14 +90,16 @@ class AdminPage extends React.Component {
 
     // main section style
     const routeStyle = {
-      marginLeft: !this.state.isMobile ? '200' : 0
+      marginLeft: !this.state.isMobile ? '300' : '50',
+      maxWidth: '68rem',
+      marginTop: 25
     };
 
     return (
       <div>
-        <Topbar 
+        <Topbar
           onLogoutClick={this.onLogoutClick}
-          onSidebarToggle={this.onSidebarToggle} 
+          onSidebarToggle={this.onSidebarToggle}
           showSidebarToggle={this.state.isMobile}
         />
         <div className="pusher">
@@ -103,10 +108,16 @@ class AdminPage extends React.Component {
               <Sidebar currentLocation={this.props.location} menu={r[0].route.routes}/>
             </div>
             <div className="ui basic segment" style={routeStyle}>
-              <Switch>
-                {renderRoutes(r[0].route.routes, r[0].route.redirects)}
-                <Redirect exact key={`REDIRECT_${Math.random()}`} from={this.props.match.url} to='/admin/dashboard' />
-              </Switch>
+              <div style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                <Switch>
+                  {renderRoutes(r[0].route.routes, r[0].route.redirects)}
+                  <Redirect
+                    exact key={`REDIRECT_${Math.random()}`}
+                    from={this.props.match.url}
+                    to='/admin/dashboard'
+                  />
+                </Switch>
+              </div>
             </div>
           </div>
         </div>

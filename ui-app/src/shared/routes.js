@@ -40,12 +40,11 @@ const raw = {
         {
           path: '/admin/components',
           component: ComponentsPage,
-          exact: true,
           title: 'Components',
           iconCls: 'browser',
           initialLoad: () => {
             return apiGateway.get('/components').then(res => {
-              return { components: res };
+              return { components: res, componentGroups: [] };
             });
           }
         }

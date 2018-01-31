@@ -24,7 +24,7 @@ Item.propTypes = {
 const Sidebar = ({ currentLocation, menu }) => {
 
   return (
-    <div 
+    <div
       className="ui inverted labeled icon left inline vertical demo sidebar menu uncover visible"
       style={{ width: 200 }}
     >
