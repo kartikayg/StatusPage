@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import _pick from 'lodash/fp/pick';
+import { NotificationManager } from 'react-notifications';
 
 import { apiGateway } from '../../../lib/ajaxActions';
 
@@ -55,6 +56,7 @@ class Form extends React.Component {
     apiGateway.post('/components', { component: this.state.inputs })
       .then(res => {
         console.log(res);
+        NotificationManager.success('Component successfully created');
         this.setState({ saving: false });
       })
       .catch(err => {

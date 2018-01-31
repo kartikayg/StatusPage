@@ -1,5 +1,8 @@
+// LOOK AT https://github.com/minhtranite/react-notifications FOR HELP //
+
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -7,15 +10,26 @@ module.exports = {
   },
   output: {
     filename: '[name].bundle.js',
-    publicPath: '/public',
-    path: path.resolve(__dirname, './dist/public')
+    publicPath: '/public/js',
+    path: path.resolve(__dirname, './dist/public/js')
   },
   plugins: [
     new webpack.DefinePlugin({
       '__CLIENT__': true,
       '__SERVER__': false
     }),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI'])
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI']),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, './node_modules/react-notifications/lib/notifications.css'),
+        to: path.resolve(__dirname, './dist/public/css')
+      },
+      {
+        context: path.resolve(__dirname, './node_modules/react-notifications/lib/fonts/'),
+        from: '*.*',
+        to: path.resolve(__dirname, './dist/public/css/fonts/')
+      },
+    ], { flatten : true })
   ],
   module: {
     rules: [{
