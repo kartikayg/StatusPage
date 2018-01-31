@@ -184,7 +184,7 @@ describe('app - integration tests', function () {
 
       agent
         .post('/api/component_groups')
-        .send({ componentgroup: newComponentGroupTestObj })
+        .send({ component_group: newComponentGroupTestObj })
         .expect('Content-Type', /json/)
         .expect(200)
         .then(res => {
@@ -241,7 +241,7 @@ describe('app - integration tests', function () {
 
       agent
         .patch(`/api/component_groups/${componentGroupId}`)
-        .send({ componentgroup: group })
+        .send({ component_group: group })
         .expect('Content-Type', /json/)
         .expect(200, done);
 

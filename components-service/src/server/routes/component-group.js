@@ -57,7 +57,7 @@ export default (componentGroupRepo) => {
     /** POST /api/component_groups - creates a component group */
     .post((req, res, next) => {
 
-      const data = req.sanitizedBody.componentgroup;
+      const data = req.sanitizedBody.component_group;
 
       // not a valid component group object sent
       if (!data || typeof data !== 'object') {
@@ -81,7 +81,7 @@ export default (componentGroupRepo) => {
     /** PATCH /api/component_groups/:componentGroupId - Updates properties of a component group */
     .patch((req, res, next) => {
 
-      const data = req.sanitizedBody.componentgroup;
+      const data = req.sanitizedBody.component_group;
 
       // not a valid component group object sent
       if (!data || typeof data !== 'object') {

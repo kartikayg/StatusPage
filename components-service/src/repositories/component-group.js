@@ -129,7 +129,7 @@ const init = (dao) => {
     const sortBy = { _id: 1 };
 
     // build predicate
-    const pred = _pick(['active'])(filter);
+    const pred = _pick(['active', 'name'])(filter);
 
     const groups = await dao.find(pred, sortBy);
     return groups.map(format);

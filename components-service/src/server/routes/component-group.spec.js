@@ -147,13 +147,13 @@ describe('routes/component_groups', function() {
 
       const createSpy = sinon.spy(testRepoStub, 'create');
 
-      const componentgroup = {
+      const component_group = {
         name: '  widget  ' // will be sanitized (trimmed)
       };
 
       request(app)
         .post('/api/component_groups')
-        .send({ componentgroup })
+        .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
         .then(res => {
@@ -177,14 +177,14 @@ describe('routes/component_groups', function() {
         return Promise.reject(e);
       });
 
-      const componentgroup = {
+      const component_group = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
         .post('/api/component_groups')
-        .send({ componentgroup })
+        .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
         .then(res => {
@@ -266,14 +266,14 @@ describe('routes/component_groups', function() {
 
       const updateSpy = sinon.spy(testRepoStub, 'update');
 
-      const componentgroup = {
+      const component_group = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
         .patch(`/api/component_groups/${testCmpGroup.id}  `)
-        .send({ componentgroup })
+        .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
         .then(res => {
@@ -298,14 +298,14 @@ describe('routes/component_groups', function() {
         throw new IdNotFoundError('Id not found');
       });
 
-      const componentgroup = {
+      const component_group = {
         name: '  widget  ',
         sort_order: '2'
       };
 
       request(app)
         .patch(`/api/component_groups/${testCmpGroup.id}  `)
-        .send({ componentgroup })
+        .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
