@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
+import _sortBy from 'lodash/fp/sortBy';
 
 import List from './components/list';
 import Form from './components/form';
@@ -61,7 +62,7 @@ ComponentsDisplay.propTypes = {
 const mapStateToProps = (state) => {
   return {
     components: state.components,
-    groups: state.componentGroups,
+    groups: _sortBy(['name'])(state.componentGroups),
     componentsByGroup: groupComponents(state.components, state.componentGroups)
   };
 };

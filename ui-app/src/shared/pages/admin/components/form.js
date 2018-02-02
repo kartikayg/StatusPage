@@ -33,15 +33,17 @@ class Form extends React.Component {
       group_name: '',
       active: true,
       status: 'operational',
-      sort_order: props.componentsCount + 1
+      sort_order: props.componentsCount + 1,
+      group_id: ''
     }, props.component);
 
     this.state = {
       inputs: {
-        ..._pick(['name', 'description', 'group_name', 'status', 'active', 'sort_order'])(cmp),
+        ..._pick(['name', 'description', 'group_name', 'status', 'active', 'sort_order', 'group_id'])(cmp),
         new_group_name: ''
       },
-      saving: false
+      saving: false,
+      showCreateNewGroupInput: false
     };
 
   }
@@ -100,6 +102,24 @@ class Form extends React.Component {
 
   }
 
+  onGroupSelectChange = (e) => {
+
+    const { value } = e.target;
+
+    if (value === 'CREATE_A_NEW_GROUP') {
+      this.setState({ showCreateNewGroupInput: true });
+    }
+    else {
+      this.onInputChange(e);
+    }
+
+  }
+
+  onCancelGroupCreation = (e) => {
+    e.preventDefault();
+    this.setState({ showCreateNewGroupInput: false });
+  }
+
   render() {
 
     const header = this.props.component ? 'Update Component' : 'New Component';
@@ -144,16 +164,44 @@ class Form extends React.Component {
                 />
               </div>
             }
-            <div className="field">
-              <label>Group Name</label>
-              <input
-                type="text"
-                name="new_group_name"
-                onChange={this.onInputChange}
-                value={this.state.inputs.new_group_name}
-                placeholder="If you want to group components, create a group"
-              />
-            </div>
+            {(this.props.groups.length === 0 || this.state.showCreateNewGroupInput) &&
+              <div className="field">
+                <label>Group</label>
+                <input
+                  type="text"
+                  name="new_group_name"
+                  onChange={this.onInputChange}
+                  value={this.state.inputs.new_group_name}
+                  placeholder={this.props.groups.length === 0
+                                ? 'If you want to group components, create a group'
+                                : 'create a group'
+                              }
+                />
+                {this.props.groups.length > 0 &&
+                  <div style={{ margin: '7px 0' }}>
+                    <a href="#" onClick={this.onCancelGroupCreation}>Cancel</a>
+                  </div>
+                }
+              </div>
+            }
+            {this.props.groups.length > 0 && !this.state.showCreateNewGroupInput &&
+              <div className="field">
+                <label>Group</label>
+                <select
+                  className="ui search dropdown"
+                  name="group_id"
+                  onChange={this.onGroupSelectChange}
+                  value={this.state.inputs.group_id}
+                >
+                    <option value="">No grouping for this component</option>
+                    <option value="CREATE_A_NEW_GROUP">Create a new group</option>
+                    <option value="">-----------------------------------------</option>
+                    {this.props.groups.map(g => {
+                      return <option key={g.id} value={g.id} >{g.name}</option>;
+                    })}
+                </select>
+              </div>
+            }
             <div className="field">
               <div className="ui checkbox">
                 <input
