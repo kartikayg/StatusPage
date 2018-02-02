@@ -9,13 +9,15 @@ import PropTypes from 'prop-types';
 import _pick from 'lodash/fp/pick';
 import { NotificationManager } from 'react-notifications';
 
-import { apiGateway } from '../../../lib/ajaxActions';
+import { apiGateway } from '../../../lib/ajax-actions';
 
 class Form extends React.Component {
 
   static propTypes = {
     component: PropTypes.object,
-    groups: PropTypes.arrayOf(PropTypes.object).isRequired
+    groups: PropTypes.arrayOf(PropTypes.object).isRequired,
+    history: PropTypes.object,
+    componentsCount: PropTypes.number.isRequired
   }
 
   constructor(props) {
@@ -28,12 +30,13 @@ class Form extends React.Component {
       description: '',
       group_name: '',
       active: true,
-      status: 'operational'
+      status: 'operational',
+      sort_order: props.componentsCount + 1
     }, props.component);
 
     this.state = {
       inputs: {
-        ..._pick(['name', 'description', 'group_name', 'status', 'active'])(cmp),
+        ..._pick(['name', 'description', 'group_name', 'status', 'active', 'sort_order'])(cmp),
         new_group_name: ''
       },
       saving: false
@@ -55,12 +58,19 @@ class Form extends React.Component {
     // post to create the component
     apiGateway.post('/components', { component: this.state.inputs })
       .then(res => {
-        console.log(res);
+
+        // flash
         NotificationManager.success('Component successfully created');
-        this.setState({ saving: false });
+
+        // fire action to add the new component
+
+
+        // go back to listing
+        this.props.history.push('/admin/components');
+
       })
       .catch(err => {
-        console.log(err);
+        NotificationManager.error(err.message);
         this.setState({ saving: false });
       });
 

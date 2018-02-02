@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 import { NotificationManager } from 'react-notifications';
 
-import { execute } from '../lib/ajaxActions';
+import { execute } from '../lib/ajax-actions';
 import auth from '../../client/auth';
 
 class LoginForm extends Component {

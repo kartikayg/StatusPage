@@ -50,6 +50,7 @@
     "react-redux": "^5.0.5",
     "react-router-config": "^1.0.0-beta.4",
     "react-router-dom": "^4.0.0",
+    "react-sortable-hoc": "^0.6.8",
     "react-transition-group": "^2.2.1",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",

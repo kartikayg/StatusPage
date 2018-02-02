@@ -13,7 +13,7 @@ import { raw as routes } from '../shared/routes';
 import renderer from './renderer';
 
 import auth from './auth';
-import { apiGateway } from '../shared/lib/ajaxActions';
+import { apiGateway } from '../shared/lib/ajax-actions';
 
 /**
  * Sets up the express server

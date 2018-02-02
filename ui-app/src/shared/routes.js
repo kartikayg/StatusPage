@@ -10,7 +10,7 @@ import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 
 import ComponentsPage from './pages/admin/components';
-import { apiGateway } from '../shared/lib/ajaxActions';
+import { apiGateway } from '../shared/lib/ajax-actions';
 
 // raw routes array
 const raw = {
@@ -43,8 +43,8 @@ const raw = {
           title: 'Components',
           iconCls: 'browser',
           initialLoad: () => {
-            return apiGateway.get('/components').then(res => {
-              return { components: res, componentGroups: [] };
+            return apiGateway.get('/components').then(resp => {
+              return resp;
             });
           }
         }

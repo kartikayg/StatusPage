@@ -10,9 +10,12 @@ import PropTypes from 'prop-types';
 
 import List from './components/list';
 import Form from './components/form';
+import { groupComponents } from '../../redux/helper';
 
+/**
+ * Container for displaying all section of components
+ */
 const ComponentsDisplay = (props) => {
-
   return (
     <div>
       <Helmet>
@@ -21,12 +24,15 @@ const ComponentsDisplay = (props) => {
       <Switch>
         <Route key={`ROUTE_${Math.random()}`} exact path={props.match.path}
           render={(subProps) => {
-            return <List {...subProps} components={props.components} />;
+            return <List {...subProps} componentsByGroup={props.componentsByGroup} />;
           }}
         />
         <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add`}
           render={(subProps) => {
-            return <Form {...subProps} groups={props.groups} />;
+            return <Form {...subProps}
+                        groups={props.groups}
+                        componentsCount={props.components.length}
+                   />;
           }}
         />
       </Switch>
@@ -37,6 +43,7 @@ const ComponentsDisplay = (props) => {
 ComponentsDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   groups: PropTypes.arrayOf(PropTypes.object).isRequired,
+  componentsByGroup: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired
 };
 
@@ -44,7 +51,8 @@ ComponentsDisplay.propTypes = {
 const mapStateToProps = (state) => {
   return {
     components: state.components,
-    groups: state.componentGroups
+    groups: state.componentGroups,
+    componentsByGroup: groupComponents(state.components, state.componentGroups)
   };
 };
 
