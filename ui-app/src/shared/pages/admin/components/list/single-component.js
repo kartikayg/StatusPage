@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { SortableElement } from 'react-sortable-hoc';
 
-import { Icon as StatusIcon } from '../../../../components/component-status';
+import { StatusIcon } from '../../../../components/component-status';
 
 const SingleComponent = SortableElement(({ component }) => {
   return (
@@ -17,7 +17,7 @@ const SingleComponent = SortableElement(({ component }) => {
           <tr>
             <td><StatusIcon status={component.status} /> {component.name} {!component.active ? '(Inactive)' : ''}</td>
             <td className="right aligned">
-              <Link to='/admin/components/edit' className="ui button">Edit</Link>
+              <Link to={`/admin/components/edit/${component.id}`} className="ui button">Edit</Link>
             </td>
           </tr>
         </tbody>

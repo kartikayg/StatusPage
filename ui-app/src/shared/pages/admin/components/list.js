@@ -12,7 +12,7 @@ import ComponentsTable from './list/table';
 import { apiGateway } from '../../../lib/ajax-actions';
 
 /**
- *
+ * Listing of components
  */
 class Listing extends React.Component {
 
@@ -87,6 +87,7 @@ class Listing extends React.Component {
             useDragHandle={false}
             onSortEnd={this.onSortEnd}
             componentsByGroup={this.props.componentsByGroup}
+            distance={20}
           />
           <div style={{ marginTop: '2rem' }}>
             <i>* Drag to sort the components.</i>

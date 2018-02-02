@@ -4,6 +4,33 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Dropdown, Icon } from 'semantic-ui-react';
+
+const _map = require('lodash/fp/map').convert({ cap: false });
+
+// list of statuses
+const statuses = {
+  operational: {
+    displayName: 'Operational',
+    color: 'green'
+  },
+  degraded_performance: {
+    displayName: 'Degraded Performance',
+    color: 'yellow'
+  },
+  partial_outage: {
+    displayName: 'Partial Outage',
+    color: 'orange'
+  },
+  major_outage: {
+    displayName: 'Major Outage',
+    color: 'red'
+  },
+  maintenance: {
+    displayName: 'Maintenance',
+    color: 'blue'
+  }
+};
 
 /**
  * Returns the color based on the status
@@ -11,30 +38,52 @@ import PropTypes from 'prop-types';
  * @return {string}
  */
 const getColor = (status) => {
-  switch (status) {
-    case 'degraded_performance':
-      return 'yellow';
-    case 'partial_outage':
-      return 'orange';
-    case 'major_outage':
-      return 'red';
-    case 'maintenance':
-      return 'blue';
-    case 'operational':
-    default:
-      return 'green';
-  }
+  return statuses[status] ? statuses[status].color : 'green';
 };
 
 /**
  * Return the icon element to use to show the status
  */
-const Icon = ({ status }) => {
-  return <i className={`${getColor(status)} circle icon`}></i>;
+const StatusIcon = ({ status }) => {
+  return (
+    <Icon color={getColor(status)} name='circle' />
+  );
 };
 
-Icon.propTypes = {
+StatusIcon.propTypes = {
   status: PropTypes.string.isRequired
 };
 
-export { Icon };
+/**
+ * Select for statuses
+ */
+const StatusDropDown = ({ onChange, value }) => {
+
+  const options = _map((val, k) => {
+    return {
+      value: k,
+      text: (<div><StatusIcon status={k} /> {val.displayName}</div>)
+    };
+  })(statuses);
+
+  return (
+    <Dropdown
+      closeOnBlur
+      closeOnChange
+      fluid
+      selection
+      options={options}
+      value={value}
+      onChange={onChange}
+      selectOnBlur={false}
+    />
+  );
+
+};
+
+StatusDropDown.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired
+};
+
+export { StatusIcon, StatusDropDown };

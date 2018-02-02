@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import _pick from 'lodash/fp/pick';
 import { NotificationManager } from 'react-notifications';
 
+import { StatusDropDown } from '../../../components/component-status';
 import { apiGateway } from '../../../lib/ajax-actions';
 
 class Form extends React.Component {
@@ -18,8 +19,9 @@ class Form extends React.Component {
     groups: PropTypes.arrayOf(PropTypes.object).isRequired,
     history: PropTypes.object,
     componentsCount: PropTypes.number.isRequired,
-    onNewComponent: PropTypes.func.isRequired,
-    onNewGroup: PropTypes.func.isRequired
+    onNewComponent: PropTypes.func,
+    onNewGroup: PropTypes.func.isRequired,
+    onUpdateComponent: PropTypes.func
   }
 
   constructor(props) {
@@ -30,7 +32,6 @@ class Form extends React.Component {
     const cmp = Object.assign({
       name: '',
       description: '',
-      group_name: '',
       active: true,
       status: 'operational',
       sort_order: props.componentsCount + 1,
@@ -39,7 +40,7 @@ class Form extends React.Component {
 
     this.state = {
       inputs: {
-        ..._pick(['name', 'description', 'group_name', 'status', 'active', 'sort_order', 'group_id'])(cmp),
+        ..._pick(['name', 'description', 'status', 'active', 'sort_order', 'group_id'])(cmp),
         new_group_name: ''
       },
       saving: false,
@@ -48,16 +49,8 @@ class Form extends React.Component {
 
   }
 
-  // on save button click
-  onSaveClick = (e) => {
-
-    e.preventDefault();
-
-    if (this.state.saving) {
-      return;
-    }
-
-    this.setState({ saving: true });
+  // creates a component on the backend
+  createComponent() {
 
     // post to create the component
     apiGateway.post('/components', { component: this.state.inputs })
@@ -84,6 +77,53 @@ class Form extends React.Component {
 
   }
 
+  // updates a component on the backend
+  updateComponent() {
+
+    apiGateway.patch(`/components/${this.props.component.id}`, { component: this.state.inputs })
+      .then(res => {
+
+        // flash
+        NotificationManager.success('Component successfully updated');
+
+        // fire action to add the update component
+        this.props.onUpdateComponent(res.component);
+
+        if (res.newGroup) {
+          this.props.onNewGroup(res.newGroup);
+        }
+
+        // go back to listing
+        this.props.history.push('/admin/components');
+
+      })
+      .catch(err => {
+        NotificationManager.error(err.message);
+        this.setState({ saving: false });
+      });
+
+  }
+
+  // on save button click
+  onSaveClick = (e) => {
+
+    e.preventDefault();
+
+    if (this.state.saving) {
+      return;
+    }
+
+    this.setState({ saving: true });
+
+    if (this.props.component) {
+      this.updateComponent();
+    }
+    else {
+      this.createComponent();
+    }
+
+  }
+
   // on input change, update the state
   onInputChange = (e) => {
 
@@ -102,6 +142,8 @@ class Form extends React.Component {
 
   }
 
+  // on group select change. a special case to 
+  // handle creation of new group
   onGroupSelectChange = (e) => {
 
     const { value } = e.target;
@@ -113,6 +155,18 @@ class Form extends React.Component {
       this.onInputChange(e);
     }
 
+  }
+
+  // on status select change. its a fake drop down
+  onStatusSelectChange = (e, { value }) => {
+    this.setState(prevState => {
+      return {
+        inputs: {
+          ...prevState.inputs,
+          status: value
+        }
+      };
+    });
   }
 
   onCancelGroupCreation = (e) => {
@@ -150,16 +204,14 @@ class Form extends React.Component {
                 rows="4"
                 placeholder="Give a helpful description of what this component does"
                 onChange={this.onInputChange}
-                value={this.state.inputs.description}
+                value={this.state.inputs.description || ''}
               ></textarea>
             </div>
             {this.props.component &&
               <div className="field">
                 <label>Status</label>
-                <input
-                  type="text"
-                  name="status"
-                  onChange={this.onInputChange}
+                <StatusDropDown
+                  onChange={this.onStatusSelectChange}
                   value={this.state.inputs.status}
                 />
               </div>
@@ -191,7 +243,7 @@ class Form extends React.Component {
                   className="ui search dropdown"
                   name="group_id"
                   onChange={this.onGroupSelectChange}
-                  value={this.state.inputs.group_id}
+                  value={this.state.inputs.group_id || ''}
                 >
                     <option value="">No grouping for this component</option>
                     <option value="CREATE_A_NEW_GROUP">Create a new group</option>

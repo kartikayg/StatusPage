@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
+import { NotificationManager } from 'react-notifications';
 import _sortBy from 'lodash/fp/sortBy';
 
 import List from './components/list';
@@ -43,6 +44,29 @@ const ComponentsDisplay = (props) => {
                    />;
           }}
         />
+        <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/edit/:id`}
+          render={(subProps) => {
+
+            // find the component based on the id
+            const { id } = subProps.match.params;
+            const component = props.components.find(c => {
+              return c.id === id;
+            });
+
+            if (!component) {
+              NotificationManager.error('Component not found.');
+              subProps.history.push('/admin/components');
+            }
+
+            return <Form {...subProps}
+                        component={component}
+                        groups={props.groups}
+                        componentsCount={props.components.length}
+                        onNewGroup={props.addGroup}
+                        onUpdateComponent={props.updateComponent}
+                   />;
+          }}
+        />
       </Switch>
     </div>
   );
@@ -55,7 +79,8 @@ ComponentsDisplay.propTypes = {
   match: PropTypes.object.isRequired,
   updateComponentSortOrder: PropTypes.func.isRequired,
   addComponent: PropTypes.func.isRequired,
-  addGroup: PropTypes.func.isRequired
+  addGroup: PropTypes.func.isRequired,
+  updateComponent: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props to pass the display component
