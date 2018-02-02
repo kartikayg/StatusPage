@@ -30,7 +30,6 @@ export const groupComponents = (components, groups, onlyActive = false) => {
   // create object of group by keys
   const groupsById = _keyBy('id')(groups);
 
-
   // now loop through the components and group by group id. if a group is not
   // found or no group_id, its a standalone component
   const componentsByGroup = {};

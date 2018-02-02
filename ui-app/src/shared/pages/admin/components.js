@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 
 import List from './components/list';
 import Form from './components/form';
+import { updateComponent, updateComponentSortOrder } from '../../redux/actions';
+
 import { groupComponents } from '../../redux/helper';
 
 /**
@@ -24,7 +26,10 @@ const ComponentsDisplay = (props) => {
       <Switch>
         <Route key={`ROUTE_${Math.random()}`} exact path={props.match.path}
           render={(subProps) => {
-            return <List {...subProps} componentsByGroup={props.componentsByGroup} />;
+            return <List {...subProps}
+                         componentsByGroup={props.componentsByGroup}
+                         onComponentSortUpdate={props.updateComponentSortOrder}
+                   />;
           }}
         />
         <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add`}
@@ -44,7 +49,8 @@ ComponentsDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   groups: PropTypes.arrayOf(PropTypes.object).isRequired,
   componentsByGroup: PropTypes.arrayOf(PropTypes.object).isRequired,
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
+  updateComponentSortOrder: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props to pass the display component
@@ -56,9 +62,17 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateComponent: (component) => {
+      dispatch(updateComponent(component));
+    },
+    updateComponentSortOrder: (payload) => {
+      dispatch(updateComponentSortOrder(payload));
+    }
+  };
+};
 
-});
 
 const ComponentsPage = connect(
   mapStateToProps,

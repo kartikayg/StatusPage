@@ -2,21 +2,35 @@
  * @fileoverview Component state
  */
 
-import { COMPONENT_ADDED, COMPONENT_REFRESHED } from '../actions/types';
+import * as actionTypes from '../actions/types';
 
 const components = (state = [], action) => {
 
   switch (action.type) {
 
-    case COMPONENT_REFRESHED:
+    case actionTypes.COMPONENT_REFRESHED:
       return action.components;
 
-    case COMPONENT_ADDED:
+    // add a new component
+    case actionTypes.ADD_COMPONENT:
       return [...state, action.component];
+
+    // update a component
+    case actionTypes.UPDATE_COMPONENT:
+      return state.map(c => {
+        return (c.id === action.component.id) ? action.component : c;
+      });
+
+    // update just the sort order
+    case actionTypes.UPDATE_COMPONENT_SORT_ORDER:
+      return state.map(c => {
+        return (c.id === action.id) ? { ...c, sort_order: action.sortOrder } : c;
+      });
 
     default:
       return state;
   }
+
 };
 
 export default components;

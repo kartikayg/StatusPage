@@ -19,9 +19,9 @@ const Table = SortableContainer(({ componentsByGroup }) => {
     <div className="ui relaxed divided list">
       {componentsByGroup.map((cg, idx) => {
         if (cg.group_id) {
-          return <MultipleComponents key={cg.group_id} index={idx + 1} group={cg} />;
+          return <MultipleComponents key={cg.group_id} index={idx} group={cg} />;
         }
-        return <SingleComponent key={cg.components[0].id} index={idx + 1} component={cg.components[0]} />; // eslint-disable-line max-len
+        return <SingleComponent key={cg.components[0].id} index={idx} component={cg.components[0]} />; // eslint-disable-line max-len
       })}
     </div>
   );

@@ -98,6 +98,10 @@ const apiGateway = (function () {
 
     post(url, data, opts = {}) {
       return execute(url, 'post', { data, ...opts }, getInstance());
+    },
+
+    patch(url, data, opts = {}) {
+      return execute(url, 'patch', { data, ...opts }, getInstance());
     }
 
   };

@@ -1,10 +1,15 @@
 /**
- * @fileoverview
+ * @fileoverview Presentation component for component status.
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * Returns the color based on the status
+ * @param {string} status
+ * @return {string}
+ */
 const getColor = (status) => {
   switch (status) {
     case 'degraded_performance':
@@ -21,7 +26,9 @@ const getColor = (status) => {
   }
 };
 
-// return the icon used based on the status
+/**
+ * Return the icon element to use to show the status
+ */
 const Icon = ({ status }) => {
   return <i className={`${getColor(status)} circle icon`}></i>;
 };
