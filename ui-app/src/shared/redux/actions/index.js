@@ -5,6 +5,19 @@
 import * as actionTypes from './types';
 
 /**
+ * add component action
+ * @param {object} component - entire component object
+ * @return {object}
+ */
+export const addComponent = (component) => {
+  return {
+    type: actionTypes.ADD_COMPONENT,
+    component
+  };
+};
+
+
+/**
  * update component action
  * @param {object} component - entire component object
  * @return {object}

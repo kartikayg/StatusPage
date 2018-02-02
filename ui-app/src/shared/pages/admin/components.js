@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 
 import List from './components/list';
 import Form from './components/form';
-import { updateComponent, updateComponentSortOrder } from '../../redux/actions';
+import { addComponent, updateComponent, updateComponentSortOrder } from '../../redux/actions';
 
 import { groupComponents } from '../../redux/helper';
 
@@ -37,6 +37,7 @@ const ComponentsDisplay = (props) => {
             return <Form {...subProps}
                         groups={props.groups}
                         componentsCount={props.components.length}
+                        onNewComponent={props.addComponent}
                    />;
           }}
         />
@@ -50,7 +51,8 @@ ComponentsDisplay.propTypes = {
   groups: PropTypes.arrayOf(PropTypes.object).isRequired,
   componentsByGroup: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
-  updateComponentSortOrder: PropTypes.func.isRequired
+  updateComponentSortOrder: PropTypes.func.isRequired,
+  addComponent: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props to pass the display component
@@ -64,6 +66,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    addComponent: (component) => {
+      dispatch(addComponent(component));
+    },
     updateComponent: (component) => {
       dispatch(updateComponent(component));
     },

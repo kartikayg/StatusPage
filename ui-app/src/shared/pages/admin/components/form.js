@@ -17,7 +17,8 @@ class Form extends React.Component {
     component: PropTypes.object,
     groups: PropTypes.arrayOf(PropTypes.object).isRequired,
     history: PropTypes.object,
-    componentsCount: PropTypes.number.isRequired
+    componentsCount: PropTypes.number.isRequired,
+    onNewComponent: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -63,7 +64,7 @@ class Form extends React.Component {
         NotificationManager.success('Component successfully created');
 
         // fire action to add the new component
-
+        this.props.onNewComponent(res.component);
 
         // go back to listing
         this.props.history.push('/admin/components');
