@@ -142,7 +142,7 @@ class Form extends React.Component {
 
   }
 
-  // on group select change. a special case to 
+  // on group select change. a special case to
   // handle creation of new group
   onGroupSelectChange = (e) => {
 

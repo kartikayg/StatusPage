@@ -11,7 +11,7 @@ export default {
     localStorage.setItem(tokenKey, token);
   },
   get token() {
-    return localStorage.getItem(tokenKey, token);
+    return localStorage.getItem(tokenKey);
   },
   logout() {
     localStorage.removeItem(tokenKey);

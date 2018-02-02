@@ -5,6 +5,8 @@
 
 import axios from 'axios';
 
+import auth from '../../client/auth';
+
 // default timeout in ms
 const CALL_TIMEOUT = 5000;
 
@@ -75,9 +77,16 @@ const apiGateway = (function () {
     baseURL: `${process.env.API_GATEWAY_URI}/api/v1`
   });
 
+  // add client auth headers, if logged in
+  const clientAuthHeaders = {};
+  if (__CLIENT__ === true && auth.token) { // eslint-disable-line no-undef
+    clientAuthHeaders.Authorization = `JWT ${auth.token}`;
+  }
+
   const clientInstance = axios.create({
     timeout: CALL_TIMEOUT,
-    baseURL: 'http://localhost:6040/api/v1'
+    baseURL: 'http://localhost:6040/api/v1',
+    headers: clientAuthHeaders
   });
 
   const getInstance = () => {
