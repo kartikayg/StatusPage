@@ -16,6 +16,18 @@ export const addComponent = (component) => {
   };
 };
 
+/**
+ * add component group action
+ * @param {object} group - entire group object
+ * @return {object}
+ */
+export const addComponentGroup = (group) => {
+  return {
+    type: actionTypes.ADD_COMPONENT_GROUP,
+    group
+  };
+};
+
 
 /**
  * update component action

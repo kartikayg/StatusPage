@@ -1,9 +1,21 @@
 /**
- * @fileoverview Component Groups state
+ * @fileoverview Component group state
  */
 
+import { ADD_COMPONENT_GROUP } from '../actions/types';
+
 const componentGroups = (state = [], action) => {
-  return state;
+
+  switch (action.type) {
+
+    // add a new component
+    case ADD_COMPONENT_GROUP:
+      return [...state, action.group];
+
+    default:
+      return state;
+  }
+
 };
 
 export default componentGroups;

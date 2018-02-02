@@ -18,7 +18,8 @@ class Form extends React.Component {
     groups: PropTypes.arrayOf(PropTypes.object).isRequired,
     history: PropTypes.object,
     componentsCount: PropTypes.number.isRequired,
-    onNewComponent: PropTypes.func.isRequired
+    onNewComponent: PropTypes.func.isRequired,
+    onNewGroup: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -65,6 +66,10 @@ class Form extends React.Component {
 
         // fire action to add the new component
         this.props.onNewComponent(res.component);
+
+        if (res.newGroup) {
+          this.props.onNewGroup(res.newGroup);
+        }
 
         // go back to listing
         this.props.history.push('/admin/components');
