@@ -79,6 +79,13 @@ const init = (baseUrl) => {
   };
 
   /**
+   * Executes post call
+   */
+  const patch = (url, data, opts = {}) => {
+    return execute(url, 'patch', { data, ...opts });
+  };
+
+  /**
    * Executes remove call
    */
   const remove = (url, opts = {}) => {
@@ -88,6 +95,7 @@ const init = (baseUrl) => {
   return {
     get,
     post,
+    patch,
     remove
   };
 

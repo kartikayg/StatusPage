@@ -11,13 +11,22 @@ export default (componentRepo) => {
   router.route('/components')
 
     .get((req, res, next) => {
-      componentRepo.get().then(components => {
-        return res.json(components);
+      componentRepo.get().then(resp => {
+        return res.json(resp);
       }).catch(next);
     })
 
     .post((req, res, next) => {
       componentRepo.create(req.body.component).then(component => {
+        res.json(component);
+      }).catch(next);
+    });
+
+  router.route('/components/:componentId')
+
+    /** Update properties of a component */
+    .patch((req, res, next) => {
+      componentRepo.update(req.params.componentId, req.body.component).then(component => {
         res.json(component);
       }).catch(next);
     });

@@ -13,18 +13,17 @@ const init = () => {
   const repo = {
 
     // return all components and groups data combined
-    get() {
+    get: async () => {
 
       const cmpCall = instance.get('/components');
       const grpCall = instance.get('/component_groups');
 
-      return Promise.all([cmpCall, grpCall]).then((components, groups) => {
-        return [];
-        // return [{
-        //   id: 'test123',
-        //   name: 'API'
-        // }];
-      });
+      const res = await Promise.all([cmpCall, grpCall]);
+
+      return {
+        components: res[0],
+        componentGroups: res[1]
+      };
 
     },
 
@@ -38,10 +37,7 @@ const init = () => {
     create: async (componentData) => {
 
       // base component data
-      const cmpData = Object.assign(
-        { sort_order: 1 },
-        _pick(['name', 'description', 'active', 'status', 'group_id'])(componentData),
-      );
+      const cmpData = _pick(['name', 'description', 'active', 'status', 'group_id', 'sort_order'])(componentData);
 
       const resp = {};
 
@@ -77,6 +73,19 @@ const init = () => {
 
       return resp;
 
+    },
+
+    /**
+     * Updates a component. It suppors partial data updates.
+     * @param {string} id
+     * @param {object} data
+     * @return {Promise}
+     *  on success, { component }
+     *  on failure, error
+     */
+    update: async (id, data) => {
+      const res = await instance.patch(`/components/${id}`, { component: data });
+      return res;
     }
 
   };
