@@ -9,6 +9,8 @@ import authRoutes from './auth';
 
 import thisPackage from '../../../../../package.json';
 
+import authM from '../../../middleware/authenticate';
+
 /**
  * Return routes
  */
@@ -26,11 +28,13 @@ export default (repos) => {
     });
   });
 
+  const authMiddleware = authM(repos.auth);
+
   // auth
   router.use(authRoutes(repos.auth));
 
   // add routes for external microservices
-  router.use(componentRoutes(repos.components));
+  router.use(componentRoutes(repos.components, authMiddleware));
 
   return router;
 

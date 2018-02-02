@@ -14,23 +14,37 @@ export default (authRepo) => {
   return async (req, res, next) => {
 
     let user;
-    let message;
+    let errMessage;
 
-    const { token } = req;
+    const rawToken = req.get('Authorization');
 
-    if (!token) {
-      message = 'No authorization token passed in the header.';
+    if (!rawToken) {
+      errMessage = 'No authorization token passed in the header.';
     }
     else {
-      user = await authRepo.verifyToken(token);
-      if (user === false) {
-        message = 'Invalid/Expired authorization token passed.';
+      const parts = rawToken.split(' ');
+      if (parts.length !== 2) {
+        errMessage = 'Invalid authorization token passed.';
+      }
+      else {
+        const scheme = parts[0];
+        const credentials = parts[1];
+
+        if (/^JWT$/i.test(scheme)) {
+          user = await authRepo.verifyToken(credentials);
+          if (user === false) {
+            errMessage = 'Invalid authorization token passed';
+          }
+        }
+        else {
+          errMessage = 'Invalid authorization token passed.';
+        }
       }
     }
 
     // not valid
-    if (message) {
-      res.status(httpStatus.Unauthorized).json({ message });
+    if (errMessage) {
+      res.status(httpStatus.UNAUTHORIZED).json({ message: errMessage });
     }
     else {
       req.user = user;

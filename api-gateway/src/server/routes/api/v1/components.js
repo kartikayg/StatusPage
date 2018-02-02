@@ -4,7 +4,7 @@
 
 import express from 'express';
 
-export default (componentRepo) => {
+export default (componentRepo, authMiddleware) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
@@ -16,7 +16,7 @@ export default (componentRepo) => {
       }).catch(next);
     })
 
-    .post((req, res, next) => {
+    .post(authMiddleware, (req, res, next) => {
       componentRepo.create(req.body.component).then(component => {
         res.json(component);
       }).catch(next);
@@ -25,7 +25,7 @@ export default (componentRepo) => {
   router.route('/components/:componentId')
 
     /** Update properties of a component */
-    .patch((req, res, next) => {
+    .patch(authMiddleware, (req, res, next) => {
       componentRepo.update(req.params.componentId, req.body.component).then(component => {
         res.json(component);
       }).catch(next);
