@@ -16,16 +16,20 @@ case "$1" in
   test)
     ## stop any old leftover services. there shouldn't be, but still.
     docker-compose -f test.yml stop && \
-    docker-compose -f test.yml run test_api && \
+    docker-compose -f test.yml run test_ui-app && \
     docker-compose -f test.yml stop \
     ;;
-   
+
   lint)
-    docker-compose -f docker-compose-dev.yml run --rm --no-deps api npm run lint
+    docker-compose -f docker-compose-dev.yml run --rm --no-deps ui-app npm run lint
+    ;;
+
+  npm)
+    docker-compose -f docker-compose-dev.yml run --rm --no-deps ui-app $@
     ;;
 
   *)
-    echo $"Usage: $0 {start|stop|test|lint}"
+    echo $"Usage: $0 {start|stop|test|lint|npm}"
     exit 1
 
 esac

@@ -8,14 +8,16 @@
     "dev": "npm-run-all -p dev:*",
     "dev:build-server": "webpack --config webpack.server.js --watch",
     "dev:build-client": "webpack --config webpack.client.js --watch",
-    "dev:server": "nodemon --watch dist --exec \"node dist/server.js\""
+    "dev:server": "nodemon --watch dist --exec \"node dist/server.js\"",
+    "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register --exit 'src/**/*.spec.js'"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "autoprefixer": "^7.2.5",
     "babel-cli": "^6.24.0",
-    "babel-core": "^6.24.0",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.1",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -23,12 +25,15 @@
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-1": "^6.24.1",
+    "chai": "^4.1.2",
     "copy-webpack-plugin": "^4.3.1",
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-lodash-fp": "^2.1.3",
     "eslint-plugin-react": "^7.5.1",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^5.0.0",
     "nodemon": "^1.14.11",
     "npm-run-all": "^4.1.2",
     "style-loader": "^0.19.1",
@@ -59,5 +64,20 @@
     "semantic-ui-react": "^0.77.2",
     "serialize-javascript": "^1.4.0",
     "webpack-node-externals": "^1.5.4"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
   }
 }

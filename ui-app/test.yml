@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  test_ui-app:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - 6051:6051
+    command: ["npm", "run", "test:coverage"]
+    env_file:
+      - test.env
