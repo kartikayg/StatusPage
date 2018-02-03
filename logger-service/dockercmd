@@ -21,9 +21,14 @@ case "$1" in
    
   lint)
     docker-compose -f docker-compose-dev.yml run --rm --no-deps logger npm run lint
-    ;; 
+    ;;
+
+  npm)
+    docker-compose -f docker-compose-dev.yml run --rm --no-deps api-gateway $@
+    ;;
+
   *)
-    echo $"Usage: $0 {start|stop|test|lint}"
+    echo $"Usage: $0 {start|stop|test|lint|npm}"
     exit 1
 
 esac
