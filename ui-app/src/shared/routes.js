@@ -32,7 +32,7 @@ const raw = {
       routes: [
         {
           path: '/admin/dashboard',
-          component: ComponentsPage,
+          component: DashboardPage,
           exact: true,
           title: 'Dashboard',
           iconCls: 'dashboard'

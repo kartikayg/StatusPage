@@ -29,7 +29,11 @@ const Sidebar = ({ currentLocation, menu }) => {
       style={{ width: 200 }}
     >
       {menu.map(m => {
-        return <Item route={m} key={m.title} isActive={currentLocation.pathname === m.path} />;
+        return <Item
+                  route={m}
+                  key={m.title}
+                  isActive={currentLocation.pathname.startsWith(m.path)}
+                />;
       })}
     </div>
   );
