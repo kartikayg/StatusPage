@@ -65,13 +65,15 @@ describe('repo/components', function () {
   // on before, setup mockery
   before(function () {
 
+    delete require.cache[require.resolve('../lib/external-client')];
+    delete require.cache[require.resolve('./components')];
+
+
     // setup mockery for the client module. this way if we change
     // from axios to something else, we don't need to worry from
     // testing stand point of view.
     mockery.enable({ warnOnUnregistered: false });
     mockery.registerMock('../lib/external-client', externalClientMock);
-
-    delete require.cache[require.resolve('../lib/external-client')];
 
     repo = require('./components').init();
 
@@ -82,6 +84,7 @@ describe('repo/components', function () {
     mockery.deregisterMock('../lib/external-client');
     mockery.disable();
     delete require.cache[require.resolve('../lib/external-client')];
+    delete require.cache[require.resolve('./components')];
   });
 
   beforeEach(function() {

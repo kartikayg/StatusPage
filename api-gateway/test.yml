@@ -10,14 +10,28 @@ services:
       - "6042:6042"
     command: ["npm", "run", "test:coverage"]
     environment:
-      COMPONENTS_URI: http://components_service:6010/api
+      COMPONENTS_URI: http://fake_components_service
     env_file:
       - test.env
     depends_on:
       - test_messagingqueue
       - test_redis
+      - fake_components_service
+
+  fake_components_service:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["node", "test/fake-components-service"]
+    environment:
+      PORT: 80
+    expose:
+      - 80
+
   test_redis:
       image: "redis"
+
   test_messagingqueue:
     hostname: testcomponentservice
     image: rabbitmq:3.6.6-management
