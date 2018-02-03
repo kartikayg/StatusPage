@@ -13,9 +13,18 @@ services:
       - .env
     depends_on:
       - db
+    networks:
+      default:
+        aliases:
+          - incidents_service
   db:
     image: "mongo:3.4"
     volumes:
       - ./mongodata:/data/db
     ports:
       - 6021:27017
+
+networks:
+  default:
+    external:
+      name: status_page_app
