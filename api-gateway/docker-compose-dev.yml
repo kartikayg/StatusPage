@@ -12,9 +12,9 @@ services:
     env_file:
       - .env
     environment:
-      COMPONENTS_URI: http://components_service:6010/api
-      INCIDENTS_URI: http://incidents_service:6020/api
-      NOTIFICATION_URI: http://notification_service:6030/api
+      COMPONENTS_SERVICE_URI: http://components_service:6010/api
+      INCIDENTS_SERVICE_URI: http://incidents_service:6020/api
+      NOTIFICATION_SERVICE_URI: http://notification_service:6030/api
     networks:
       default:
         aliases:

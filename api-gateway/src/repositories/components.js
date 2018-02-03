@@ -6,7 +6,7 @@ import _pick from 'lodash/fp/pick';
 import client from '../lib/external-client';
 
 // base client instance
-const instance = client.init(process.env.COMPONENTS_URI);
+const instance = client.init(process.env.COMPONENTS_SERVICE_URI);
 
 /**
  * Creates a component group if not already existed.

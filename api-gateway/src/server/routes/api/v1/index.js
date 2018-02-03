@@ -4,12 +4,12 @@
 
 import express from 'express';
 
-import componentRoutes from './components';
 import authRoutes from './auth';
+import componentRoutes from './components';
+import incidentsRoutes from './incidents';
+import authM from '../../../middleware/authenticate';
 
 import thisPackage from '../../../../../package.json';
-
-import authM from '../../../middleware/authenticate';
 
 /**
  * Return routes
@@ -35,6 +35,7 @@ export default (repos) => {
 
   // add routes for external microservices
   router.use(componentRoutes(repos.components, authMiddleware));
+  router.use(incidentsRoutes(repos.incidents, authMiddleware));
 
   return router;
 

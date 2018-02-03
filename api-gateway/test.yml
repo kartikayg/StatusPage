@@ -10,7 +10,7 @@ services:
       - "6042:6042"
     command: ["npm", "run", "test:coverage"]
     environment:
-      COMPONENTS_URI: http://fake_components_service
+      COMPONENTS_SERVICE_URI: http://fake_components_service
     env_file:
       - test.env
     depends_on:
