@@ -10,6 +10,7 @@ import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 
 import ComponentsPage from './pages/admin/components';
+import IncidentsPage from './pages/admin/incidents';
 import { apiGateway } from '../shared/lib/ajax-actions';
 
 // raw routes array
@@ -46,6 +47,27 @@ const raw = {
             return apiGateway.get('/components').then(resp => {
               return resp;
             });
+          }
+        },
+        {
+          path: '/admin/incidents',
+          component: IncidentsPage,
+          title: 'Incidents',
+          iconCls: 'warning sign',
+          initialLoad: () => {
+
+            // get components and incidents
+            const components = apiGateway.get('/components');
+            const incidents  = apiGateway.get('/incidents');
+
+            return Promise.all([components, incidents]).then(resp => {
+              return {
+                components: resp[0].components || [],
+                componentGroups: resp[0].componentGroups || [],
+                incidents: resp[1] || []
+              };
+            });
+
           }
         }
       ],
