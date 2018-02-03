@@ -89,6 +89,18 @@ describe('src/lib/external-client', function () {
 
   });
 
+  it ('should call axios instance for patch call', function (done) {
+
+    const data = { domain: 'test.com' };
+
+    baseClient.patch('/test', data).then((resp) => {
+      sinon.assert.calledOnce(instanceSpy);
+      sinon.assert.calledWith(instanceSpy, { url: '/test', method: 'patch', data });
+      assert.equal(resp, 'data');
+      done();
+    });
+  });
+
   it ('should call axios instance for delete call', function (done) {
     baseClient.remove('/test').then((resp) => {
       sinon.assert.calledOnce(instanceSpy);

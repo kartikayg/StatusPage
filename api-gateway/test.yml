@@ -9,6 +9,8 @@ services:
     ports:
       - "6042:6042"
     command: ["npm", "run", "test:coverage"]
+    environment:
+      COMPONENTS_URI: http://components_service:6010/api
     env_file:
       - test.env
     depends_on:
