@@ -8,6 +8,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import { NotificationManager } from 'react-notifications';
+import _sortBy from 'lodash/fp/sortBy';
 
 import List from './incidents/list';
 import * as rActions from '../../redux/actions/incidents';
@@ -22,9 +23,17 @@ const IncidentsDisplay = (props) => {
         <title>Incidents</title>
       </Helmet>
       <Switch>
-        <Route key={`ROUTE_${Math.random()}`} exact path={props.match.path}
+        <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add`}
           render={(subProps) => {
-            return <List {...subProps} />;
+          }}
+        />
+        <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add_maintenance`}
+          render={(subProps) => {
+          }}
+        />
+        <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/:tab?`}
+          render={(subProps) => {
+            return <List {...subProps} incidents={props.incidents} />;
           }}
         />
       </Switch>
@@ -33,12 +42,16 @@ const IncidentsDisplay = (props) => {
 };
 
 IncidentsDisplay.propTypes = {
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
+  components: PropTypes.arrayOf(PropTypes.object).isRequired,
+  incidents: PropTypes.object.isRequired
 };
 
-// mapping redux state and actions to props to pass the display component
+// mapping redux state and actions to props
 const mapStateToProps = (state) => {
   return {
+    components: _sortBy(['sort_order', 'created_at'])(state.components),
+    incidents: { realtime: [], scheduled: [] }
   };
 };
 

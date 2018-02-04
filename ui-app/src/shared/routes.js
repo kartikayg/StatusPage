@@ -58,7 +58,7 @@ const raw = {
 
             // get components and incidents
             const components = apiGateway.get('/components');
-            const incidents  = apiGateway.get('/incidents');
+            const incidents = apiGateway.get('/incidents');
 
             return Promise.all([components, incidents]).then(resp => {
               return {
