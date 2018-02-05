@@ -12,12 +12,12 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      - components_db
     networks:
       default:
         aliases:
           - components_service
-  db:
+  components_db:
     image: "mongo:3.4"
     volumes:
       - ./mongodata:/data/db
