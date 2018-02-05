@@ -4,13 +4,13 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
-import { NotificationManager } from 'react-notifications';
 import _sortBy from 'lodash/fp/sortBy';
 
 import List from './incidents/list';
+import NewIncident from './incidents/create';
 import * as rActions from '../../redux/actions/incidents';
 
 /**
@@ -23,11 +23,19 @@ const IncidentsDisplay = (props) => {
         <title>Incidents</title>
       </Helmet>
       <Switch>
-        <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add`}
+        <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/add/:type?`}
+          render={(subProps) => {
+            if (props.components.length === 0) {
+              return <Redirect to="/admin/components" />;
+            }
+            return <NewIncident {...subProps} components={props.components} />;
+          }}
+        />
+        <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/edit/:id`}
           render={(subProps) => {
           }}
         />
-        <Route key={`ROUTE_${Math.random()}`} exact path={`${props.match.path}/add_maintenance`}
+        <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/view/:id`}
           render={(subProps) => {
           }}
         />
@@ -42,6 +50,7 @@ const IncidentsDisplay = (props) => {
 };
 
 IncidentsDisplay.propTypes = {
+  history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.object.isRequired

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Presentation component for component status.
+ * @fileoverview Presentation components for component-status.
  */
 
 import React from 'react';

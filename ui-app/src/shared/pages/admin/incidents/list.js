@@ -35,7 +35,8 @@ class Listing extends React.Component {
     const noBorder = {
       borderLeft: '0px',
       borderRight: '0px',
-      borderBottom: '0px'
+      borderBottom: '0px',
+      paddingLeft: '0px'
     };
 
     const realtimeTabClass = classNames('item', { active: this.state.tab === 'realtime' });

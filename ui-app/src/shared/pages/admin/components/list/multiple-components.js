@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { SortableElement } from 'react-sortable-hoc';
 
-import { StatusIcon } from '../../../../components/component-status';
+import { StatusIcon } from '../../../../presentation/component-status';
 
 const MultipleComponents = SortableElement(({ group }) => {
   return (

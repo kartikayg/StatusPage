@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import _pick from 'lodash/fp/pick';
 import { NotificationManager } from 'react-notifications';
 
-import { StatusDropDown } from '../../../components/component-status';
+import { StatusDropDown } from '../../../presentation/component-status';
 import { apiGateway } from '../../../lib/ajax-actions';
 
 class Form extends React.Component {
