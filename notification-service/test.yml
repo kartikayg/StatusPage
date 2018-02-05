@@ -12,9 +12,9 @@ services:
     env_file:
       - test.env
     depends_on:
-      - test_db
+      - test_notification_db
       - test_messagingqueue
-  test_db:
+  test_notification_db:
     image: "mongo:3.4"
     ports:
       - 6033:27017
