@@ -57,7 +57,7 @@ StatusIcon.propTypes = {
 /**
  * Select for statuses
  */
-const StatusDropDown = ({ onChange, value }) => {
+const StatusDropDown = ({ onChange, value, readOnly, name }) => {
 
   const options = _map((val, k) => {
     return {
@@ -76,6 +76,8 @@ const StatusDropDown = ({ onChange, value }) => {
       value={value}
       onChange={onChange}
       selectOnBlur={false}
+      disabled={readOnly || false}
+      name={name}
     />
   );
 
@@ -83,7 +85,9 @@ const StatusDropDown = ({ onChange, value }) => {
 
 StatusDropDown.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
+  readOnly: PropTypes.bool,
+  name: PropTypes.string.isRequired
 };
 
 export { StatusIcon, StatusDropDown };

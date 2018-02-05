@@ -41,6 +41,7 @@ export default (req, store, context) => {
         ${helmet.link.toString()}
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
         <link rel="stylesheet" type="text/css" href="/public/css/notifications.css">
+        <link rel="stylesheet" type="text/css" href="/public/css/override.css">
       </head>
       <body>
         <div id="root">${html}</div>

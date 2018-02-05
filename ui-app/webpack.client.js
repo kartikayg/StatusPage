@@ -25,6 +25,11 @@ module.exports = {
         to: path.resolve(__dirname, './dist/public/css')
       },
       {
+        context: path.resolve(__dirname, './src/shared/assets/css/'),
+        from: '*.css',
+        to: path.resolve(__dirname, './dist/public/css')
+      },
+      {
         context: path.resolve(__dirname, './node_modules/react-notifications/lib/fonts/'),
         from: '*.*',
         to: path.resolve(__dirname, './dist/public/css/fonts/')
