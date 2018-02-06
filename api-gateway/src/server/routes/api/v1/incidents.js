@@ -14,6 +14,12 @@ export default (incidentRepo, authMiddleware) => {
       incidentRepo.get().then(resp => {
         return res.json(resp);
       }).catch(next);
+    })
+
+    .post(authMiddleware, (req, res, next) => {
+      incidentRepo.create(req.body.incident).then(resp => {
+        return res.json(resp);
+      }).catch(next);
     });
 
   return router;

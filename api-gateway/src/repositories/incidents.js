@@ -16,8 +16,13 @@ const init = () => {
 
     // return all incidents
     get: async () => {
-      const inc = await instance.get('/incidents');
-      return inc;
+      const incidents = await instance.get('/incidents');
+      return incidents;
+    },
+
+    create: async (data) => {
+      const incident = await instance.post('/incidents', { incident: data });
+      return incident;
     }
 
   };

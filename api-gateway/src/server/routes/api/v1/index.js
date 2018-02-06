@@ -37,6 +37,18 @@ export default (repos) => {
   router.use(componentRoutes(repos.components, authMiddleware));
   router.use(incidentsRoutes(repos.incidents, authMiddleware));
 
+  // generic error handler. if there is any special case/override, it should be
+  // handled by the route.
+  router.use((err, req, res, next) => {
+
+    if (err.httpStatus) {
+      return res.status(err.httpStatus).json({ message: err.message });
+    }
+
+    return next(err);
+
+  });
+
   return router;
 
 };
