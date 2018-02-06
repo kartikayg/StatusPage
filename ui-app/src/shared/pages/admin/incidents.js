@@ -11,7 +11,8 @@ import _sortBy from 'lodash/fp/sortBy';
 
 import List from './incidents/list';
 import NewIncident from './incidents/create';
-import * as rActions from '../../redux/actions/incidents';
+import * as incActions from '../../redux/actions/incidents';
+import { updateComponentStatus } from '../../redux/actions/components';
 
 /**
  * Container for displaying all section of components
@@ -28,7 +29,11 @@ const IncidentsDisplay = (props) => {
             if (props.components.length === 0) {
               return <Redirect to="/admin/components" />;
             }
-            return <NewIncident {...subProps} components={props.components} />;
+            return <NewIncident {...subProps}
+                      components={props.components}
+                      updateComponentStatus={props.updateComponentStatus}
+                      addIncident={props.addIncident}
+                   />;
           }}
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/edit/:id`}
@@ -53,7 +58,9 @@ IncidentsDisplay.propTypes = {
   history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
-  incidents: PropTypes.object.isRequired
+  incidents: PropTypes.object.isRequired,
+  updateComponentStatus: PropTypes.func.isRequired,
+  addIncident: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props
@@ -66,6 +73,12 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    addIncident: (incident) => {
+      dispatch(incActions.addIncident(incident));
+    },
+    updateComponentStatus: (payload) => {
+      dispatch(updateComponentStatus(payload));
+    }
   };
 };
 

@@ -55,3 +55,18 @@ export const updateComponentSortOrder = ({ id, sort_order }) => { // eslint-disa
     sortOrder: sort_order
   };
 };
+
+/**
+ * update component status
+ * @param {object}
+ *  id - component id
+ *  status - status
+ * @return {object}
+ */
+export const updateComponentStatus = ({ id, status }) => {
+  return {
+    type: actionTypes.UPDATE_COMPONENT_STATUS,
+    id,
+    status
+  };
+};

@@ -7,22 +7,31 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import _pick from 'lodash/fp/pick';
-const _each = require('lodash/fp/each').convert({ cap: false });
+import { NotificationManager } from 'react-notifications';
 
+import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
 
+const _each = require('lodash/fp/each').convert({ cap: false });
+
 // statuses for incident
-const statuses = [
+const incidentStatuses = [
   { key: 'investigating', value: 'Investigating' },
   { key: 'identified', value: 'Identified' },
   { key: 'monitoring', value: 'Monitoring' },
   { key: 'resolved', value: 'Resolved' }
 ];
 
+const componentStatusesOrder = [
+  'operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'
+];
+
 class Form extends React.Component {
 
   static propTypes = {
-    components: PropTypes.arrayOf(PropTypes.object).isRequired
+    components: PropTypes.arrayOf(PropTypes.object).isRequired,
+    onComponentStatusUpdate: PropTypes.func.isRequired,
+    onNewIncident: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -34,7 +43,8 @@ class Form extends React.Component {
     props.components.forEach(c => {
       cmpState[c.id] = {
         checked: false,
-        status: c.status
+        status: c.status,
+        originalStatus: c.status
       };
     });
 
@@ -130,8 +140,13 @@ class Form extends React.Component {
 
   }
 
+  saveIncident = async (data) => {
+    const res = await apiGateway.post('/incidents', { incident: data });
+    return res;
+  }
+
   // on submit button click
-  onSaveClick = (e) => {
+  onSaveClick = async (e) => {
 
     e.preventDefault();
 
@@ -139,27 +154,79 @@ class Form extends React.Component {
       return;
     }
 
-    this.setState({ saving: true });
+    /* eslint-disable function-paren-newline */
 
-    // create data object
-    const data = _pick([
-      'name',
-      'status',
-      'message',
-      'do_notify_subscribers',
-      'type']
-    )(this.state.inputs);
+    this.setState({ saving: true }, async () => {
 
-    data.components = {};
+      try {
 
-    // add components that are checked
-    _each((o, id) => {
-      if (o.checked == true) {
-        data.components[id] = o.status;
+        const impactedComponents = [];
+        const updatedComponentsCall = [];
+
+        _each((o, id) => {
+          if (o.checked === true) {
+            impactedComponents.push({ id, status: o.status });
+            // the status also changed, so lets update it
+            if (o.status !== o.originalStatus) {
+              const c = { id, status: o.status };
+              updatedComponentsCall.push(
+                apiGateway.patch(`/components/${c.id}`, { component: c })
+              );
+            }
+          }
+        })(this.state.inputs.components);
+
+        // first, lets update the component status
+        const cmpUpdRes = await Promise.all(updatedComponentsCall);
+
+        // create incident data object
+        const incData = _pick([
+          'name',
+          'status',
+          'message',
+          'do_notify_subscribers',
+          'type']
+        )(this.state.inputs);
+
+        incData.components = impactedComponents.map(c => {
+          return c.id;
+        });
+
+        if (impactedComponents.length > 0) {
+          incData.components_impact_status = impactedComponents.reduce((hStatus, { status }) => {
+            // find position of the statuses and return the highest
+            const hPos = componentStatusesOrder.indexOf(hStatus);
+            const cPos = componentStatusesOrder.indexOf(status);
+            return hPos > cPos ? hStatus : status;
+          }, impactedComponents[0].status);
+        }
+
+        const savedIncident = await this.saveIncident(incData);
+
+        this.setState({ saving: false }, () => {
+
+          // update redux
+          cmpUpdRes.forEach(({ component }) => {
+            this.props.onComponentStatusUpdate({
+              id: component.id, status: component.status
+            });
+          });
+
+          this.props.onNewIncident(savedIncident);
+
+          NotificationManager.success('Incident successfully created');
+
+        });
+
       }
-    })(this.state.inputs.components);
+      catch (err) {
+        this.setState({ saving: false });
+        NotificationManager.error(err.message);
+      }
 
-    
+    });
+
+    /* eslint-enable function-paren-newline */
 
   }
 
@@ -190,7 +257,7 @@ class Form extends React.Component {
             onChange={this.onInputChange}
             value={this.state.inputs.status}
           >
-            {statuses.map(s => {
+            {incidentStatuses.map(s => {
               return <option key={s.key} value={s.key}>{s.value}</option>;
             })}
           </select>

@@ -56,10 +56,12 @@ class AdminPage extends React.Component {
         const rect = body.getBoundingClientRect();
         const isMobile = rect.width - RATIO < WIDTH;
 
-        this.setState({
-          sidebarActive: !isMobile,
-          isMobile
-        });
+        if (this.state.isMobile !== isMobile) {
+          this.setState({
+            sidebarActive: !isMobile,
+            isMobile
+          });
+        }
 
       }
     };

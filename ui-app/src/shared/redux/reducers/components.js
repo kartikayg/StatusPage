@@ -27,6 +27,12 @@ const components = (state = [], action) => {
         return (c.id === action.id) ? { ...c, sort_order: action.sortOrder } : c;
       });
 
+    // update just the status
+    case actionTypes.UPDATE_COMPONENT_STATUS:
+      return state.map(c => {
+        return (c.id === action.id) ? { ...c, status: action.status } : c;
+      });
+
     default:
       return state;
   }
