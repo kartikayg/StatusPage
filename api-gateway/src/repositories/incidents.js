@@ -20,6 +20,7 @@ const init = () => {
       return incidents;
     },
 
+    // create a new incident
     create: async (data) => {
       const incident = await instance.post('/incidents', { incident: data });
       return incident;
