@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Incident related actions
  */
 
 import * as actionTypes from './types';

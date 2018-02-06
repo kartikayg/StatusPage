@@ -1,5 +1,6 @@
 /**
- * @fileoverview
+ * @fileoverview Shell for creating a new incident. This will render
+ * the correct component based on the type.
  */
 import React from 'react';
 import PropTypes from 'prop-types';

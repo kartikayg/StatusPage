@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Form for a new/update realtime incident
  */
 
 import React from 'react';
@@ -192,6 +192,7 @@ class Form extends React.Component {
           return c.id;
         });
 
+        // calculate the highest impacted component status
         if (impactedComponents.length > 0) {
           incData.components_impact_status = impactedComponents.reduce((hStatus, { status }) => {
             // find position of the statuses and return the highest
