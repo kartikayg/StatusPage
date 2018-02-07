@@ -40,15 +40,15 @@ export default (req, store, context) => {
         ${helmet.meta.toString()}
         ${helmet.link.toString()}
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
-        <link rel="stylesheet" type="text/css" href="/public/css/notifications.css">
-        <link rel="stylesheet" type="text/css" href="/public/css/override.css">
+        <link rel="stylesheet" href="/public/app.styles.css"></link>
       </head>
       <body>
         <div id="root">${html}</div>
         <script>
           window.__PRELOADED_STATE__ = ${serialize(store.getState())}
         </script>
-        <script type=text/javascript src="/public/js/client.bundle.js"></script>
+        <script type=text/javascript src="/public/vendor.bundle.js"></script>
+        <script type=text/javascript src="/public/app.bundle.js"></script>
       </body>
     </html>
   `;
