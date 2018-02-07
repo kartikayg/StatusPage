@@ -57,7 +57,7 @@ StatusIcon.propTypes = {
 /**
  * Select for statuses
  */
-const StatusDropDown = ({ onChange, value, readOnly, name }) => {
+const StatusDropDown = (props) => {
 
   const options = _map((val, k) => {
     return {
@@ -66,6 +66,13 @@ const StatusDropDown = ({ onChange, value, readOnly, name }) => {
     };
   })(statuses);
 
+  if (props.optional === true) {
+    options.unshift({
+      value: '',
+      text: '-- Select a value --'
+    });
+  }
+
   return (
     <Dropdown
       closeOnBlur
@@ -73,11 +80,12 @@ const StatusDropDown = ({ onChange, value, readOnly, name }) => {
       fluid
       selection
       options={options}
-      value={value}
-      onChange={onChange}
+      value={props.value}
+      onChange={props.onChange}
       selectOnBlur={false}
-      disabled={readOnly || false}
-      name={name}
+      disabled={props.readOnly || false}
+      name={props.name}
+      placeholder='-- Select a value --'
     />
   );
 
@@ -87,7 +95,14 @@ StatusDropDown.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
   readOnly: PropTypes.bool,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
+  optional: PropTypes.bool
+};
+
+// Specifies the default values for props:
+StatusDropDown.defaultProps = {
+  name: 'component-status'
 };
 
 export { StatusIcon, StatusDropDown };
+

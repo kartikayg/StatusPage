@@ -18,7 +18,7 @@ module.exports = {
       '__CLIENT__': true,
       '__SERVER__': false
     }),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI']),
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI', 'TIMEZONE']),
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, './node_modules/react-notifications/lib/notifications.css'),

@@ -6,6 +6,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import NewRealtime from './realtime/create';
+import NewBackfilled from './backfilled/create';
 
 const NewIncident = (props) => {
 
@@ -14,6 +15,7 @@ const NewIncident = (props) => {
   return (
     <div>
       {type === 'realtime' && <NewRealtime {...props} />}
+      {type === 'backfilled' && <NewBackfilled {...props} />}
     </div>
   );
 };
