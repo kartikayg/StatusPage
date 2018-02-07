@@ -40,7 +40,7 @@ const init = (dao, messagingQueue) => {
     incUpdateObj.status = 'resolved';
 
     // build incident object
-    let incidentObj = Object.assign(_pick(['name'])(data), {
+    let incidentObj = Object.assign(_pick(['name', 'components_impact_status'])(data), {
       components: null,
       type: INCIDENT_TYPE,
       updates: [incUpdateObj]

@@ -12,7 +12,7 @@ services:
     env_file:
       - test.env
     depends_on:
-      - test_db
+      - test_incidents_db
       - test_messagingqueue
   test_incidents_db:
     image: "mongo:3.4"

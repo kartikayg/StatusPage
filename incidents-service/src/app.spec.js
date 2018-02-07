@@ -469,7 +469,8 @@ describe('app - integration tests', function () {
         const newIncidentObj = {
           name: 'backfilled incident',
           message: 'API was not working',
-          type: 'backfilled'
+          type: 'backfilled',
+          'components_impact_status': 'partial_outage'
         };
 
         agent
@@ -492,6 +493,7 @@ describe('app - integration tests', function () {
               components: null,
               created_at: staticCurrentTime.toISOString(),
               updated_at: staticCurrentTime.toISOString(),
+              components_impact_status: 'partial_outage',
               updates:[{
                 message: 'API was not working',
                 status: 'resolved',

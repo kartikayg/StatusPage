@@ -129,7 +129,10 @@ describe('entity/incident', function() {
 
   describe ('type#backfilled', function () {
 
-    const bfIncidentTestData = Object.assign({ type: 'backfilled' }, incidentTestData);
+    const bfIncidentTestData = Object.assign({
+      type: 'backfilled',
+      'components_impact_status': 'partial_outage'
+    }, incidentTestData);
 
     const bfIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
 
