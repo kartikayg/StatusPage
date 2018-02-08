@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 import { StatusIconWithText } from '../../../../../presentation/component-status';
 
-const ResolvedListing = ({ incidents }) => {
+const ResolvedListing = ({ incidents, onDeleteIncidentClick }) => {
 
   return (
     <table className="ui celled striped table large">
@@ -51,9 +51,11 @@ const ResolvedListing = ({ incidents }) => {
                 <Link to='/admin/incidents' style={{ color: 'inherit' }}>
                   <i className="unhide icon large"></i>
                 </Link>
-                <Link to='/admin/incidents' style={{ color: 'inherit' }}>
-                  <i className="remove circle icon large"></i>
-                </Link>
+                <i
+                  className="remove circle icon large"
+                  onClick={onDeleteIncidentClick(i.id)}
+                  style={{ cursor: 'pointer' }}
+                ></i>
               </td>
             </tr>
           );
@@ -64,7 +66,8 @@ const ResolvedListing = ({ incidents }) => {
 };
 
 ResolvedListing.propTypes = {
-  incidents: PropTypes.arrayOf(PropTypes.object).isRequired
+  incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onDeleteIncidentClick: PropTypes.func.isRequired
 };
 
 export default ResolvedListing;

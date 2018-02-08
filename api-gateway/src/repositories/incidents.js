@@ -24,6 +24,12 @@ const init = () => {
     create: async (data) => {
       const incident = await instance.post('/incidents', { incident: data });
       return incident;
+    },
+
+    // removes an incident
+    remove: async (id) => {
+      const resp = await instance.remove(`/incidents/${id}`);
+      return resp;
     }
 
   };

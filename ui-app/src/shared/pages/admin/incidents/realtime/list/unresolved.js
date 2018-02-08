@@ -10,7 +10,7 @@ import { statuses } from '../../../../../presentation/incident-status';
 import { StatusIconWithText, getColor } from '../../../../../presentation/component-status';
 import { getHighestImpactStatus } from '../../../../../redux/helper';
 
-const UnresolvedListing = ({ incidents }) => {
+const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
 
   const highestImpactStatus = getHighestImpactStatus(incidents);
 
@@ -48,9 +48,11 @@ const UnresolvedListing = ({ incidents }) => {
                 <Link to='/admin/incidents' style={{ color: 'inherit' }}>
                   <i className="edit icon large"></i>
                 </Link>
-                <Link to='/admin/incidents' style={{ color: 'inherit' }}>
-                  <i className="remove circle icon large"></i>
-                </Link>
+                <i
+                  className="remove circle icon large"
+                  onClick={onDeleteIncidentClick(i.id)}
+                  style={{ cursor: 'pointer' }}
+                ></i>
               </td>
             </tr>
           );
@@ -61,7 +63,8 @@ const UnresolvedListing = ({ incidents }) => {
 };
 
 UnresolvedListing.propTypes = {
-  incidents: PropTypes.arrayOf(PropTypes.object).isRequired
+  incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onDeleteIncidentClick: PropTypes.func.isRequired
 };
 
 export default UnresolvedListing;

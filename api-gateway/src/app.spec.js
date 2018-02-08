@@ -64,10 +64,14 @@ describe('app - integration tests', function () {
     });
 
     setTimeout(() => {
-      require('./app').start().then(r => {
-        app = r;
-        agent = request.agent(app);
-      });
+      require('./app').start()
+        .then(r => {
+          app = r;
+          agent = request.agent(app);
+        })
+        .catch(e => {
+          console.log(e);
+        })
     }, 1000);
 
     setTimeout(done, 3000);
@@ -247,10 +251,7 @@ describe('app - integration tests', function () {
       agent
         .post('/api/v1/components')
         .expect('Content-Type', /json/)
-        .expect(401)
-        .then(res => {
-          done();
-        });
+        .expect(401, done);
 
     });
 
@@ -260,10 +261,7 @@ describe('app - integration tests', function () {
         .post('/api/v1/components')
         .set('Authorization', 'Oauth 123334w2323232')
         .expect('Content-Type', /json/)
-        .expect(401)
-        .then(res => {
-          done();
-        });
+        .expect(401, done);
 
     });
 
@@ -298,6 +296,70 @@ describe('app - integration tests', function () {
           assert.equal(component.id, 'CI-123');
           done();
         });
+
+    });
+
+
+  });
+
+  describe ('incidents-service', function () {
+
+    it ('should get all incidents', function(done) {
+
+      agent
+        .get('/api/v1/incidents')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(res => {
+          const incidents = res.body;
+          assert.strictEqual(incidents.length, 1);
+          done();
+        });
+
+    });
+
+    it ('should fail authentication for creating incidents, missing token', function (done) {
+
+      agent
+        .post('/api/v1/incidents')
+        .expect('Content-Type', /json/)
+        .expect(401, done);
+
+    });
+
+    it ('should create an incident', function (done) {
+
+      agent
+        .post('/api/v1/incidents')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .send({ incident: {} })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(res => {
+          const incident = res.body;
+          assert.isObject(incident);
+          assert.equal(incident.id, 'IC123');
+          done();
+        });
+
+    });
+
+    it ('should fail authentication for deleting incident, missing token', function (done) {
+
+      agent
+        .delete('/api/v1/incidents/ic123')
+        .expect('Content-Type', /json/)
+        .expect(401, done);
+
+    });
+
+    it ('should delete the incident', function (done) {
+
+      agent
+        .delete('/api/v1/incidents/IC123')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .expect('Content-Type', /json/)
+        .expect(200, done);
 
     });
 

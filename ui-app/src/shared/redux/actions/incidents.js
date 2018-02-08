@@ -15,3 +15,15 @@ export const addIncident = (incident) => {
     incident
   };
 };
+
+/**
+ * remove incident action
+ * @param {id} id - incident id
+ * @return {object}
+ */
+export const removeIncident = (id) => {
+  return {
+    type: actionTypes.REMOVE_INCIDENT,
+    id
+  };
+};

@@ -12,7 +12,7 @@ import { filterUnresolvedIncidents, filterResolvedIncidents } from '../../../../
 import UnresolvedListing from './list/unresolved';
 import ResolvedListing from './list/resolved';
 
-const Listing = ({ incidents }) => {
+const Listing = ({ incidents, onDeleteIncidentClick }) => {
 
   let body;
 
@@ -26,8 +26,8 @@ const Listing = ({ incidents }) => {
   }
   else {
 
-    const unresolved = _sortBy(['created_ts'])(filterUnresolvedIncidents(incidents));
-    const resolved = filterResolvedIncidents(incidents);
+    const unresolved = _sortBy(['created_at'])(filterUnresolvedIncidents(incidents));
+    const resolved = _sortBy(['resolved_at'])(filterResolvedIncidents(incidents));
 
     body = (
       <div>
@@ -35,13 +35,24 @@ const Listing = ({ incidents }) => {
           unresolved.length > 0 &&
           (
             <div style={{ marginBottom: '3rem' }}>
-              <UnresolvedListing incidents={unresolved} />
+              <UnresolvedListing
+                incidents={unresolved}
+                onDeleteIncidentClick={onDeleteIncidentClick}
+              />
             </div>
           )
         }
-        <div>
-          <ResolvedListing incidents={resolved} />
-        </div>
+        {
+          resolved.length > 0 &&
+          (
+            <div>
+              <ResolvedListing
+                incidents={resolved}
+                onDeleteIncidentClick={onDeleteIncidentClick}
+              />
+            </div>
+          )
+        }
       </div>
     );
   }
@@ -64,7 +75,8 @@ const Listing = ({ incidents }) => {
 };
 
 Listing.propTypes = {
-  incidents: PropTypes.arrayOf(PropTypes.object).isRequired
+  incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onDeleteIncidentClick: PropTypes.func.isRequired
 };
 
 export default Listing;

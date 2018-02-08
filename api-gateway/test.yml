@@ -11,12 +11,14 @@ services:
     command: ["npm", "run", "test:coverage"]
     environment:
       COMPONENTS_SERVICE_URI: http://fake_components_service
+      INCIDENTS_SERVICE_URI: http://fake_incidents_service
     env_file:
       - test.env
     depends_on:
       - test_messagingqueue
       - test_redis
       - fake_components_service
+      - fake_incidents_service
 
   fake_components_service:
     image: node:8.9.0
@@ -24,6 +26,17 @@ services:
       - .:/app
     working_dir: /app
     command: ["node", "test/fake-components-service"]
+    environment:
+      PORT: 80
+    expose:
+      - 80
+
+  fake_incidents_service:
+    image: node:8.9.0
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["node", "test/fake-incidents-service"]
     environment:
       PORT: 80
     expose:

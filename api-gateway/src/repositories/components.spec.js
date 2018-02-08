@@ -20,7 +20,7 @@ describe('repo/components', function () {
 
   const httpOps = {
     get(url, opts) {
-      switch (url) { 
+      switch (url) {
         case '/components':
           return Promise.resolve([testComponentObj]);
         case '/component_groups':
@@ -91,11 +91,6 @@ describe('repo/components', function () {
     getOpsSpy.reset();
     postOpsSpy.reset();
     patchOpsSpy.reset();
-  });
-
-  it ('should call client init with component-service uri', function () {
-    sinon.assert.calledOnce(clientInitSpy);
-    sinon.assert.calledWith(clientInitSpy, process.env.COMPONENTS_URI);
   });
 
   describe('get()', function () {

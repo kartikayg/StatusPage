@@ -48,7 +48,10 @@ const IncidentsDisplay = (props) => {
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/:tab?`}
           render={(subProps) => {
-            return <List {...subProps} incidents={props.incidents} />;
+            return <List {...subProps}
+              incidents={props.incidents}
+              removeIncidentAction={props.removeIncidentAction}
+            />;
           }}
         />
       </Switch>
@@ -62,7 +65,8 @@ IncidentsDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
   updateComponentStatusAction: PropTypes.func.isRequired,
-  addIncidentAction: PropTypes.func.isRequired
+  addIncidentAction: PropTypes.func.isRequired,
+  removeIncidentAction: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props
@@ -78,6 +82,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addIncidentAction: (incident) => {
       dispatch(incActions.addIncident(incident));
+    },
+    removeIncidentAction: (id) => {
+      dispatch(incActions.removeIncident(id));
     },
     updateComponentStatusAction: (payload) => {
       dispatch(updateComponentStatus(payload));

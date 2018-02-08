@@ -28,9 +28,8 @@ const createGroup = async (name) => {
       id: existingGroups[0].id
     };
   }
+
   // create a new group
-
-
   const newGroup = await instance.post('/component_groups', {
     component_group: { name, active: true }
   });
@@ -38,7 +37,6 @@ const createGroup = async (name) => {
   return {
     newGroup
   };
-
 
 };
 

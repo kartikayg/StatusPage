@@ -111,6 +111,10 @@ const apiGateway = (function () {
 
     patch(url, data, opts = {}) {
       return execute(url, 'patch', { data, ...opts }, getInstance());
+    },
+
+    remove(url, opts = {}) {
+      return execute(url, 'delete', opts, getInstance());
     }
 
   };
