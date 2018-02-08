@@ -55,6 +55,19 @@ StatusIcon.propTypes = {
 };
 
 /**
+ * Return the icon element to use to show the status
+ */
+const StatusIconWithText = ({ status }) => {
+  return (
+    <div><StatusIcon status={status} /> {statuses[status].displayName}</div>
+  );
+};
+
+StatusIconWithText.propTypes = {
+  status: PropTypes.string.isRequired
+};
+
+/**
  * Select for statuses
  */
 const StatusDropDown = (props) => {
@@ -104,5 +117,4 @@ StatusDropDown.defaultProps = {
   name: 'component-status'
 };
 
-export { StatusIcon, StatusDropDown };
-
+export { StatusIcon, StatusDropDown, StatusIconWithText, statuses };

@@ -9,18 +9,12 @@ import { Link } from 'react-router-dom';
 import _pick from 'lodash/fp/pick';
 import { NotificationManager } from 'react-notifications';
 
+import { statuses } from '../../../../presentation/incident-status';
 import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
 
 const _each = require('lodash/fp/each').convert({ cap: false });
-
-// statuses for incident
-const incidentStatuses = [
-  { key: 'investigating', value: 'Investigating' },
-  { key: 'identified', value: 'Identified' },
-  { key: 'monitoring', value: 'Monitoring' },
-  { key: 'resolved', value: 'Resolved' }
-];
+const _map = require('lodash/fp/map').convert({ cap: false });
 
 const componentStatusesOrder = [
   'operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'
@@ -262,9 +256,9 @@ class Form extends React.Component {
             onChange={this.onInputChange}
             value={this.state.inputs.status}
           >
-            {incidentStatuses.map(s => {
-              return <option key={s.key} value={s.key}>{s.value}</option>;
-            })}
+            {_map((v, k) => {
+              return <option key={k} value={k}>{v.displayName}</option>;
+            })(statuses)}
           </select>
         </div>
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>

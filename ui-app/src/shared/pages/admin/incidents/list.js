@@ -8,6 +8,8 @@ import PropTypes from 'prop-types';
 import RealtimeList from './realtime/list';
 import ScheduledList from './scheduled/list';
 
+import { filterRealtimeIncidents, filterScheduledIncidents } from '../../../redux/helper';
+
 /**
  * Listing of Incidents
  */
@@ -23,7 +25,7 @@ class Listing extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
-    incidents: PropTypes.object.isRequired
+    incidents: PropTypes.arrayOf(PropTypes.object).isRequired
   }
 
   onTabClick = (e) => {
@@ -46,17 +48,21 @@ class Listing extends React.Component {
       <div>
         <h1 className='ui header' style={{ marginBottom: '2.5rem' }}>Incidents</h1>
         <div className="ui top attached tabular menu">
-          <a className={realtimeTabClass} data-tab='realtime' onClick={this.onTabClick}>Incidents</a>
-          <a className={scheduledTabClass} data-tab='scheduled' onClick={this.onTabClick}>Scheduled Maintenance</a>
+          <a className={realtimeTabClass} data-tab='realtime' onClick={this.onTabClick}>
+            Incidents
+          </a>
+          <a className={scheduledTabClass} data-tab='scheduled' onClick={this.onTabClick}>
+            Scheduled Maintenance
+          </a>
         </div>
         {this.state.tab === 'realtime' &&
           <div className="ui bottom attached tab segment active" style={ noBorder }>
-            <RealtimeList incidents={this.props.incidents.realtime} />
+            <RealtimeList incidents={filterRealtimeIncidents(this.props.incidents)} />
           </div>
         }
         {this.state.tab === 'scheduled' &&
           <div className="ui bottom attached tab segment active" style={ noBorder }>
-            <ScheduledList incidents={this.props.incidents.scheduled} />
+            <ScheduledList incidents={filterScheduledIncidents(this.props.incidents)} />
           </div>
         }
       </div>

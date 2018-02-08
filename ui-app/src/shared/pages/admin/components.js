@@ -14,7 +14,7 @@ import List from './components/list';
 import Form from './components/form';
 import * as rActions from '../../redux/actions/components';
 
-import { componentsByGroup } from '../../redux/helper';
+import { getComponentsByGroup } from '../../redux/helper';
 
 /**
  * Container for displaying all section of components
@@ -88,7 +88,7 @@ const mapStateToProps = (state) => {
   return {
     components: state.components,
     groups: _sortBy(['name'])(state.componentGroups),
-    componentsByGroup: componentsByGroup(state)
+    componentsByGroup: getComponentsByGroup(state)
   };
 };
 

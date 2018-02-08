@@ -8,11 +8,13 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import _sortBy from 'lodash/fp/sortBy';
+import _filter from 'lodash/fp/filter';
 
 import List from './incidents/list';
 import NewIncident from './incidents/create';
 import * as incActions from '../../redux/actions/incidents';
 import { updateComponentStatus } from '../../redux/actions/components';
+import { fmtIncidents } from '../../redux/helper';
 
 /**
  * Container for displaying all section of components
@@ -58,7 +60,7 @@ IncidentsDisplay.propTypes = {
   history: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
-  incidents: PropTypes.object.isRequired,
+  incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
   updateComponentStatusAction: PropTypes.func.isRequired,
   addIncidentAction: PropTypes.func.isRequired
 };
@@ -66,8 +68,9 @@ IncidentsDisplay.propTypes = {
 // mapping redux state and actions to props
 const mapStateToProps = (state) => {
   return {
-    components: _sortBy(['sort_order', 'created_at'])(state.components),
-    incidents: { realtime: [], scheduled: [] }
+    // only show active components, sort by sort order
+    components: _sortBy(['sort_order', 'created_at'])(_filter('active')(state.components)),
+    incidents: fmtIncidents(state)
   };
 };
 

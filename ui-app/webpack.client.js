@@ -77,7 +77,7 @@ module.exports = {
       '__CLIENT__': true,
       '__SERVER__': false
     }),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI', 'TIMEZONE']),
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI', 'ORG_TIMEZONE']),
     new ExtractTextPlugin('app.styles.css'),
     new webpack.optimize.CommonsChunkPlugin({
       name:     'vendor',
