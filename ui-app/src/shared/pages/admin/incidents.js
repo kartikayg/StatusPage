@@ -31,8 +31,8 @@ const IncidentsDisplay = (props) => {
             }
             return <NewIncident {...subProps}
                       components={props.components}
-                      updateComponentStatus={props.updateComponentStatus}
-                      addIncident={props.addIncident}
+                      updateComponentStatusAction={props.updateComponentStatusAction}
+                      addIncidentAction={props.addIncidentAction}
                    />;
           }}
         />
@@ -59,8 +59,8 @@ IncidentsDisplay.propTypes = {
   match: PropTypes.object.isRequired,
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.object.isRequired,
-  updateComponentStatus: PropTypes.func.isRequired,
-  addIncident: PropTypes.func.isRequired
+  updateComponentStatusAction: PropTypes.func.isRequired,
+  addIncidentAction: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props
@@ -73,10 +73,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addIncident: (incident) => {
+    addIncidentAction: (incident) => {
       dispatch(incActions.addIncident(incident));
     },
-    updateComponentStatus: (payload) => {
+    updateComponentStatusAction: (payload) => {
       dispatch(updateComponentStatus(payload));
     }
   };

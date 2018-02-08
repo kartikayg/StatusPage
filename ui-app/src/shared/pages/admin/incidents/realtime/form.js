@@ -30,8 +30,9 @@ class Form extends React.Component {
 
   static propTypes = {
     components: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onComponentStatusUpdate: PropTypes.func.isRequired,
-    onNewIncident: PropTypes.func.isRequired
+    updateComponentStatusAction: PropTypes.func.isRequired,
+    addIncidentAction: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired
   }
 
   constructor(props) {
@@ -208,14 +209,17 @@ class Form extends React.Component {
 
           // update redux
           cmpUpdRes.forEach(({ component }) => {
-            this.props.onComponentStatusUpdate({
+            this.props.updateComponentStatusAction({
               id: component.id, status: component.status
             });
           });
 
-          this.props.onNewIncident(savedIncident);
+          this.props.addIncidentAction(savedIncident);
 
           NotificationManager.success('Incident successfully created');
+
+          // go back to listing
+          this.props.history.push('/admin/incidents');
 
         });
 
