@@ -15,7 +15,7 @@ const schema = Joi.object({
   // this kind of defines the impact status of this incident.
   components_impact_status: Joi.string()
     .only(['operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'])
-    .allow(null),
+    .required(),
 
   // add incident updates
   updates: Joi.array()
