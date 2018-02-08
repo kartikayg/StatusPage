@@ -7,15 +7,14 @@ import _keyBy from 'lodash/fp/keyBy';
 import _values from 'lodash/fp/values';
 
 /**
- * Given components and groups, this function will group components
- * @param {array} components
- * @param {array} groups
+ * Given a state, this function will return components combined with groups.
+ * @param {object} state - redux state
  * @param {boolean} onlyActive
  * @return {array}
  */
-export const groupComponents = (components, groups, onlyActive = false) => {
+export const componentsByGroup = (state, onlyActive = false) => {
 
-  let workingCopy = [...components];
+  let workingCopy = [...state.components];
 
   // apply onlyActive
   if (onlyActive === true) {
@@ -28,7 +27,7 @@ export const groupComponents = (components, groups, onlyActive = false) => {
   workingCopy = _sortBy(['sort_order', 'created_by'])(workingCopy);
 
   // create object of group by keys
-  const groupsById = _keyBy('id')(groups);
+  const groupsById = _keyBy('id')(state.componentGroups);
 
   // now loop through the components and group by group id. if a group is not
   // found or no group_id, its a standalone component
