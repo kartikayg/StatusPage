@@ -12,6 +12,7 @@ import _flow from 'lodash/fp/flow';
 import _filter from 'lodash/fp/filter';
 import _last from 'lodash/fp/last';
 import _map from 'lodash/fp/map';
+import _reduce from 'lodash/fp/reduce';
 
 import moment from 'moment-timezone';
 
@@ -170,4 +171,50 @@ export const filterUnresolvedIncidents = (incidents) => {
   return _filter(i => {
     return i.is_resolved === false;
   })(incidents);
+};
+
+/**
+ * Filter resolved incidents
+ * @param {array} incidents
+ * @return array
+ */
+export const filterResolvedIncidents = (incidents) => {
+  return _filter(i => {
+    return i.is_resolved === true;
+  })(incidents);
+};
+
+/**
+ * Given a list of unresolved incidents, return what
+ * is the highest component impact status.
+ * @param {array} unresolvedIncidents
+ * @return {string}
+ */
+export const getHighestImpactStatus = (unresolvedIncidents) => {
+  
+  if (unresolvedIncidents.length === 0) {
+    return 'operational';
+  }
+
+  const order = [
+    'operational',
+    'maintenance',
+    'degraded_performance',
+    'partial_outage',
+    'major_outage'
+  ];
+
+  const statuses = unresolvedIncidents.map(i => {
+    return (i.type === 'scheduled') 
+            ? 'maintenance'
+            : i.components_impact_status || 'operational';
+  });
+
+  return statuses.reduce((hStatus, cStatus) => {
+    // find position of the statuses and return the highest
+    const hPos = order.indexOf(hStatus);
+    const cPos = order.indexOf(cStatus);
+    return hPos > cPos ? hStatus : cStatus;
+  }, statuses[0]);
+
 };

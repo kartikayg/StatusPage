@@ -9,7 +9,7 @@ import { Dropdown, Icon } from 'semantic-ui-react';
 const _map = require('lodash/fp/map').convert({ cap: false });
 
 // list of statuses
-const statuses = {
+export const statuses = {
   operational: {
     displayName: 'Operational',
     color: 'green'
@@ -37,14 +37,14 @@ const statuses = {
  * @param {string} status
  * @return {string}
  */
-const getColor = (status) => {
+export const getColor = (status) => {
   return statuses[status] ? statuses[status].color : 'green';
 };
 
 /**
  * Return the icon element to use to show the status
  */
-const StatusIcon = ({ status }) => {
+export const StatusIcon = ({ status }) => {
   return (
     <Icon color={getColor(status)} name='circle' />
   );
@@ -57,7 +57,7 @@ StatusIcon.propTypes = {
 /**
  * Return the icon element to use to show the status
  */
-const StatusIconWithText = ({ status }) => {
+export const StatusIconWithText = ({ status }) => {
   return (
     <div><StatusIcon status={status} /> {statuses[status].displayName}</div>
   );
@@ -70,7 +70,7 @@ StatusIconWithText.propTypes = {
 /**
  * Select for statuses
  */
-const StatusDropDown = (props) => {
+export const StatusDropDown = (props) => {
 
   const options = _map((val, k) => {
     return {
@@ -117,4 +117,3 @@ StatusDropDown.defaultProps = {
   name: 'component-status'
 };
 
-export { StatusIcon, StatusDropDown, StatusIconWithText, statuses };

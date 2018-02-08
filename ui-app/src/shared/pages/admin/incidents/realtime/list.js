@@ -7,9 +7,10 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import _sortBy from 'lodash/fp/sortBy';
 
-import { filterUnresolvedIncidents } from '../../../../redux/helper';
+import { filterUnresolvedIncidents, filterResolvedIncidents } from '../../../../redux/helper';
 
 import UnresolvedListing from './list/unresolved';
+import ResolvedListing from './list/resolved';
 
 const Listing = ({ incidents }) => {
 
@@ -26,13 +27,21 @@ const Listing = ({ incidents }) => {
   else {
 
     const unresolved = _sortBy(['created_ts'])(filterUnresolvedIncidents(incidents));
+    const resolved = filterResolvedIncidents(incidents);
 
     body = (
       <div>
         {
           unresolved.length > 0 &&
-          <UnresolvedListing incidents={filterUnresolvedIncidents(incidents)} />
+          (
+            <div style={{ marginBottom: '3rem' }}>
+              <UnresolvedListing incidents={unresolved} />
+            </div>
+          )
         }
+        <div>
+          <ResolvedListing incidents={resolved} />
+        </div>
       </div>
     );
   }

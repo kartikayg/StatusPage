@@ -136,8 +136,8 @@ class NewIncidentForm extends React.Component {
                 onChange={this.onDateChange}
               />
             </div>
-            <div className='field'>
-              <label>Impact (optional)</label>
+            <div className='field required'>
+              <label>Impact</label>
               <StatusDropDown
                 value={this.state.inputs.components_impact_status}
                 onChange={this.onImpactStatusChange}
