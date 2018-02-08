@@ -12,7 +12,6 @@ import _flow from 'lodash/fp/flow';
 import _filter from 'lodash/fp/filter';
 import _last from 'lodash/fp/last';
 import _map from 'lodash/fp/map';
-import _reduce from 'lodash/fp/reduce';
 
 import moment from 'moment-timezone';
 
@@ -191,7 +190,7 @@ export const filterResolvedIncidents = (incidents) => {
  * @return {string}
  */
 export const getHighestImpactStatus = (unresolvedIncidents) => {
-  
+
   if (unresolvedIncidents.length === 0) {
     return 'operational';
   }
@@ -205,9 +204,9 @@ export const getHighestImpactStatus = (unresolvedIncidents) => {
   ];
 
   const statuses = unresolvedIncidents.map(i => {
-    return (i.type === 'scheduled') 
-            ? 'maintenance'
-            : i.components_impact_status || 'operational';
+    return (i.type === 'scheduled')
+      ? 'maintenance'
+      : i.components_impact_status || 'operational';
   });
 
   return statuses.reduce((hStatus, cStatus) => {
