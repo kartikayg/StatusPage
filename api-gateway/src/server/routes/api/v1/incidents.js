@@ -27,6 +27,13 @@ export default (incidentRepo, authMiddleware) => {
 
   router.route('/incidents/:incidentId')
 
+    /** Updates an incident */
+    .patch(authMiddleware, (req, res, next) => {
+      incidentRepo.update(req.params.incidentId, req.body.incident).then(incident => {
+        res.json(incident);
+      }).catch(next);
+    })
+
     /** Deletes an incident */
     .delete(authMiddleware, (req, res, next) => {
       incidentRepo.remove(req.params.incidentId).then(resp => {
