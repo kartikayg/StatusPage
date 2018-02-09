@@ -9,9 +9,12 @@ import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import _sortBy from 'lodash/fp/sortBy';
 import _filter from 'lodash/fp/filter';
+import _find from 'lodash/fp/find';
+import { NotificationManager } from 'react-notifications';
 
 import List from './incidents/list';
 import NewIncident from './incidents/create';
+import EditIncident from './incidents/edit';
 import * as incActions from '../../redux/actions/incidents';
 import { updateComponentStatus } from '../../redux/actions/components';
 import { fmtIncidents } from '../../redux/helper';
@@ -40,6 +43,25 @@ const IncidentsDisplay = (props) => {
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/edit/:id`}
           render={(subProps) => {
+            
+            // find the instance based on the id
+            const { id } = subProps.match.params;
+            const incident = props.incidents.find(i => {
+              return i.id === id;
+            });
+
+            if (!incident) {
+              NotificationManager.error('Incident not found.');
+              return <Redirect to="/admin/incidents" />;
+            }
+
+            return <EditIncident {...subProps}
+              components={props.components}
+              incident={incident}
+              updateComponentStatusAction={props.updateComponentStatusAction}
+              updateIncidentAction={props.updateIncidentAction}
+            />;
+
           }}
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/view/:id`}
@@ -66,6 +88,7 @@ IncidentsDisplay.propTypes = {
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
   updateComponentStatusAction: PropTypes.func.isRequired,
   addIncidentAction: PropTypes.func.isRequired,
+  updateIncidentAction: PropTypes.func.isRequired,
   removeIncidentAction: PropTypes.func.isRequired
 };
 
@@ -82,6 +105,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addIncidentAction: (incident) => {
       dispatch(incActions.addIncident(incident));
+    },
+    updateIncidentAction: (incident) => {
+      dispatch(incActions.updateIncident(incident));
     },
     removeIncidentAction: (id) => {
       dispatch(incActions.removeIncident(id));

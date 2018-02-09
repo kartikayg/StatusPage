@@ -33,7 +33,9 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
               <td>
                 <h4 className="ui image header">
                   <div className="content">
-                    {i.name}
+                    <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
+                      {i.name}
+                    </Link>
                     <div className="sub header">
                       {statuses[i.latestUpdate.status].displayName},{' '}
                       {lastUpdateDate.fromNow()} at {lastUpdateDate.format('ddd, h:mm A (zz)')}
@@ -45,11 +47,12 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
                 <StatusIconWithText status={i.components_impact_status} />
               </td>
               <td className="center aligned three wide">
-                <Link to='/admin/incidents' style={{ color: 'inherit' }}>
-                  <i className="edit icon large"></i>
+                <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
+                  <i className="edit icon large" title="Edit Incident"></i>
                 </Link>
                 <i
                   className="remove circle icon large"
+                  title="Delete Incident"
                   onClick={onDeleteIncidentClick(i.id)}
                   style={{ cursor: 'pointer' }}
                 ></i>

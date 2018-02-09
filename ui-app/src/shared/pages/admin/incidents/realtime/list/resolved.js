@@ -26,8 +26,10 @@ const ResolvedListing = ({ incidents, onDeleteIncidentClick }) => {
               <td>
                 <h4 className="ui image header">
                   <div className="content">
-                    {i.name}
-                     <div className="sub header">
+                    <Link to={`/admin/incidents/view/${i.id}`} style={{ color: 'inherit' }}>
+                      {i.name}
+                    </Link>
+                    <div className="sub header">
                       {
                         i.type === 'realtime' &&
                         <div>
@@ -48,13 +50,14 @@ const ResolvedListing = ({ incidents, onDeleteIncidentClick }) => {
                 <StatusIconWithText status={i.components_impact_status} />
               </td>
               <td className="center aligned three wide">
-                <Link to='/admin/incidents' style={{ color: 'inherit' }}>
-                  <i className="unhide icon large"></i>
+                <Link to={`/admin/incidents/view/${i.id}`} style={{ color: 'inherit' }}>
+                  <i className="unhide icon large" title="View Incident"></i>
                 </Link>
                 <i
                   className="remove circle icon large"
                   onClick={onDeleteIncidentClick(i.id)}
                   style={{ cursor: 'pointer' }}
+                  title="Delete Incident"
                 ></i>
               </td>
             </tr>

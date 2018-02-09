@@ -8,6 +8,7 @@ import { hydrate } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
+import ScrollToTop from './scroll-to-top';
 import App from '../shared/app';
 import { configure as configureStore } from '../shared/redux/store';
 
@@ -27,7 +28,9 @@ hydrate(
   (
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <ScrollToTop>
+          <App />
+        </ScrollToTop>
       </BrowserRouter>
     </Provider>
   ),

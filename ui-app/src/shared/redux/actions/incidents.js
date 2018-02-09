@@ -17,6 +17,18 @@ export const addIncident = (incident) => {
 };
 
 /**
+ * update incident action
+ * @param {object} incident - entire incident object
+ * @return {object}
+ */
+export const updateIncident = (incident) => {
+  return {
+    type: actionTypes.UPDATE_INCIDENT,
+    incident
+  };
+};
+
+/**
  * remove incident action
  * @param {id} id - incident id
  * @return {object}

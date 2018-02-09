@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import _pick from 'lodash/fp/pick';
 import _flow from 'lodash/fp/flow';
+import _getOr from 'lodash/fp/getOr';
 import { NotificationManager } from 'react-notifications';
 
 import { statuses as incidentStatuses } from '../../../../presentation/incident-status';
@@ -16,7 +17,7 @@ import { StatusDropDown } from '../../../../presentation/component-status';
 
 const _each = require('lodash/fp/each').convert({ cap: false });
 const _map = require('lodash/fp/map').convert({ cap: false });
-const _filter = require('lodash/fp/filter').convert({ cap: false });
+const _pickBy = require('lodash/fp/pickBy').convert({ cap: false });
 
 const componentStatusesOrder = [
   'operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'
@@ -27,8 +28,10 @@ class Form extends React.Component {
   static propTypes = {
     components: PropTypes.arrayOf(PropTypes.object).isRequired,
     updateComponentStatusAction: PropTypes.func.isRequired,
-    addIncidentAction: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired
+    addIncidentAction: PropTypes.func,
+    updateIncidentAction: PropTypes.func,
+    history: PropTypes.object.isRequired,
+    incident: PropTypes.object
   }
 
   constructor(props) {
@@ -39,7 +42,9 @@ class Form extends React.Component {
 
     props.components.forEach(c => {
       cmpState[c.id] = {
-        checked: false,
+        // if the id exists in the components array
+        checked: _getOr([], 'components', props.incident)
+          .findIndex(ic => ic.id === c.id) !== -1,
         status: c.status,
         originalStatus: c.status
       };
@@ -47,15 +52,16 @@ class Form extends React.Component {
 
     this.state = {
       inputs: {
-        name: '',
+        name: _getOr('', 'name', props.incident),
         type: 'realtime',
         components: cmpState,
-        status: 'investigating',
+        status: _getOr('investigating', 'latestUpdate.status', props.incident),
         message: '',
-        do_notify_subscribers: true
+        do_notify_subscribers: true,
+        originalStatus: _getOr('investigating', 'latestUpdate.status', props.incident)
       },
       saving: false,
-      action: 'New'
+      action: props.incident ? 'Update' : 'New'
     };
 
   }
@@ -138,8 +144,9 @@ class Form extends React.Component {
   }
 
   saveIncident = async (data) => {
-    const res = await apiGateway.post('/incidents', { incident: data });
-    return res;
+
+    
+
   }
 
   // on submit button click
@@ -185,6 +192,15 @@ class Form extends React.Component {
           'type']
         )(this.state.inputs);
 
+        // for status, if its an update
+        if (this.state.action === 'Update' && 
+            this.state.inputs.originalStatus === this.state.inputs.status &&
+            !this.state.inputs.message
+           )
+        {
+          incData.status = '';
+        }
+
         incData.components = impactedComponents.map(c => {
           return c.id;
         });
@@ -199,7 +215,15 @@ class Form extends React.Component {
           }, impactedComponents[0].status);
         }
 
-        const savedIncident = await this.saveIncident(incData);
+        let savedIncident;
+
+        if (this.state.action === 'New') {
+          savedIncident = await apiGateway.post(`/incidents`, { incident: incData });
+        }
+        else {
+          const { id } = this.props.incident;
+          savedIncident = await apiGateway.patch(`/incidents/${id}`, { incident: incData });
+        }
 
         this.setState({ saving: false }, () => {
 
@@ -210,9 +234,14 @@ class Form extends React.Component {
             });
           });
 
-          this.props.addIncidentAction(savedIncident);
-
-          NotificationManager.success('Incident successfully created');
+          if (this.state.action === 'New') {
+            this.props.addIncidentAction(savedIncident);
+            NotificationManager.success('Incident successfully created');
+          }
+          else {
+            this.props.updateIncidentAction(savedIncident);
+            NotificationManager.success('Incident successfully updated');
+          }
 
           // go back to listing
           this.props.history.push('/admin/incidents');
@@ -240,16 +269,20 @@ class Form extends React.Component {
 
     return (
       <form className="ui form">
-        <div className="field required">
-          <label>Incident Name</label>
-          <input
-            type="text"
-            name="name"
-            onChange={this.onInputChange}
-            value={this.state.inputs.name}
-            readOnly={this.state.action === 'Update'}
-          />
-        </div>
+        {
+          this.state.action === 'New'
+          &&
+          <div className="field required">
+            <label>Incident Name</label>
+            <input
+              type="text"
+              name="name"
+              onChange={this.onInputChange}
+              value={this.state.inputs.name}
+              readOnly={this.state.action === 'Update'}
+            />
+          </div>
+        }
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
           <label>Status</label>
           <select
@@ -261,7 +294,7 @@ class Form extends React.Component {
             {(
               _flow(
                 // hide resolved if not update
-                _filter((v, k) => {
+                _pickBy((v, k) => {
                   return this.state.action === 'Update' || k !== 'resolved';
                 }),
                 _map((v, k) => {
