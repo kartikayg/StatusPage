@@ -7,14 +7,16 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import _pick from 'lodash/fp/pick';
+import _flow from 'lodash/fp/flow';
 import { NotificationManager } from 'react-notifications';
 
-import { statuses } from '../../../../presentation/incident-status';
+import { statuses as incidentStatuses } from '../../../../presentation/incident-status';
 import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
 
 const _each = require('lodash/fp/each').convert({ cap: false });
 const _map = require('lodash/fp/map').convert({ cap: false });
+const _filter = require('lodash/fp/filter').convert({ cap: false });
 
 const componentStatusesOrder = [
   'operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'
@@ -256,9 +258,17 @@ class Form extends React.Component {
             onChange={this.onInputChange}
             value={this.state.inputs.status}
           >
-            {_map((v, k) => {
-              return <option key={k} value={k}>{v.displayName}</option>;
-            })(statuses)}
+            {(
+              _flow(
+                // hide resolved if not update
+                _filter((v, k) => {
+                  return this.state.action === 'Update' || k !== 'resolved';
+                }),
+                _map((v, k) => {
+                  return <option key={k} value={k}>{v.displayName}</option>;
+                })
+              )(incidentStatuses)
+            )}
           </select>
         </div>
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
