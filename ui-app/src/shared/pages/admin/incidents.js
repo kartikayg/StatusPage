@@ -9,7 +9,6 @@ import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import _sortBy from 'lodash/fp/sortBy';
 import _filter from 'lodash/fp/filter';
-import _find from 'lodash/fp/find';
 import { NotificationManager } from 'react-notifications';
 
 import List from './incidents/list';
@@ -43,7 +42,7 @@ const IncidentsDisplay = (props) => {
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/edit/:id`}
           render={(subProps) => {
-            
+
             // find the instance based on the id
             const { id } = subProps.match.params;
             const incident = props.incidents.find(i => {

@@ -11,6 +11,7 @@ import _flow from 'lodash/fp/flow';
 import _getOr from 'lodash/fp/getOr';
 import { NotificationManager } from 'react-notifications';
 
+import { Input as MessageInput } from '../incident-message';
 import { statuses as incidentStatuses } from '../../../../presentation/incident-status';
 import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
@@ -44,7 +45,7 @@ class Form extends React.Component {
       cmpState[c.id] = {
         // if the id exists in the components array
         checked: _getOr([], 'components', props.incident)
-          .findIndex(ic => ic.id === c.id) !== -1,
+          .findIndex(ic => ic.id === c.id) !== -1, // eslint-disable-line arrow-body-style
         status: c.status,
         originalStatus: c.status
       };
@@ -56,7 +57,7 @@ class Form extends React.Component {
         type: 'realtime',
         components: cmpState,
         status: _getOr('investigating', 'latestUpdate.status', props.incident),
-        message: '',
+        message: { text: '', selection: null },
         do_notify_subscribers: true,
         originalStatus: _getOr('investigating', 'latestUpdate.status', props.incident)
       },
@@ -109,6 +110,17 @@ class Form extends React.Component {
 
   }
 
+  onMessageChange = (value) => {
+    this.setState(prevState => {
+      return {
+        inputs: {
+          ...prevState.inputs,
+          message: value
+        }
+      };
+    });
+  }
+
   // on component checkbox
   onComponentCheckboxChange = (e) => {
 
@@ -140,12 +152,6 @@ class Form extends React.Component {
     const id = parts[1];
 
     this.updateComponentStateData(id, 'status', value);
-
-  }
-
-  saveIncident = async (data) => {
-
-    
 
   }
 
@@ -187,17 +193,18 @@ class Form extends React.Component {
         const incData = _pick([
           'name',
           'status',
-          'message',
           'do_notify_subscribers',
           'type']
         )(this.state.inputs);
 
+        // get the message
+        incData.message = this.state.inputs.message.text;
+
         // for status, if its an update
-        if (this.state.action === 'Update' && 
+        if (this.state.action === 'Update' &&
             this.state.inputs.originalStatus === this.state.inputs.status &&
             !this.state.inputs.message
-           )
-        {
+        ) {
           incData.status = '';
         }
 
@@ -218,7 +225,7 @@ class Form extends React.Component {
         let savedIncident;
 
         if (this.state.action === 'New') {
-          savedIncident = await apiGateway.post(`/incidents`, { incident: incData });
+          savedIncident = await apiGateway.post('/incidents', { incident: incData });
         }
         else {
           const { id } = this.props.incident;
@@ -306,12 +313,13 @@ class Form extends React.Component {
         </div>
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
           <label>Message</label>
-          <textarea
-            name="message"
-            rows="6"
-            onChange={this.onInputChange}
-            value={this.state.inputs.message}
-          ></textarea>
+          <div style={{ border: '1px solid rgba(0, 0, 0, 0.125)', padding: '10px', borderRadius: '0.2rem' }}>
+            <MessageInput
+              value={this.state.inputs.message}
+              onChange={this.onMessageChange}
+              name={'message'}
+            />
+          </div>
         </div>
         <div className="field required">
           <label>Impacted Components</label>

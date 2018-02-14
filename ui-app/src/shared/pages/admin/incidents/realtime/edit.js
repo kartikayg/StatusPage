@@ -4,8 +4,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import _orderBy from 'lodash/fp/orderBy';
 
 import Form from './form';
+import IncidentUpdates from '../incident-updates';
 import { getColor } from '../../../../presentation/component-status';
 
 const EditRealtimeIncident = (props) => {
@@ -20,12 +22,23 @@ const EditRealtimeIncident = (props) => {
       <div style={{ marginTop: '2rem' }}>
         <Form {...props} />
       </div>
+      <div className="ui horizontal divider" style={{ marginTop: '3rem' }}>
+        Previous Updates
+      </div>
+      <div style={{ marginTop: '1.5rem' }}>
+        <IncidentUpdates
+          incidentId={props.incident.id}
+          updates={_orderBy(['created_at'])(['desc'])(props.incident.updates)}
+          updateIncidentAction={props.updateIncidentAction}
+        />
+      </div>
     </div>
   );
 };
 
 EditRealtimeIncident.propTypes = {
-  incident: PropTypes.object.isRequired
+  incident: PropTypes.object.isRequired,
+  updateIncidentAction: PropTypes.func.isRequired
 };
 
 export default EditRealtimeIncident;
