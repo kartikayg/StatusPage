@@ -54,6 +54,14 @@ const init = () => {
     remove: async (id) => {
       const resp = await instance.remove(`/incidents/${id}`);
       return resp;
+    },
+
+    // updates incident-update entry
+    changeIncidentUpdate: async (incidentId, updateId, data) => {
+
+      const url = `/incidents/${incidentId}/incident_updates/${updateId}`;
+      const incident = await instance.patch(url, { update: data });
+      return incident;
     }
 
   };

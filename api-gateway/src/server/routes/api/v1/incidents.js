@@ -41,6 +41,20 @@ export default (incidentRepo, authMiddleware) => {
       }).catch(next);
     });
 
+
+  router.route('/incidents/:incidentId/incident_updates/:incidentUpdateId')
+
+    /** updates incident-update entry */
+    .patch(authMiddleware, (req, res, next) => {
+      incidentRepo.changeIncidentUpdate(
+        req.params.incidentId,
+        req.params.incidentUpdateId,
+        req.body.update
+      ).then(resp => {
+        return res.json(resp);
+      }).catch(next);
+    });
+
   return router;
 
 };
