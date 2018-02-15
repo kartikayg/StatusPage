@@ -31,6 +31,14 @@ export default (componentRepo, authMiddleware) => {
       }).catch(next);
     });
 
+  router.route('/component_groups')
+
+    .post(authMiddleware, (req, res, next) => {
+      componentRepo.createGroup(req.body.name).then(group => {
+        res.json(group);
+      }).catch(next);
+    });
+
   return router;
 
 };

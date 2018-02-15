@@ -274,7 +274,7 @@ describe('app - integration tests', function () {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(res => {
-          const { component } = res.body;
+          const component = res.body;
           assert.isObject(component);
           assert.equal(component.id, 'CI-123');
           done();
@@ -291,7 +291,7 @@ describe('app - integration tests', function () {
         .expect('Content-Type', /json/)
         .expect(200)
         .then(res => {
-          const { component } = res.body;
+          const component = res.body;
           assert.isObject(component);
           assert.equal(component.id, 'CI-123');
           done();

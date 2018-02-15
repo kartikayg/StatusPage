@@ -9,78 +9,36 @@ import client from '../lib/external-client';
 const instance = client.init(process.env.COMPONENTS_SERVICE_URI);
 
 /**
- * Creates a component group if not already existed.
- * @param {string} name
- * @return {Promise}
- *  on success, { id } - if group already exists
- *              { newGroup } - if a group is created
- */
-const createGroup = async (name) => {
-
-  // check if group exists with the name
-  const existingGroups = await instance.get('/component_groups', {
-    params: { name }
-  });
-
-  // already there ...
-  if (existingGroups.length > 0) {
-    return {
-      id: existingGroups[0].id
-    };
-  }
-
-  // create a new group
-  const newGroup = await instance.post('/component_groups', {
-    component_group: { name, active: true }
-  });
-
-  return {
-    newGroup
-  };
-
-};
-
-/**
- * Insert/update a component. It also supports creating a new group if needed.
+ * Insert/update a component.
  * @param {object} data
  * @param {string} id - component id for update
  * @return {Promise}
- *  on success, { component, newGroup (if created) }
+ *  on success, { component object }
  *  on failure, error
  */
 const upsert = async (data, id) => {
 
   // base component data
-  const cmpData = _pick(['name', 'description', 'active', 'status', 'group_id', 'sort_order'])(data);
+  const cmpData = _pick([
+    'name',
+    'description',
+    'active',
+    'status',
+    'group_id',
+    'sort_order'
+  ])(data);
 
-  const resp = {};
-
-  // a new group to create
-  if (data.new_group_name) {
-
-    const grp = await createGroup(data.new_group_name);
-
-    // already there ...
-    if (grp.id) {
-      cmpData.group_id = grp.id;
-    }
-    // created a new group
-    else {
-      resp.newGroup = grp.newGroup;
-      cmpData.group_id = resp.newGroup.id;
-    }
-
-  }
+  let savedComponent = {};
 
   // create the group
   if (!id) {
-    resp.component = await instance.post('/components', { component: cmpData });
+    savedComponent = await instance.post('/components', { component: cmpData });
   }
   else {
-    resp.component = await instance.patch(`/components/${id}`, { component: cmpData });
+    savedComponent = await instance.patch(`/components/${id}`, { component: cmpData });
   }
 
-  return resp;
+  return savedComponent;
 
 };
 
@@ -107,10 +65,10 @@ const init = () => {
     },
 
     /**
-     * Creates a new component. It also supports creating a new group if needed.
+     * Creates a new component.
      * @param {object} data
      * @return {Promise}
-     *  on success, { component, newGroup (if created) }
+     *  on success, { component object }
      *  on failure, error
      */
     create: async (data) => {
@@ -123,12 +81,40 @@ const init = () => {
      * @param {string} id
      * @param {object} data
      * @return {Promise}
-     *  on success, { component, newGroup (if created) }
+     *  on success, { component object }
      *  on failure, error
      */
     update: async (id, data) => {
       const resp = await upsert(data, id);
       return resp;
+    },
+
+    /**
+     * Creates a new component group. If the group already exists
+     * (based on the name), returns that object.
+     * @param {string} name
+     * @return {Promise}
+     *  on success, { group object }
+     */
+    createGroup: async (name) => {
+
+      // check if group exists with the name
+      const existingGroups = await instance.get('/component_groups', {
+        params: { name }
+      });
+
+      // already there ...
+      if (existingGroups.length > 0) {
+        return existingGroups[0];
+      }
+
+      // create a new group
+      const newGroup = await instance.post('/component_groups', {
+        component_group: { name, active: true }
+      });
+
+      return newGroup;
+
     }
 
   };
