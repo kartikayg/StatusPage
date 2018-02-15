@@ -49,63 +49,15 @@ class Form extends React.Component {
 
   }
 
-  // creates a component on the backend
-  createComponent() {
-
-    // post to create the component
-    apiGateway.post('/components', { component: this.state.inputs })
-      .then(res => {
-
-        // flash
-        NotificationManager.success('Component successfully created');
-
-        // fire action to add the new component
-        this.props.onNewComponent(res.component);
-
-        if (res.newGroup) {
-          this.props.onNewGroup(res.newGroup);
-        }
-
-        // go back to listing
-        this.props.history.push('/admin/components');
-
-      })
-      .catch(err => {
-        NotificationManager.error(err.message);
-        this.setState({ saving: false });
-      });
-
-  }
-
-  // updates a component on the backend
-  updateComponent() {
-
-    apiGateway.patch(`/components/${this.props.component.id}`, { component: this.state.inputs })
-      .then(res => {
-
-        // flash
-        NotificationManager.success('Component successfully updated');
-
-        // fire action to add the update component
-        this.props.onUpdateComponent(res.component);
-
-        if (res.newGroup) {
-          this.props.onNewGroup(res.newGroup);
-        }
-
-        // go back to listing
-        this.props.history.push('/admin/components');
-
-      })
-      .catch(err => {
-        NotificationManager.error(err.message);
-        this.setState({ saving: false });
-      });
-
+  // async way for changing state
+  setStateAsync = (state) => {
+    return new Promise(resolve => {
+      this.setState(state, resolve);
+    });
   }
 
   // on save button click
-  onSaveClick = (e) => {
+  onSaveClick = async (e) => {
 
     e.preventDefault();
 
@@ -113,13 +65,53 @@ class Form extends React.Component {
       return;
     }
 
-    this.setState({ saving: true });
+    await this.setStateAsync({ saving: true });
 
-    if (this.props.component) {
-      this.updateComponent();
+    try {
+
+      let newGroup = null;
+
+      // create the group
+      if (this.state.inputs.new_group_name) {
+
+        newGroup = await apiGateway.post('/component_groups', { name: this.state.inputs.new_group_name });
+
+        await this.setStateAsync(prevState => {
+          return {
+            inputs: {
+              ...prevState.inputs,
+              group_id: newGroup.id
+            }
+          };
+        });
+
+      }
+
+      // update component
+      if (this.props.component) {
+        const url = `/components/${this.props.component.id}`;
+        const cmp = await apiGateway.patch(url, { component: this.state.inputs });
+        NotificationManager.success('Component successfully updated');
+        this.props.onUpdateComponent(cmp);
+      }
+      // or create it
+      else {
+        const cmp = await apiGateway.post('/components', { component: this.state.inputs });
+        NotificationManager.success('Component successfully created');
+        this.props.onNewComponent(cmp);
+      }
+
+      if (newGroup) {
+        this.props.onNewGroup(newGroup);
+      }
+
+      // go back to listing
+      this.props.history.push('/admin/components');
+
     }
-    else {
-      this.createComponent();
+    catch (err) {
+      NotificationManager.error(err.message);
+      this.setState({ saving: false });
     }
 
   }
@@ -171,7 +163,15 @@ class Form extends React.Component {
 
   onCancelGroupCreation = (e) => {
     e.preventDefault();
-    this.setState({ showCreateNewGroupInput: false });
+    this.setState(prevState => {
+      return {
+        showCreateNewGroupInput: false,
+        inputs: {
+          ...prevState.inputs,
+          new_group_name: ''
+        }
+      };
+    });
   }
 
   render() {
