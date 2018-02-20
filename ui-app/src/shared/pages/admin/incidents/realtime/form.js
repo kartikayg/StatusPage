@@ -276,20 +276,16 @@ class Form extends React.Component {
 
     return (
       <form className="ui form">
-        {
-          this.state.action === 'New'
-          &&
-          <div className="field required">
-            <label>Incident Name</label>
-            <input
-              type="text"
-              name="name"
-              onChange={this.onInputChange}
-              value={this.state.inputs.name}
-              readOnly={this.state.action === 'Update'}
-            />
-          </div>
-        }
+        <div className="field required">
+          <label>Incident Name</label>
+          <input
+            type="text"
+            name="name"
+            onChange={this.onInputChange}
+            value={this.state.inputs.name}
+            readOnly={this.state.action === 'Update'}
+          />
+        </div>
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
           <label>Status</label>
           <select

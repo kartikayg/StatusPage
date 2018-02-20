@@ -46,27 +46,26 @@ class UpdateRow extends React.Component {
     return (
       <div
         className="item incident-update-row"
-        style={{ paddingBottom: '2rem' }}
+        style={{ paddingBottom: '1.25rem' }}
         onMouseOut={this.onMouseOut}
         onMouseOver={this.onMouseOver}
       >
-        <div style={editButtonStyles} className="right floated content">
-          <button
-            className="ui button tiny"
-            onClick={this.props.onEditButtonClick(update.id)}
-          >
-            Edit
-          </button>
-        </div>
         <div className="content">
-          <h3 style={{ display: 'inline', fontSize: '1.1rem' }}>
-            {incidentStatus[update.status].displayName}
-          </h3>
-          {' '}-{' '}
-          <span className="sub" style={{ color: 'rgba(0,0,0,.6)' }}>
-            {update.fmt_displayed_at.format('MMM D, YYYY - h:mm A (zz)')}
-          </span>
-          <div style={{ marginTop: '5px', fontSize: '1.05rem' }} >
+          <div style={{ display: 'block', height: '20px' }}>
+            <h3 style={{ display: 'inline', fontSize: '1.1rem' }}>
+              {incidentStatus[update.status].displayName}
+            </h3>
+            {' '}-{' '}
+            <span className="sub" style={{ color: 'rgba(0,0,0,.6)' }}>
+              {update.fmt_displayed_at.format('MMM D, YYYY - h:mm A (zz)')}
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <a style={editButtonStyles} className="ui label small" onClick={this.props.onEditButtonClick(update.id)}>
+              <i className="edit icon"></i>
+              Edit
+            </a>
+          </div>
+          <div style={{ marginTop: '0.75rem', fontSize: '1.05rem' }} >
             <RenderMessage message={update.message} />
           </div>
         </div>

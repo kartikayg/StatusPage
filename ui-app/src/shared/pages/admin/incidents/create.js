@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Helmet } from 'react-helmet';
 
 import NewRealtime from './realtime/create';
 import NewBackfilled from './backfilled/create';
@@ -14,6 +15,9 @@ const NewIncident = (props) => {
 
   return (
     <div>
+      <Helmet>
+        <title>New Incident</title>
+      </Helmet>
       {type === 'realtime' && <NewRealtime {...props} />}
       {type === 'backfilled' && <NewBackfilled {...props} />}
     </div>

@@ -14,6 +14,7 @@ import { NotificationManager } from 'react-notifications';
 import List from './incidents/list';
 import NewIncident from './incidents/create';
 import EditIncident from './incidents/edit';
+import ViewIncident from './incidents/view';
 import * as incActions from '../../redux/actions/incidents';
 import { updateComponentStatus } from '../../redux/actions/components';
 import { fmtIncidents } from '../../redux/helper';
@@ -65,6 +66,24 @@ const IncidentsDisplay = (props) => {
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/view/:id`}
           render={(subProps) => {
+
+            // find the instance based on the id
+            const { id } = subProps.match.params;
+            const incident = props.incidents.find(i => {
+              return i.id === id;
+            });
+
+            if (!incident) {
+              NotificationManager.error('Incident not found.');
+              return <Redirect to="/admin/incidents" />;
+            }
+
+            return <ViewIncident {...subProps}
+              incident={incident}
+              components={props.components}
+              updateIncidentAction={props.updateIncidentAction}
+            />;
+
           }}
         />
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/:tab?`}
