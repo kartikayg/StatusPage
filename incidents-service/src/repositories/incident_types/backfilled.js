@@ -22,7 +22,8 @@ const init = (dao, messagingQueue) => {
   // repo object. add functions from common object to this repo
   const repo = Object.assign({}, {
     type: INCIDENT_TYPE,
-    remove: commonRepo.remove
+    remove: commonRepo.remove,
+    changeIncidentUpdateEntry: commonRepo.changeIncidentUpdateEntry
   });
 
   /**
