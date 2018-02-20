@@ -15,6 +15,9 @@ const statuses = {
   },
   resolved: {
     displayName: 'Resolved'
+  },
+  update: {
+    displayName: 'Update'
   }
 };
 

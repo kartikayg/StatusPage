@@ -31,6 +31,7 @@ const ViewRealtimeIncident = (props) => {
           incidentId={props.incident.id}
           updates={_orderBy(['created_at'])(['desc'])(props.incident.updates)}
           updateIncidentAction={props.updateIncidentAction}
+          allowNewUpdate={true}
         />
       </div>
     </div>

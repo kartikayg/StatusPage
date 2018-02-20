@@ -298,7 +298,7 @@ class Form extends React.Component {
               _flow(
                 // hide resolved if not update
                 _pickBy((v, k) => {
-                  return this.state.action === 'Update' || k !== 'resolved';
+                  return k !== 'update' && (this.state.action === 'Update' || k !== 'resolved');
                 }),
                 _map((v, k) => {
                   return <option key={k} value={k}>{v.displayName}</option>;

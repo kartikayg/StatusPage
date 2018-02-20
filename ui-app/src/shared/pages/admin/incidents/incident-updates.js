@@ -82,11 +82,64 @@ class IncidentUpdates extends React.Component {
     this.state = this.getInitialState();
   }
 
+  static defaultProps = {
+    allowNewUpdate: false
+  }
+
   static propTypes = {
     incidentId: PropTypes.string.isRequired,
     updates: PropTypes.arrayOf(PropTypes.object).isRequired,
-    updateIncidentAction: PropTypes.func.isRequired
+    updateIncidentAction: PropTypes.func.isRequired,
+    allowNewUpdate: PropTypes.bool.isRequired
   }
+
+  // initial state for this component
+  getInitialState = () => {
+    return {
+      editIncidentUpdate: {
+        showModal: false,
+        id: null,
+        ajax: false,
+        inputs: {
+          message: { text: '', selection: null },
+          displayed_at: null
+        }
+      },
+      addIncidentUpdate: {
+        showModal: false,
+        ajax: false,
+        inputs: {
+          message: { text: '', selection: null },
+          do_notify_subscribers: true
+        }
+      }
+    };
+  }
+
+  getModalKeyByType = (type) => {
+    return type === 'add' ? 'addIncidentUpdate' : 'editIncidentUpdate';
+  }
+
+  // add incident update button clicked
+  onAddButtonClick = (e) => {
+
+    e.preventDefault();
+
+    if (this.state.addIncidentUpdate.showModal === true) {
+      return;
+    }
+
+    this.setState(prevState => {
+      return {
+        addIncidentUpdate: {
+          ...prevState.addIncidentUpdate,
+          showModal: true
+        }
+      };
+    });
+
+  }
+
 
   // on edit click, show the modal
   onEditButtonClick = (id) => (e) => { // eslint-disable-line arrow-body-style
@@ -119,28 +172,36 @@ class IncidentUpdates extends React.Component {
 
   }
 
-  // close delete confirm modal
-  closeEditModal = (e) => {
+  // close modal
+  onCloseModal = (e, type) => {
 
     if (e) {
       e.preventDefault();
     }
 
-    if (this.state.editIncidentUpdate.ajax === true) {
+    const key = this.getModalKeyByType(type);
+
+    if (this.state[key].ajax === true) {
       return;
     }
 
-    this.setState(this.getInitialState());
+    this.setState({
+      [key]: this.getInitialState()[key]
+    });
 
   }
 
-  updateInputValue = (name, value) => {
+  // updates input value from modal
+  updateInputValue = (type, name, value) => {
+
+    const key = this.getModalKeyByType(type);
+
     this.setState(prevState => {
       return {
-        editIncidentUpdate: {
-          ...prevState.editIncidentUpdate,
+        [key]: {
+          ...prevState[key],
           inputs: {
-            ...prevState.editIncidentUpdate.inputs,
+            ...prevState[key].inputs,
             [name]: value
           }
         }
@@ -148,32 +209,42 @@ class IncidentUpdates extends React.Component {
     });
   }
 
-  updateEditModalAjaxState = (state, cb) => {
+  updateModalAjaxState = (type, state, cb) => {
+
+    const key = this.getModalKeyByType(type);
+
     this.setState(prevState => {
       return {
-        editIncidentUpdate: {
-          ...prevState.editIncidentUpdate,
+        [key]: {
+          ...prevState[key],
           ajax: state
         }
       };
     }, cb);
+
   }
 
-  onMessageChange = (value) => {
-    this.updateInputValue('message', value);
+  onMessageChange = (type, value) => {
+    this.updateInputValue(type, 'message', value);
   }
 
   onDateChange = (date) => {
-    this.updateInputValue('displayed_at', date);
+    this.updateInputValue('edit', 'displayed_at', date);
   }
 
+  onNotifySubscriberChange = (e) => {
+    const { checked } = e.target;
+    this.updateInputValue('add', 'do_notify_subscribers', checked);
+  }
+
+  // save button on edit form clicked
   onSaveEditForm = () => {
 
     if (!this.state.editIncidentUpdate.id || this.state.editIncidentUpdate.ajax) {
       return;
     }
 
-    this.updateEditModalAjaxState(true, async () => {
+    this.updateModalAjaxState('edit', true, async () => {
 
       try {
 
@@ -186,14 +257,17 @@ class IncidentUpdates extends React.Component {
 
         const savedIncident = await apiGateway.patch(url, { update: updData });
 
-        this.updateEditModalAjaxState(false, () => {
+        this.updateModalAjaxState('edit', false, () => {
           this.props.updateIncidentAction(savedIncident);
           NotificationManager.success('Incident successfully updated');
-          this.setState(this.getInitialState());
+          const key = this.getModalKeyByType('edit');
+          this.setState({
+            [key]: this.getInitialState()[key]
+          });
         });
       }
       catch (err) {
-        this.updateEditModalAjaxState(false);
+        this.updateModalAjaxState('edit', false);
         NotificationManager.error(err.message);
       }
 
@@ -201,79 +275,172 @@ class IncidentUpdates extends React.Component {
 
   }
 
-  getInitialState = () => {
-    return {
-      editIncidentUpdate: {
-        showModal: false,
-        id: null,
-        ajax: false,
-        inputs: {
-          message: { text: '', selection: null }
-        }
+  // save button on add form clicked
+  onSaveAddForm = () => {
+
+    if (this.state.addIncidentUpdate.ajax) {
+      return;
+    }
+
+    this.updateModalAjaxState('add', true, async () => {
+
+      try {
+
+        const updData = {
+          message: this.state.addIncidentUpdate.inputs.message.text,
+          do_notify_subscribers: this.state.addIncidentUpdate.inputs.do_notify_subscribers
+        };
+
+        const url = `/incidents/${this.props.incidentId}`;
+        const savedIncident = await apiGateway.patch(url, { incident: updData });
+
+        this.updateModalAjaxState('add', false, () => {
+          this.props.updateIncidentAction(savedIncident);
+          NotificationManager.success('Incident successfully updated');
+          const key = this.getModalKeyByType('add');
+          this.setState({
+            [key]: this.getInitialState()[key]
+          });
+        });
       }
-    };
+      catch (err) {
+        this.updateModalAjaxState('add', false);
+        NotificationManager.error(err.message);
+      }
+
+    });
+
   }
 
   render() {
 
-    const modalSaveBtnCls = classNames('positive ui button', {
+    const editModalSaveBtnCls = classNames('positive ui button', {
       loading: this.state.editIncidentUpdate.ajax,
       disabled: this.state.editIncidentUpdate.ajax
     });
 
+    const addModalSaveBtnCls = classNames('positive ui button', {
+      loading: this.state.addIncidentUpdate.ajax,
+      disabled: this.state.addIncidentUpdate.ajax
+    });
+
+    /* eslint-disable brace-style */
+
     return (
-      <div className="ui very relaxed list divided middle aligned">
-        {this.props.updates.map(u => {
-          return <UpdateRow
-                    key={u.id}
-                    item={u}
-                    onEditButtonClick={this.onEditButtonClick}
-                  />;
-        })}
-        <Modal
-          size='tiny'
-          open={this.state.editIncidentUpdate.showModal}
-          onClose={this.closeEditModal}
-          closeOnDocumentClick={true}
-          className='app-incident-update-edit-modal'
-        >
-          <Modal.Header>
-            Editing Incident-Update
-          </Modal.Header>
-          <Modal.Content>
-            <form className="ui form">
-              <div className='field required'>
-                <label>Date & Time ({moment().format('zz')})</label>
-                <DatePicker
-                  selected={this.state.editIncidentUpdate.inputs.displayed_at}
-                  onChange={this.onDateChange}
-                  showTimeSelect
-                  timeFormat="h:mm A"
-                  timeIntervals={5}
-                  dateFormat="MMM DD, YYYY  h:mm A"
-                />
-              </div>
-              <div className="field required">
-                <label>Message</label>
-                <MessageInput
-                  value={this.state.editIncidentUpdate.inputs.message}
-                  onChange={this.onMessageChange}
-                  name={'message'}
-                />
-              </div>
-            </form>
-          </Modal.Content>
-          <Modal.Actions>
-            <a href="#" onClick={this.closeEditModal}>Cancel</a>{' '}
-            <button className={modalSaveBtnCls} onClick={this.onSaveEditForm}>
-              Save
+      <div>
+        {this.props.allowNewUpdate &&
+          <div style={{ marginBottom: '1.5rem' }}>
+            <button className='ui button tiny positive' onClick={this.onAddButtonClick}>
+              <i className="add icon"></i>
+              Update
             </button>
-          </Modal.Actions>
-        </Modal>
+          </div>
+        }
+        <div className="ui very relaxed list divided middle aligned">
+          {this.props.updates.map(u => {
+            return <UpdateRow
+                      key={u.id}
+                      item={u}
+                      onEditButtonClick={this.onEditButtonClick}
+                    />;
+          })}
+
+          {/* Edit incident-update modal */}
+          <Modal
+            size='tiny'
+            open={this.state.editIncidentUpdate.showModal}
+            onClose={(e) => { this.onCloseModal(e, 'edit'); }}
+            closeOnDocumentClick={true}
+            className='app-incident-update-edit-modal'
+          >
+            <Modal.Header>
+              Editing Incident-Update
+            </Modal.Header>
+            <Modal.Content>
+              <form className="ui form">
+                <div className='field required'>
+                  <label>Date & Time ({moment().format('zz')})</label>
+                  <DatePicker
+                    selected={this.state.editIncidentUpdate.inputs.displayed_at}
+                    onChange={this.onDateChange}
+                    showTimeSelect
+                    timeFormat="h:mm A"
+                    timeIntervals={5}
+                    dateFormat="MMM DD, YYYY  h:mm A"
+                  />
+                </div>
+                <div className="field required">
+                  <label>Message</label>
+                  <MessageInput
+                    value={this.state.editIncidentUpdate.inputs.message}
+                    onChange={(val) => { this.onMessageChange('edit', val); }}
+                    name={'message'}
+                  />
+                </div>
+              </form>
+            </Modal.Content>
+            <Modal.Actions>
+              <a href="#" onClick={(e) => { this.onCloseModal(e, 'edit'); }}>
+                Cancel
+              </a>
+              {' '}
+              <button className={editModalSaveBtnCls} onClick={this.onSaveEditForm}>
+                Save
+              </button>
+            </Modal.Actions>
+          </Modal>
+
+          {/* add new update modal */}
+          {this.props.allowNewUpdate &&
+            <Modal
+              size='tiny'
+              open={this.state.addIncidentUpdate.showModal}
+              onClose={(e) => { this.onCloseModal(e, 'add'); }}
+              closeOnDocumentClick={true}
+              className='app-incident-update-add-modal'
+            >
+              <Modal.Header>
+                Add Incident-Update
+              </Modal.Header>
+              <Modal.Content>
+                <form className="ui form">
+                  <div className="field required">
+                    <label>Message</label>
+                    <MessageInput
+                      value={this.state.addIncidentUpdate.inputs.message}
+                      onChange={(val) => { this.onMessageChange('add', val); }}
+                      name={'message'}
+                    />
+                  </div>
+                  <div className="ui checkbox">
+                    <input
+                      type="checkbox"
+                      name="do_notify_subscribers"
+                      checked={this.state.addIncidentUpdate.inputs.do_notify_subscribers}
+                      onChange={this.onNotifySubscriberChange}
+                    />
+                    <label>Notify Subscribers</label>
+                  </div>
+                </form>
+              </Modal.Content>
+              <Modal.Actions>
+                <a href="#" onClick={(e) => { this.onCloseModal(e, 'add'); }}>
+                  Cancel
+                </a>
+                {' '}
+                <button className={addModalSaveBtnCls} onClick={this.onSaveAddForm}>
+                  Save
+                </button>
+              </Modal.Actions>
+            </Modal>
+          }
+        </div>
       </div>
     );
-  }
 
+    /* eslint-enable brace-style */
+
+  }
 }
 
 export default IncidentUpdates;
