@@ -11,3 +11,8 @@ services:
     command: ["npm", "run", "dev"]
     env_file:
       - .env
+
+networks:
+  default:
+    external:
+      name: status_page_app
