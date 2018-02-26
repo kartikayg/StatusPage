@@ -10,7 +10,9 @@ const instance = client.init(process.env.INCIDENTS_SERVICE_URI);
 // default message per status
 const defaultMessages = {
   investigating: 'We are currently investigating this issue.',
+  in_progress: 'The scheduled maintenance is in progress.',
   identified: 'The issue has been identified and a fix is being implemented.',
+  verifying: 'We are verifying the scheduled maintenance.',
   monitoring: 'A fix has been implemented and we are monitoring the results.',
   resolved: 'This incident has been resolved.'
 };
