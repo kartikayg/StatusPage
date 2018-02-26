@@ -81,7 +81,7 @@ const init = (dao, messagingQueue) => {
 
     const baseData = {
       status: 'in_progress',
-      message: 'The scheduled maintenance is in progress now.'
+      message: 'The scheduled maintenance is in progress.'
     };
 
     const updates = incidents.map(i => {

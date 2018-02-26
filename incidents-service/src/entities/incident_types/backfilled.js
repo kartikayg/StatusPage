@@ -9,7 +9,8 @@ import incidentUpdate from '../incident-update';
 const schema = Joi.object({
 
   components: Joi.array()
-    .allow(null),
+    .allow(null)
+    .min(0),
 
   // the highest status from all of the impacted components.
   // this kind of defines the impact status of this incident.
