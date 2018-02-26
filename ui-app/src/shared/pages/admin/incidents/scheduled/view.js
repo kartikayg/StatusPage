@@ -1,5 +1,5 @@
 /**
- * @fileoverview View a single realtime incident
+ * @fileoverview View a single scheduled maintenance
  */
 
 import React from 'react';
@@ -9,11 +9,11 @@ import _orderBy from 'lodash/fp/orderBy';
 import { getColor } from '../../../../presentation/component-status';
 import IncidentUpdates from '../incident-updates';
 
-const ViewRealtimeIncident = (props) => {
+const ViewScheduledIncident = (props) => {
 
   return (
     <div>
-       <h1 className="ui header" style={{ color: getColor(props.incident.components_impact_status) }}>
+       <h1 className="ui header" style={{ color: getColor('maintenance') }}>
         {props.incident.name}
       </h1>
       <div>
@@ -31,16 +31,16 @@ const ViewRealtimeIncident = (props) => {
           incidentId={props.incident.id}
           updates={_orderBy(['created_at'])(['desc'])(props.incident.updates)}
           updateIncidentAction={props.updateIncidentAction}
-          allowNewUpdate={true}
+          allowNewUpdate={props.incident.scheduled_status === 'completed'}
         />
       </div>
     </div>
   );
 };
 
-ViewRealtimeIncident.propTypes = {
+ViewScheduledIncident.propTypes = {
   incident: PropTypes.object.isRequired,
   updateIncidentAction: PropTypes.func.isRequired
 };
 
-export default ViewRealtimeIncident;
+export default ViewScheduledIncident;

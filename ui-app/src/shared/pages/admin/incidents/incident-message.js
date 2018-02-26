@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Component for Incident-message editor with markdown support
  */
 
 import React from 'react';

@@ -1,20 +1,18 @@
 /**
  * @fileoverview Shell for editing an incident. This will render
- * the correct component based on the type.
+ * the correct component based on the incident type.
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet';
 
 import EditRealtimeIncident from './realtime/edit';
+import EditScheduledIncident from './scheduled/edit';
 
 const EditIncident = (props) => {
   return (
     <div>
-      <Helmet>
-        <title>Edit Incident</title>
-      </Helmet>
-      {props.incident.type === 'realtime' && <EditRealtimeIncident {...props} />}
+      { props.incident.type === 'realtime' && <EditRealtimeIncident {...props} /> }
+      { props.incident.type === 'scheduled' && <EditScheduledIncident {...props} /> }
     </div>
   );
 };

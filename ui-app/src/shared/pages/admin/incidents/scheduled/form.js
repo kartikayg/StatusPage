@@ -1,28 +1,26 @@
 /**
- * @fileoverview Form for a new/update realtime incident
+ * @fileoverview Form for a new/update scheduled incident
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import { NotificationManager } from 'react-notifications';
+import DatePicker from 'react-datepicker';
+import moment from 'moment-timezone';
+import _getOr from 'lodash/fp/getOr';
 import _pick from 'lodash/fp/pick';
 import _flow from 'lodash/fp/flow';
-import _getOr from 'lodash/fp/getOr';
-import { NotificationManager } from 'react-notifications';
 
 import { Input as MessageInput } from '../incident-message';
-import { realtimeStatuses } from '../../../../redux/helpers/incidents';
+import { scheduledStatuses } from '../../../../redux/helpers/incidents';
 import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
 
+const _pickBy = require('lodash/fp/pickBy').convert({ cap: false });
 const _each = require('lodash/fp/each').convert({ cap: false });
 const _map = require('lodash/fp/map').convert({ cap: false });
-const _pickBy = require('lodash/fp/pickBy').convert({ cap: false });
-
-const componentStatusesOrder = [
-  'operational', 'maintenance', 'degraded_performance', 'partial_outage', 'major_outage'
-];
 
 class Form extends React.Component {
 
@@ -46,25 +44,41 @@ class Form extends React.Component {
         // if the id exists in the components array
         checked: _getOr([], 'components', props.incident)
           .findIndex(ic => ic.id === c.id) !== -1, // eslint-disable-line arrow-body-style
-        status: c.status,
-        originalStatus: c.status
+        originalStatus: c.status,
+        status: c.status
       };
     });
 
     this.state = {
       inputs: {
         name: _getOr('', 'name', props.incident),
-        type: 'realtime',
+        type: 'scheduled',
         components: cmpState,
-        status: _getOr('investigating', 'latestUpdate.status', props.incident),
+        status: _getOr('scheduled', 'latestUpdate.status', props.incident),
         message: { text: '', selection: null },
         do_notify_subscribers: true,
-        originalStatus: _getOr('investigating', 'latestUpdate.status', props.incident)
+        scheduled_auto_status_updates: _getOr(false, 'scheduled_auto_status_updates', props.incident),
+        scheduled_auto_updates_send_notifications: _getOr(false, 'scheduled_auto_updates_send_notifications', props.incident),
+        originalStatus: _getOr('scheduled', 'latestUpdate.status', props.incident),
+        scheduled_start_time: _getOr(null, 'fmt_scheduled_start_time', props.incident),
+        scheduled_end_time: _getOr(null, 'fmt_scheduled_end_time', props.incident)
       },
       saving: false,
       action: props.incident ? 'Update' : 'New'
     };
 
+  }
+
+  // updates input value from modal
+  updateInputValue = (name, value) => {
+    this.setState(prevState => {
+      return {
+        inputs: {
+          ...prevState.inputs,
+          [name]: value
+        }
+      };
+    });
   }
 
   /**
@@ -90,24 +104,15 @@ class Form extends React.Component {
     });
   }
 
-  // update an input's value in the state
-  updateInputValue = (name, value) => {
-    this.setState(prevState => {
-      return {
-        inputs: {
-          ...prevState.inputs,
-          [name]: value
-        }
-      };
-    });
-  }
-
   // on input change, update the state
   onInputChange = (e) => {
+
     const { target } = e;
     const { name } = target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
+
     this.updateInputValue(name, value);
+
   }
 
   // on component checkbox
@@ -183,32 +188,31 @@ class Form extends React.Component {
           'name',
           'status',
           'do_notify_subscribers',
-          'type']
-        )(this.state.inputs);
+          'type',
+          'scheduled_auto_status_updates',
+          'scheduled_auto_updates_send_notifications'
+        ])(this.state.inputs);
 
-        // get the message
         incData.message = this.state.inputs.message.text;
-
-        // for status, if its an update
-        if (this.state.action === 'Update' &&
-            this.state.inputs.originalStatus === this.state.inputs.status &&
-            !this.state.inputs.message
-        ) {
-          incData.status = '';
-        }
-
         incData.components = impactedComponents.map(c => {
           return c.id;
         });
 
-        // calculate the highest impacted component status
-        if (impactedComponents.length > 0) {
-          incData.components_impact_status = impactedComponents.reduce((hStatus, { status }) => {
-            // find position of the statuses and return the highest
-            const hPos = componentStatusesOrder.indexOf(hStatus);
-            const cPos = componentStatusesOrder.indexOf(status);
-            return hPos > cPos ? hStatus : status;
-          }, impactedComponents[0].status);
+        // if an update and no message and status remain the same, don't post the
+        // status
+        if (this.state.action === 'Update' &&
+            this.state.inputs.originalStatus === this.state.inputs.status &&
+            !incData.message
+        ) {
+          incData.status = '';
+        }
+
+        if (this.state.inputs.scheduled_start_time) {
+          incData.scheduled_start_time = this.state.inputs.scheduled_start_time.format();
+        }
+
+        if (this.state.inputs.scheduled_end_time) {
+          incData.scheduled_end_time = this.state.inputs.scheduled_end_time.format();
         }
 
         let savedIncident;
@@ -232,15 +236,15 @@ class Form extends React.Component {
 
           if (this.state.action === 'New') {
             this.props.addIncidentAction(savedIncident);
-            NotificationManager.success('Incident successfully created');
+            NotificationManager.success('Maintenance successfully created');
           }
           else {
             this.props.updateIncidentAction(savedIncident);
-            NotificationManager.success('Incident successfully updated');
+            NotificationManager.success('Maintenance successfully updated');
           }
 
           // go back to listing
-          this.props.history.push('/admin/incidents');
+          this.props.history.push('/admin/incidents/scheduled');
 
         });
 
@@ -256,6 +260,7 @@ class Form extends React.Component {
 
   }
 
+
   render() {
 
     const saveBtnClasses = classNames('ui button positive', {
@@ -263,10 +268,23 @@ class Form extends React.Component {
       disabled: this.state.saving
     });
 
+    const scheduledStatus = _getOr('scheduled', 'scheduled_status', this.props.incident);
+    const allowedStatusesForUpdate = [];
+    switch (scheduledStatus) {
+      case 'scheduled':
+        allowedStatusesForUpdate.push('scheduled', 'in_progress', 'cancelled');
+        break;
+      default:
+        allowedStatusesForUpdate.push('in_progress', 'verifying', 'resolved', 'cancelled');
+        break;
+    }
+
+    /* eslint-disable brace-style */
+
     return (
       <form className="ui form">
         <div className="field required">
-          <label>Incident Name</label>
+          <label>Maintenance Name</label>
           <input
             type="text"
             name="name"
@@ -274,33 +292,65 @@ class Form extends React.Component {
             value={this.state.inputs.name}
           />
         </div>
-        <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
-          <label>Status</label>
-          <select
-            className="ui search dropdown"
-            name="status"
-            onChange={this.onInputChange}
-            value={this.state.inputs.status}
-          >
-            {(
-              _flow(
-                // hide resolved if not update
-                _pickBy((v, k) => {
-                  return k !== 'update' && (this.state.action === 'Update' || k !== 'resolved');
-                }),
-                _map((v, k) => {
-                  return <option key={k} value={k}>{v.displayName}</option>;
-                })
-              )(realtimeStatuses)
-            )}
-          </select>
+
+        {this.state.action === 'Update' &&
+          <div className='field required'>
+            <label>Status</label>
+            <select
+              className="ui search dropdown"
+              name="status"
+              onChange={this.onInputChange}
+              value={this.state.inputs.status}
+            >
+              {(
+                _flow(
+                  // hide resolved if not update
+                  _pickBy((v, k) => {
+                    return allowedStatusesForUpdate.includes(k);
+                  }),
+                  _map((v, k) => {
+                    return <option key={k} value={k}>{v.displayName}</option>;
+                  })
+                )(scheduledStatuses)
+              )}
+            </select>
+          </div>
+        }
+
+        <div className="two fields">
+          <div className="field required">
+            <label>Start Date & Time ({moment().format('zz')})</label>
+            <DatePicker
+              selected={this.state.inputs.scheduled_start_time}
+              onChange={(val) => { this.updateInputValue('scheduled_start_time', val); }}
+              showTimeSelect
+              timeFormat="h:mm A"
+              timeIntervals={5}
+              dateFormat="MMM DD, YYYY  h:mm A"
+              disabled={scheduledStatus !== 'scheduled'}
+              minDate={moment()}
+            />
+          </div>
+          <div className="field required">
+            <label>End Date & Time ({moment().format('zz')})</label>
+            <DatePicker
+              selected={this.state.inputs.scheduled_end_time}
+              onChange={(val) => { this.updateInputValue('scheduled_end_time', val); }}
+              showTimeSelect
+              timeFormat="h:mm A"
+              timeIntervals={5}
+              dateFormat="MMM DD, YYYY  h:mm A"
+              minDate={this.state.inputs.scheduled_start_time}
+            />
+          </div>
         </div>
+
         <div className={`field ${this.state.action === 'New' ? 'required' : ''}`}>
-          <label>Message</label>
+          <label>{this.state.action === 'New' ? 'Details' : 'New Update Message'}</label>
           <div style={{ border: '1px solid rgba(0, 0, 0, 0.125)', padding: '10px', borderRadius: '0.2rem' }}>
             <MessageInput
               value={this.state.inputs.message}
-              onChange={(value) => { this.updateInputValue('message', value); }} // eslint-disable-line brace-style
+              onChange={(val) => { this.updateInputValue('message', val); }}
               name={'message'}
             />
           </div>
@@ -323,20 +373,27 @@ class Form extends React.Component {
                         />
                       </td>
                       <td>{c.name}</td>
-                      <td className="right aligned five wide">
-                        <StatusDropDown
-                          value={this.state.inputs.components[c.id].status}
-                          readOnly={!this.state.inputs.components[c.id].checked}
-                          onChange={this.onComponentStatusChange}
-                          name={`component-${c.id}-status`}
-                        />
-                      </td>
+                      {this.state.action === 'Update' &&
+                        <td className="right aligned five wide">
+                          <StatusDropDown
+                            value={this.state.inputs.components[c.id].status}
+                            readOnly={!this.state.inputs.components[c.id].checked}
+                            onChange={this.onComponentStatusChange}
+                            name={`component-${c.id}-status`}
+                          />
+                        </td>
+                      }
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
+          {this.state.action === 'Update' &&
+            <p style={{ fontStyle: 'italic', marginTop: '0.2rem' }}>
+              If auto-update is not enabled, you need to change the component status manually
+            </p>
+          }
         </div>
         <div className="field">
           <div className="ui checkbox">
@@ -349,6 +406,35 @@ class Form extends React.Component {
             <label>Notify Subscribers</label>
           </div>
         </div>
+
+        <h4>---- Automated Updates ----</h4>
+
+        <div className="field">
+          <div className="ui checkbox">
+            <input
+              type="checkbox"
+              name="scheduled_auto_status_updates"
+              checked={this.state.inputs.scheduled_auto_status_updates}
+              onChange={this.onInputChange}
+            />
+            <label>Update statuses for this maintenance and components on start and end time</label>
+          </div>
+        </div>
+
+        {this.state.inputs.scheduled_auto_status_updates &&
+          <div className="field">
+            <div className="ui checkbox" style={{ marginLeft: '3rem' }}>
+              <input
+                type="checkbox"
+                name="scheduled_auto_updates_send_notifications"
+                checked={this.state.inputs.scheduled_auto_updates_send_notifications}
+                onChange={this.onInputChange}
+              />
+              <label>Notify Subscribers when auto updates</label>
+            </div>
+          </div>
+        }
+
         <div style={{ marginTop: '1.5rem' }}>
           <button
             className={saveBtnClasses}
@@ -357,11 +443,13 @@ class Form extends React.Component {
           >
             Submit
           </button>{' '}
-          <Link to="/admin/incidents">Cancel</Link>
+          <Link to="/admin/incidents/scheduled">Cancel</Link>
         </div>
       </form>
     );
   }
+
+  /* eslint-enable brace-style */
 
 }
 

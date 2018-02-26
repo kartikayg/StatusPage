@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview View component for a backfilled incident
  */
 
 import React from 'react';

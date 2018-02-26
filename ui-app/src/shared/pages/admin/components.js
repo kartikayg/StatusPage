@@ -14,7 +14,7 @@ import List from './components/list';
 import Form from './components/form';
 import * as rActions from '../../redux/actions/components';
 
-import { getComponentsByGroup } from '../../redux/helper';
+import { getComponentsByGroup } from '../../redux/helpers/components';
 
 /**
  * Container for displaying all section of components

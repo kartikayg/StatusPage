@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Creates a new realtime incident
  */
 
 import React from 'react';

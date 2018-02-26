@@ -11,7 +11,7 @@ import { NotificationManager } from 'react-notifications';
 import RealtimeList from './realtime/list';
 import ScheduledList from './scheduled/list';
 import { apiGateway } from '../../../lib/ajax-actions';
-import { filterRealtimeIncidents, filterScheduledIncidents } from '../../../redux/helper';
+import { filterRealtimeIncidents, filterScheduledIncidents } from '../../../redux/helpers/incidents';
 
 /**
  * Listing of Incidents

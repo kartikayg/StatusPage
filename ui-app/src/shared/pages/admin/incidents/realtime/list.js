@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview List of realtime incidents
  */
 
 import React from 'react';
@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import _sortBy from 'lodash/fp/sortBy';
 
-import { filterUnresolvedIncidents, filterResolvedIncidents } from '../../../../redux/helper';
+import { filterUnresolvedIncidents, filterResolvedIncidents } from '../../../../redux/helpers/incidents';
 
 import UnresolvedListing from './list/unresolved';
 import ResolvedListing from './list/resolved';
@@ -26,6 +26,7 @@ const Listing = ({ incidents, onDeleteIncidentClick }) => {
   }
   else {
 
+    // group by unresolved and resolved
     const unresolved = _sortBy(['created_at'])(filterUnresolvedIncidents(incidents));
     const resolved = _sortBy(['resolved_at'])(filterResolvedIncidents(incidents));
 

@@ -17,7 +17,7 @@ import EditIncident from './incidents/edit';
 import ViewIncident from './incidents/view';
 import * as incActions from '../../redux/actions/incidents';
 import { updateComponentStatus } from '../../redux/actions/components';
-import { fmtIncidents } from '../../redux/helper';
+import { fmtIncidents } from '../../redux/helpers/incidents';
 
 /**
  * Container for displaying all section of components
@@ -29,6 +29,8 @@ const IncidentsDisplay = (props) => {
         <title>Incidents</title>
       </Helmet>
       <Switch>
+
+        {/* Adding a new incident */}
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/add/:type?`}
           render={(subProps) => {
             if (props.components.length === 0) {
@@ -41,6 +43,8 @@ const IncidentsDisplay = (props) => {
                    />;
           }}
         />
+
+      {/* Upading incident */}
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/edit/:id`}
           render={(subProps) => {
 
@@ -64,6 +68,8 @@ const IncidentsDisplay = (props) => {
 
           }}
         />
+
+      {/* Viewing incident */}
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/view/:id`}
           render={(subProps) => {
 
@@ -86,6 +92,8 @@ const IncidentsDisplay = (props) => {
 
           }}
         />
+
+      {/* Listing incident */}
         <Route key={`ROUTE_${Math.random()}`} path={`${props.match.path}/:tab?`}
           render={(subProps) => {
             return <List {...subProps}

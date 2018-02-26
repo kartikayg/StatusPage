@@ -1,24 +1,21 @@
 /**
- * @fileoverview Listing of unresolved incidents
+ * @fileoverview Listing of Inprogress maintenance
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { statuses, getHighestImpactStatus } from '../../../../../redux/helpers/incidents';
-import { StatusIconWithText, getColor } from '../../../../../presentation/component-status';
+import { statuses } from '../../../../../redux/helpers/incidents';
+import { getColor } from '../../../../../presentation/component-status';
 
-const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
-
-  const highestImpactStatus = getHighestImpactStatus(incidents);
-
+const InprogressListing = ({ incidents, onDeleteIncidentClick }) => {
   return (
     <table className="ui celled striped table large">
       <thead>
         <tr>
-          <th colSpan="3" style={{ color: getColor(highestImpactStatus) }}>
-            Unresolved ({incidents.length})
+          <th colSpan="3" style={{ color: getColor('maintenance') }}>
+            In Progress ({incidents.length})
           </th>
         </tr>
       </thead>
@@ -42,9 +39,6 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
                   </div>
                 </h4>
               </td>
-              <td className="five wide">
-                <StatusIconWithText status={i.components_impact_status} />
-              </td>
               <td className="center aligned three wide">
                 <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
                   <i className="edit icon large" title="Edit Incident"></i>
@@ -64,9 +58,9 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
   );
 };
 
-UnresolvedListing.propTypes = {
+InprogressListing.propTypes = {
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
   onDeleteIncidentClick: PropTypes.func.isRequired
 };
 
-export default UnresolvedListing;
+export default InprogressListing;

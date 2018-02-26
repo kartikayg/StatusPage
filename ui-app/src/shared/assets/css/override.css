@@ -2,14 +2,14 @@
   margin-bottom: 1.5rem;
 }
 
-.app-incident-update-edit-modal .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
   width: 100px !important;
 }
 
-.app-incident-update-edit-modal .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
   padding: 5px 20px;
 }
 
-.app-incident-update-edit-modal .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
   padding: 5px 0px !important;
 }

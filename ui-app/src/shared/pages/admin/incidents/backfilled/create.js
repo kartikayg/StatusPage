@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import _pick from 'lodash/fp/pick';
 import { NotificationManager } from 'react-notifications';
+import moment from 'moment-timezone';
 
 import { apiGateway } from '../../../../lib/ajax-actions';
 import { StatusDropDown } from '../../../../presentation/component-status';
@@ -38,14 +39,7 @@ class NewIncidentForm extends React.Component {
     this.updateInputValue(name, value);
   }
 
-  onImpactStatusChange = (e, { name, value }) => {
-    this.updateInputValue(name, value);
-  }
-
-  onDateChange = (date) => {
-    this.updateInputValue('displayed_at', date);
-  }
-
+  // update an input's value in the state
   updateInputValue = (name, value) => {
     this.setState(prevState => {
       return {
@@ -57,6 +51,7 @@ class NewIncidentForm extends React.Component {
     });
   }
 
+  // on save button
   onSaveClick = (e) => {
 
     e.preventDefault();
@@ -101,6 +96,8 @@ class NewIncidentForm extends React.Component {
 
   render() {
 
+    /* eslint-disable brace-style */
+
     const saveBtnClasses = classNames('ui button positive', {
       loading: this.state.saving,
       disabled: this.state.saving
@@ -133,14 +130,15 @@ class NewIncidentForm extends React.Component {
               <label>Incident Date</label>
               <DatePicker
                 selected={this.state.inputs.displayed_at}
-                onChange={this.onDateChange}
+                onChange={(date) => { this.updateInputValue('displayed_at', date); }}
+                maxDate={moment()}
               />
             </div>
             <div className='field required'>
               <label>Impact</label>
               <StatusDropDown
                 value={this.state.inputs.components_impact_status}
-                onChange={this.onImpactStatusChange}
+                onChange={(e, { name, value }) => { this.updateInputValue(name, value); }}
                 name='components_impact_status'
                 optional={true}
               />
@@ -159,6 +157,9 @@ class NewIncidentForm extends React.Component {
         </div>
       </div>
     );
+
+    /* eslint-enable brace-style */
+
   }
 
 }

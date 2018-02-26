@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 
 import ViewRealtimeIncident from './realtime/view';
 import ViewBackfilledIncident from './backfilled/view';
+import ViewScheduledIncident from './scheduled/view';
 
 const ViewIncident = (props) => {
   return (
@@ -15,8 +16,9 @@ const ViewIncident = (props) => {
       <Helmet>
         <title>{props.incident.name}</title>
       </Helmet>
-      {props.incident.type === 'realtime' && <ViewRealtimeIncident {...props} />}
-      {props.incident.type === 'backfilled' && <ViewBackfilledIncident {...props} />}
+      { props.incident.type === 'realtime' && <ViewRealtimeIncident {...props} /> }
+      { props.incident.type === 'backfilled' && <ViewBackfilledIncident {...props} /> }
+      { props.incident.type === 'scheduled' && <ViewScheduledIncident {...props} /> }
     </div>
   );
 };

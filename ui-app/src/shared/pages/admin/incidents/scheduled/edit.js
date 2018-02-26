@@ -1,5 +1,5 @@
 /**
- * @fileoverview Editing realtime incident
+ * @fileoverview Editing scheduled incident
  */
 
 import React from 'react';
@@ -9,15 +9,14 @@ import { Helmet } from 'react-helmet';
 
 import Form from './form';
 import IncidentUpdates from '../incident-updates';
-import { getColor } from '../../../../presentation/component-status';
 
-const EditRealtimeIncident = (props) => {
+const EditScheduledIncident = (props) => {
   return (
     <div>
       <Helmet>
-        <title>Edit Incident</title>
+        <title>Edit Scheduled Maintenance</title>
       </Helmet>
-      <h1 className="ui header" style={{ color: getColor(props.incident.components_impact_status) }}>
+      <h1 className="ui header">
         {props.incident.name}
       </h1>
       <div style={{ marginTop: '-10px', fontStyle: 'italic' }}>
@@ -40,9 +39,9 @@ const EditRealtimeIncident = (props) => {
   );
 };
 
-EditRealtimeIncident.propTypes = {
+EditScheduledIncident.propTypes = {
   incident: PropTypes.object.isRequired,
   updateIncidentAction: PropTypes.func.isRequired
 };
 
-export default EditRealtimeIncident;
+export default EditScheduledIncident;

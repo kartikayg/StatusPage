@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Render incident updates with add and edit functionality
  */
 
 import React from 'react';
@@ -11,7 +11,7 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment-timezone';
 import { NotificationManager } from 'react-notifications';
 
-import { statuses as incidentStatus } from '../../../presentation/incident-status';
+import { statuses as incidentStatus } from '../../../redux/helpers/incidents';
 import { Render as RenderMessage, Input as MessageInput } from './incident-message';
 import { apiGateway } from '../../../lib/ajax-actions';
 

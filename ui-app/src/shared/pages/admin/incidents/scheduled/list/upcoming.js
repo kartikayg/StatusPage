@@ -1,32 +1,23 @@
 /**
- * @fileoverview Listing of unresolved incidents
+ * @fileoverview Listing of Upcoming scheduled incidents
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { statuses, getHighestImpactStatus } from '../../../../../redux/helpers/incidents';
-import { StatusIconWithText, getColor } from '../../../../../presentation/component-status';
-
-const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
-
-  const highestImpactStatus = getHighestImpactStatus(incidents);
-
+const UpcomingListing = ({ incidents, onDeleteIncidentClick }) => {
   return (
     <table className="ui celled striped table large">
       <thead>
         <tr>
-          <th colSpan="3" style={{ color: getColor(highestImpactStatus) }}>
-            Unresolved ({incidents.length})
+          <th colSpan="3">
+            Upcoming ({incidents.length})
           </th>
         </tr>
       </thead>
       <tbody>
         {incidents.map(i => {
-
-          const lastUpdateDate = i.latestUpdate.fmt_created_at;
-
           return (
             <tr key={i.id}>
               <td>
@@ -36,22 +27,18 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
                       {i.name}
                     </Link>
                     <div className="sub header">
-                      {statuses[i.latestUpdate.status].displayName},{' '}
-                      {lastUpdateDate.fromNow()} at {lastUpdateDate.format('ddd, h:mm A (zz)')}
+                      Scheduled for{' '}{i.fmt_scheduled_start_time.format('ddd, MMM Do YYYY, h:mm A (zz)')}
                     </div>
                   </div>
                 </h4>
               </td>
-              <td className="five wide">
-                <StatusIconWithText status={i.components_impact_status} />
-              </td>
               <td className="center aligned three wide">
                 <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
-                  <i className="edit icon large" title="Edit Incident"></i>
+                  <i className="edit icon large" title="Edit Maintenance"></i>
                 </Link>
                 <i
                   className="remove circle icon large"
-                  title="Delete Incident"
+                  title="Delete Maintenance"
                   onClick={onDeleteIncidentClick(i.id)}
                   style={{ cursor: 'pointer' }}
                 ></i>
@@ -64,9 +51,9 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
   );
 };
 
-UnresolvedListing.propTypes = {
+UpcomingListing.propTypes = {
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
   onDeleteIncidentClick: PropTypes.func.isRequired
 };
 
-export default UnresolvedListing;
+export default UpcomingListing;
