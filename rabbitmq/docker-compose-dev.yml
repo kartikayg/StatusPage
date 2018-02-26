@@ -13,3 +13,12 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      default:
+        aliases:
+          - rabbitmq
+
+networks:
+  default:
+    external:
+      name: status_page_app
