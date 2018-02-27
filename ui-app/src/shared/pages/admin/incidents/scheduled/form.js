@@ -208,11 +208,11 @@ class Form extends React.Component {
         }
 
         if (this.state.inputs.scheduled_start_time) {
-          incData.scheduled_start_time = this.state.inputs.scheduled_start_time.format();
+          incData.scheduled_start_time = this.state.inputs.scheduled_start_time.set('second', 0).format();
         }
 
         if (this.state.inputs.scheduled_end_time) {
-          incData.scheduled_end_time = this.state.inputs.scheduled_end_time.format();
+          incData.scheduled_end_time = this.state.inputs.scheduled_end_time.set('second', 0).format();
         }
 
         let savedIncident;
