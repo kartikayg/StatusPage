@@ -6,10 +6,12 @@ import moment from 'moment';
 import _pick from 'lodash/fp/pick';
 import _omit from 'lodash/fp/omit';
 import _cloneDeep from 'lodash/fp/cloneDeep';
+import _uniq from 'lodash/fp/uniq';
 
 import common from './common';
 import { InvalidDateError, InvalidIncidentStatusError } from '../errors';
 
+import client from '../../lib/external-client';
 import logger from '../../lib/logger';
 
 const INCIDENT_TYPE = 'scheduled';
@@ -41,6 +43,26 @@ const validateStartEndTime = (incidentObj) => {
   if (endMoment.isBefore(startMoment)) {
     throw new InvalidDateError('End time must be after the start time');
   }
+
+};
+
+/**
+ * Update the components status in components-service.
+ * @param {array} components
+ *  array of component ids to update
+ * @param {string} status
+ *  new status
+ * @return {promise}
+ */
+const updateComponentStatus = async (components, status) => {
+
+  const instance = client.init(process.env.COMPONENTS_SERVICE_URI);
+
+  const updates = components.map(cid => {
+    return instance.patch(`/components/${cid}`, { component: { status } });
+  });
+
+  await Promise.all(updates);
 
 };
 
@@ -79,19 +101,26 @@ const init = (dao, messagingQueue) => {
     // remove db prop _id
     incidents = incidents.map(_omit(['_id']));
 
+    // first update all components to maintenance
+    let componentsToUpdate = [];
+    incidents.forEach(i => {
+      componentsToUpdate.push(...i.components);
+    });
+    componentsToUpdate = _uniq(componentsToUpdate);
+
+    await updateComponentStatus(componentsToUpdate, 'maintenance');
+
+    // now add a new update to the incident and moving it to in-progress
     const baseData = {
       status: 'in_progress',
       message: 'The scheduled maintenance is in progress.'
     };
 
     const updates = incidents.map(i => {
-
       const updateData = Object.assign({}, baseData, {
         do_notify_subscribers: i.scheduled_auto_updates_send_notifications
       });
-
       return repo.update(i, updateData);
-
     });
 
     const updatedIncidents = await Promise.all(updates);
@@ -118,22 +147,29 @@ const init = (dao, messagingQueue) => {
 
     let incidents = await dao.find(pred);
 
+    // first update all components to operational
+    let componentsToUpdate = [];
+    incidents.forEach(i => {
+      componentsToUpdate.push(...i.components);
+    });
+    componentsToUpdate = _uniq(componentsToUpdate);
+
+    await updateComponentStatus(componentsToUpdate, 'operational');
+
     // remove db prop _id
     incidents = incidents.map(_omit(['_id']));
 
+    // now add a new update to the incident and moving it to resolved
     const baseData = {
       status: 'resolved',
       message: 'The schedule maintenance is now completed.'
     };
 
     const updates = incidents.map(i => {
-
       const updateData = Object.assign({}, baseData, {
         do_notify_subscribers: i.scheduled_auto_updates_send_notifications
       });
-
       return repo.update(i, updateData);
-
     });
 
     const updatedIncidents = await Promise.all(updates);

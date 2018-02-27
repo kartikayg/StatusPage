@@ -469,7 +469,6 @@ describe('repo/incidents/type/scheduled', function() {
       setTimeout(done, 6000);
     })
 
-
     it ('should create three scheduled incidents', async function () {
 
       const newPartialIncidentObj = {

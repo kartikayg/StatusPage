@@ -26,6 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "amqp": "^0.2.6",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "cors": "^2.8.4",
@@ -49,6 +50,7 @@
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-2": "^6.24.1",
@@ -86,7 +88,8 @@
       ]
     ],
     "plugins": [
-      "add-module-exports"
+      "add-module-exports",
+      "transform-object-rest-spread"
     ]
   },
   "private": true

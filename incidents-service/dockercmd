@@ -25,7 +25,7 @@ case "$1" in
     ;;
 
   npm)
-    docker-compose -f docker-compose-dev.yml run --rm --no-deps api-gateway $@
+    docker-compose -f docker-compose-dev.yml run --rm --no-deps api $@
     ;;
 
   *)
