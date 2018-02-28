@@ -11,6 +11,7 @@ import AdminPage from './pages/admin';
 
 import ComponentsPage from './pages/admin/components';
 import IncidentsPage from './pages/admin/incidents';
+import SubscriptionsPage from './pages/admin/subscriptions';
 import { apiGateway } from '../shared/lib/ajax-actions';
 
 // raw routes array
@@ -68,6 +69,19 @@ const raw = {
               };
             });
 
+          }
+        },
+        {
+          path: '/admin/subscriptions',
+          component: SubscriptionsPage,
+          title: 'Subscriptions',
+          iconCls: 'bell',
+          initialLoad: () => {
+            return apiGateway.get('/subscriptions').then(subs => {
+              return {
+                subscriptions: subs
+              };
+            });
           }
         }
       ],

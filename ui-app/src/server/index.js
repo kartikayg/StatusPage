@@ -34,6 +34,12 @@ const setupServer = () => {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
+  // set auth token for api gateway
+  app.use((req, res, next) => {
+    apiGateway.setAuthToken(authAdapter.token);
+    next();
+  });
+
   // static files
   app.use('/public', express.static('./dist/public'));
 

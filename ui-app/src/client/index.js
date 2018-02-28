@@ -12,6 +12,9 @@ import ScrollToTop from './scroll-to-top';
 import App from '../shared/app';
 import { configure as configureStore } from '../shared/redux/store';
 
+import auth from './auth';
+import { apiGateway } from '../shared/lib/ajax-actions';
+
 /* eslint-disable no-undef */
 
 // Grab the state from a global variable injected into the server-generated HTML
@@ -23,6 +26,11 @@ if (typeof window !== 'undefined' && window.__PRELOADED_STATE__) {
 
 // create the store
 const store = configureStore(preloadedState);
+
+// set auth token on api gateway, if present
+if (__CLIENT__ === true && auth.token) { // eslint-disable-line no-undef
+  apiGateway.setAuthToken(auth.token);
+}
 
 hydrate(
   (

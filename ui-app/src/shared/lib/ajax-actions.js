@@ -5,8 +5,6 @@
 
 import axios from 'axios';
 
-import auth from '../../client/auth';
-
 // default timeout in ms
 const CALL_TIMEOUT = 5000;
 
@@ -17,7 +15,7 @@ const CALL_TIMEOUT = 5000;
  * @param {object} opts. See axios docs: https://github.com/axios/axios
  * @return {Promise}
  */
-const execute = async (url, method, opts = {}, instance = null) => {
+const executeCall = async (url, method, opts = {}, instance = null) => {
 
   let axiosInstance = instance;
 
@@ -71,54 +69,66 @@ const execute = async (url, method, opts = {}, instance = null) => {
  */
 const apiGateway = (function () {
 
-  // Create an axios instance
   const serverInstance = axios.create({
     timeout: CALL_TIMEOUT,
     baseURL: `${process.env.API_GATEWAY_URI}/api/v1`
   });
 
-  // add client auth headers, if logged in
-  const clientAuthHeaders = {};
-  if (__CLIENT__ === true && auth.token) { // eslint-disable-line no-undef
-    clientAuthHeaders.Authorization = `JWT ${auth.token}`;
-  }
-
   const clientInstance = axios.create({
     timeout: CALL_TIMEOUT,
-    baseURL: 'http://localhost:6040/api/v1',
-    headers: clientAuthHeaders
+    baseURL: 'http://localhost:6040/api/v1'
   });
 
   const getInstance = () => {
 
-    if (__CLIENT__ === true) { // eslint-disable-line no-undef
-      return clientInstance;
+    if (__SERVER__ === true) { // eslint-disable-line no-undef
+      return serverInstance;
     }
 
-    return serverInstance;
+    return clientInstance;
 
   };
 
+  let authToken;
+
   return {
 
+    setAuthToken(token) {
+      authToken = token;
+    },
+
+    execute(url, method, opts = {}) {
+
+      const executeOpts = { ...opts };
+
+      if (authToken) {
+        const headers = opts.headers || {};
+        headers.Authorization = `JWT ${authToken}`;
+        executeOpts.headers = headers;
+      }
+
+      return executeCall(url, method, executeOpts, getInstance());
+
+    },
+
     get(url, opts = {}) {
-      return execute(url, 'get', opts, getInstance());
+      return this.execute(url, 'get', opts);
     },
 
     post(url, data, opts = {}) {
-      return execute(url, 'post', { data, ...opts }, getInstance());
+      return this.execute(url, 'post', { data, ...opts });
     },
 
     patch(url, data, opts = {}) {
-      return execute(url, 'patch', { data, ...opts }, getInstance());
+      return this.execute(url, 'patch', { data, ...opts });
     },
 
     remove(url, opts = {}) {
-      return execute(url, 'delete', opts, getInstance());
+      return this.execute(url, 'delete', opts);
     }
 
   };
 
 }());
 
-export { execute, apiGateway };
+export { executeCall, apiGateway };

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
 import { NotificationManager } from 'react-notifications';
 
-import { execute } from '../lib/ajax-actions';
+import { executeCall } from '../lib/ajax-actions';
 import auth from '../../client/auth';
 
 class LoginForm extends Component {
@@ -53,7 +53,7 @@ class LoginForm extends Component {
 
     this.setState({ saving: true });
 
-    execute('/login', 'post', { data: toSave })
+    executeCall('/login', 'post', { data: toSave })
       .then(res => {
         // save the token and redirect to admin
         auth.token = res.token;
