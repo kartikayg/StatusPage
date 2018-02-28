@@ -7,6 +7,8 @@ import express from 'express';
 import authRoutes from './auth';
 import componentRoutes from './components';
 import incidentsRoutes from './incidents';
+import subscriptionRoutes from './subscriptions';
+
 import authM from '../../../middleware/authenticate';
 
 import thisPackage from '../../../../../package.json';
@@ -36,6 +38,7 @@ export default (repos) => {
   // add routes for external microservices
   router.use(componentRoutes(repos.components, authMiddleware));
   router.use(incidentsRoutes(repos.incidents, authMiddleware));
+  router.use(subscriptionRoutes(repos.notifications, authMiddleware));
 
   // generic error handler. if there is any special case/override, it should be
   // handled by the route.
