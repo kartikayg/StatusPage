@@ -13,9 +13,19 @@ services:
       - .env
     depends_on:
       - notification_db
+    networks:
+      default:
+        aliases:
+          - notification_service
+
   notification_db:
     image: "mongo:3.4"
     volumes:
       - ./mongodata:/data/db
     ports:
       - 6031:27017
+
+networks:
+  default:
+    external:
+      name: status_page_app
