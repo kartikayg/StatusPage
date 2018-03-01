@@ -5,13 +5,11 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import _find from 'lodash/fp/find';
-import { Modal } from 'semantic-ui-react';
-import { NotificationManager } from 'react-notifications';
 
 import RealtimeList from './realtime/list';
 import ScheduledList from './scheduled/list';
-import { apiGateway } from '../../../lib/ajax-actions';
 import { filterRealtimeIncidents, filterScheduledIncidents } from '../../../redux/helpers/incidents';
+import DeleteModal from './delete-modal';
 
 /**
  * Listing of Incidents
@@ -25,10 +23,8 @@ class Listing extends React.Component {
     this.state = {
       tab: props.match.params.tab || 'realtime',
       removeIncident: {
-        showModal: false,
         id: null,
-        name: null,
-        ajax: false
+        name: null
       }
     };
   }
@@ -49,10 +45,6 @@ class Listing extends React.Component {
 
     e.preventDefault();
 
-    if (this.state.removeIncident.showModal === true) {
-      return;
-    }
-
     // make sure the id is valid
     const inc = _find(['id', id])(this.props.incidents);
 
@@ -63,83 +55,21 @@ class Listing extends React.Component {
     // show a confirm modal
     this.setState({
       removeIncident: {
-        showModal: true,
         id,
-        name: inc.name,
-        ajax: false
+        name: inc.name
       }
     });
 
   }
 
   // close delete confirm modal
-  closeDeleteConfirmModal = (e) => {
-
-    if (e) {
-      e.preventDefault();
-    }
-
-    if (this.state.removeIncident.ajax === true) {
-      return;
-    }
-
+  closeDeleteConfirmModal = () => {
     this.setState({
       removeIncident: {
-        showModal: false,
         id: null,
-        name: null,
-        ajax: false
+        name: null
       }
     });
-  }
-
-  // delete incident after its confirmed
-  confirmDeleteIncident = () => {
-
-    if (this.state.removeIncident.ajax === true || !this.state.removeIncident.id) {
-      return;
-    }
-
-    const { id } = this.state.removeIncident;
-
-    // change the state and in the callback, make the ajax call.
-    this.setState({
-      removeIncident: {
-        ...this.state.removeIncident,
-        ajax: true
-      }
-    }, async () => {
-
-      try {
-
-        // make the ajax call to delete
-        const resp = await apiGateway.remove(`/incidents/${id}`);
-
-        this.setState({
-          removeIncident: {
-            ...this.state.removeIncident,
-            ajax: false
-          }
-        }, () => {
-          this.props.removeIncidentAction(id);
-          this.closeDeleteConfirmModal();
-          NotificationManager.success(resp.message);
-        });
-
-      }
-      catch (err) {
-        NotificationManager.error(err.message);
-        this.setState({
-          removeIncident: {
-            ...this.state.removeIncident,
-            ajax: false
-          }
-        });
-
-      }
-
-    });
-
   }
 
   render() {
@@ -154,10 +84,7 @@ class Listing extends React.Component {
     const realtimeTabClass = classNames('item', { active: this.state.tab === 'realtime' });
     const scheduledTabClass = classNames('item', { active: this.state.tab === 'scheduled' });
 
-    const modalDeleteBtnCls = classNames('negative ui button', {
-      loading: this.state.removeIncident.ajax,
-      disabled: this.state.removeIncident.ajax
-    });
+    /* eslint-disable brace-style */
 
     return (
       <div>
@@ -187,31 +114,21 @@ class Listing extends React.Component {
           </div>
         }
 
-        <Modal
-          size='tiny'
-          open={this.state.removeIncident.showModal}
-          onClose={this.closeDeleteConfirmModal}
-          closeOnDocumentClick={true}
-        >
-          <Modal.Header>
-            Deleting Incident
-          </Modal.Header>
-          <Modal.Content>
-            <p>
-              Are you sure you want to delete the incident:{' '}
-              <strong>{this.state.removeIncident.name}</strong>
-            </p>
-          </Modal.Content>
-          <Modal.Actions>
-            <a href="#" onClick={this.closeDeleteConfirmModal}>Cancel</a>{' '}
-            <button className={modalDeleteBtnCls} onClick={this.confirmDeleteIncident}>
-              Delete
-            </button>
-          </Modal.Actions>
-        </Modal>
+        {/* delete modal */}
+        {
+          this.state.removeIncident.id !== null && <DeleteModal
+            id={this.state.removeIncident.id}
+            name={this.state.removeIncident.name}
+            onModalClose={this.closeDeleteConfirmModal}
+            removeIncidentAction={this.removeIncidentAction}
+          />
+        }
 
       </div>
     );
+
+    /* eslint-enable brace-style */
+
   }
 
 }
