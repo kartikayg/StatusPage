@@ -4,10 +4,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
-import { statuses } from '../../../../../redux/helpers/incidents';
 import { getColor } from '../../../../../presentation/component-status';
+import { IncidentRow } from '../../realtime/list/unresolved';
 
 const InprogressListing = ({ incidents, onDeleteIncidentClick }) => {
   return (
@@ -21,37 +20,11 @@ const InprogressListing = ({ incidents, onDeleteIncidentClick }) => {
       </thead>
       <tbody>
         {incidents.map(i => {
-
-          const lastUpdateDate = i.latestUpdate.fmt_created_at;
-
-          return (
-            <tr key={i.id}>
-              <td>
-                <h4 className="ui image header">
-                  <div className="content">
-                    <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
-                      {i.name}
-                    </Link>
-                    <div className="sub header">
-                      {statuses[i.latestUpdate.status].displayName},{' '}
-                      {lastUpdateDate.fromNow()} at {lastUpdateDate.format('ddd, h:mm A (zz)')}
-                    </div>
-                  </div>
-                </h4>
-              </td>
-              <td className="center aligned three wide">
-                <Link to={`/admin/incidents/edit/${i.id}`} style={{ color: 'inherit' }}>
-                  <i className="edit icon large" title="Edit Incident"></i>
-                </Link>
-                <i
-                  className="remove circle icon large"
-                  title="Delete Incident"
-                  onClick={onDeleteIncidentClick(i.id)}
-                  style={{ cursor: 'pointer' }}
-                ></i>
-              </td>
-            </tr>
-          );
+          return <IncidentRow
+            key={i.id}
+            incident={i}
+            onDeleteIncidentClick={onDeleteIncidentClick}
+          />;
         })}
       </tbody>
     </table>

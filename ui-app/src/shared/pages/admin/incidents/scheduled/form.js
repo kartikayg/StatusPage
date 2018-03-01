@@ -5,7 +5,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
 import { NotificationManager } from 'react-notifications';
 import DatePicker from 'react-datepicker';
 import moment from 'moment-timezone';
@@ -443,7 +442,7 @@ class Form extends React.Component {
           >
             Submit
           </button>{' '}
-          <Link to="/admin/incidents/scheduled">Cancel</Link>
+          <a href="#" onClick={() => { this.props.history.goBack(); }}>Cancel</a>
         </div>
       </form>
     );

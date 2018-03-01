@@ -229,7 +229,7 @@ const filterCompletedScheduledIncidents = (incidents) => {
 const getHighestImpactStatus = (unresolvedIncidents) => {
 
   if (unresolvedIncidents.length === 0) {
-    return 'operational';
+    return '';
   }
 
   const order = [

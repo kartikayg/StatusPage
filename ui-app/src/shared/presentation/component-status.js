@@ -38,7 +38,7 @@ export const statuses = {
  * @return {string}
  */
 export const getColor = (status) => {
-  return statuses[status] ? statuses[status].color : 'green';
+  return statuses[status] ? statuses[status].color : 'black';
 };
 
 /**

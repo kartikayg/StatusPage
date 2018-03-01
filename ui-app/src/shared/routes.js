@@ -9,6 +9,7 @@ import DashboardPage from './pages/dashboard';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 
+import AdminDashboardPage from './pages/admin/dashboard';
 import ComponentsPage from './pages/admin/components';
 import IncidentsPage from './pages/admin/incidents';
 import SubscriptionsPage from './pages/admin/subscriptions';
@@ -34,10 +35,25 @@ const raw = {
       routes: [
         {
           path: '/admin/dashboard',
-          component: DashboardPage,
+          component: AdminDashboardPage,
           exact: true,
           title: 'Dashboard',
-          iconCls: 'dashboard'
+          iconCls: 'dashboard',
+          initialLoad: () => {
+
+            // get components and incidents
+            const components = apiGateway.get('/components');
+            const incidents = apiGateway.get('/incidents');
+
+            return Promise.all([components, incidents]).then(resp => {
+              return {
+                components: resp[0].components || [],
+                componentGroups: resp[0].componentGroups || [],
+                incidents: resp[1] || []
+              };
+            });
+
+          }
         },
         {
           path: '/admin/components',

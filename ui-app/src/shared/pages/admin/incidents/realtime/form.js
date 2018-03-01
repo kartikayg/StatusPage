@@ -5,7 +5,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
 import _pick from 'lodash/fp/pick';
 import _flow from 'lodash/fp/flow';
 import _getOr from 'lodash/fp/getOr';
@@ -263,6 +262,8 @@ class Form extends React.Component {
       disabled: this.state.saving
     });
 
+    /* eslint-disable brace-style */
+
     return (
       <form className="ui form">
         <div className="field required">
@@ -357,10 +358,13 @@ class Form extends React.Component {
           >
             Submit
           </button>{' '}
-          <Link to="/admin/incidents">Cancel</Link>
+          <a href="#" onClick={() => { this.props.history.goBack(); }}>Cancel</a>
         </div>
       </form>
     );
+
+    /* eslint-enable brace-style */
+
   }
 
 }
