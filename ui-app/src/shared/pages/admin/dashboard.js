@@ -12,6 +12,7 @@ import _filter from 'lodash/fp/filter';
 import IncidentsListing from './dashboard/incidents';
 import ComponentsListing from './dashboard/components';
 import { removeIncident } from '../../redux/actions/incidents';
+import { updateComponentStatus } from '../../redux/actions/components';
 
 import { fmtIncidents, filterUnresolvedIncidents } from '../../redux/helpers/incidents';
 
@@ -28,8 +29,11 @@ const DashboardDisplay = (props) => {
           removeIncidentAction={props.removeIncidentAction}
         />
       </div>
-      <div style={{ marginTop: '2rem' }}>
-        <ComponentsListing components={props.components} />
+      <div style={{ marginTop: '3rem' }}>
+        <ComponentsListing
+          components={props.components}
+          updateComponentStatusAction={props.updateComponentStatusAction}
+        />
       </div>
     </div>
   );
@@ -38,7 +42,8 @@ const DashboardDisplay = (props) => {
 DashboardDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired,
-  removeIncidentAction: PropTypes.func.isRequired
+  removeIncidentAction: PropTypes.func.isRequired,
+  updateComponentStatusAction: PropTypes.func.isRequired
 };
 
 // mapping redux state and actions to props
@@ -54,6 +59,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     removeIncidentAction: (id) => {
       dispatch(removeIncident(id));
+    },
+    updateComponentStatusAction: (payload) => {
+      dispatch(updateComponentStatus(payload));
     }
   };
 };
