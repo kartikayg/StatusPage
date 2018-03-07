@@ -54,20 +54,31 @@ class ComponentsListing extends React.Component {
               </tr>
             </thead>
             <tbody>
-              {this.props.components.map(c => {
-                return (
-                  <tr key={c.id}>
-                    <td>{c.name}</td>
-                    <td className="right aligned five wide">
-                      <StatusDropDown
-                        value={c.status}
-                        onChange={this.onComponentStatusChange}
-                        name={c.id}
-                      />
+              {
+                this.props.components.length === 0 && (
+                  <tr>
+                    <td colSpan="2">
+                      There are no active components.
                     </td>
                   </tr>
-                );
-              })}
+                )
+              }
+              {
+                this.props.components.length > 0 && this.props.components.map(c => {
+                  return (
+                    <tr key={c.id}>
+                      <td>{c.name}</td>
+                      <td className="right aligned five wide">
+                        <StatusDropDown
+                          value={c.status}
+                          onChange={this.onComponentStatusChange}
+                          name={c.id}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
+              }
             </tbody>
           </table>
         </div>

@@ -4,6 +4,8 @@
 
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
+import _flow from 'lodash/fp/flow';
+import _map from 'lodash/fp/map';
 
 import DashboardPage from './pages/dashboard';
 import LoginPage from './pages/login';
@@ -15,13 +17,71 @@ import IncidentsPage from './pages/admin/incidents';
 import SubscriptionsPage from './pages/admin/subscriptions';
 import { apiGateway } from '../shared/lib/ajax-actions';
 
+const _filter = require('lodash/fp/filter').convert({ cap: false });
+
+/**
+ * Initial loads for the routes.
+ * @param {array} toLoad - what to load. options:
+ *  components
+ *  incidents
+ *  subscriptions
+ * @return {promise}
+ *  on success, array
+ */
+const initialLoadData = (toLoad) => {
+
+  const loads = {
+    components: () => {
+      return apiGateway.get('/components').then(res => {
+        return {
+          components: res.components || [],
+          componentGroups: res.componentGroups || []
+        };
+      });
+    },
+    incidents: () => {
+      return apiGateway.get('/incidents').then(res => {
+        return {
+          incidents: res
+        };
+      });
+    },
+    subscriptions: () => {
+      return apiGateway.get('/subscriptions').then(res => {
+        return {
+          subscriptions: res
+        };
+      });
+    }
+  };
+
+  const fnToLoad = _flow(
+    _filter((fn, k) => {
+      return toLoad.includes(k);
+    }),
+    _map(fn => {
+      return fn();
+    })
+  )(loads);
+
+  return Promise.all(fnToLoad).then(res => {
+    return res.reduce((acc, val) => {
+      return {...acc, ...val};
+    }, {});
+  });
+
+};
+
 // raw routes array
 const raw = {
   routes: [
     {
       path: '/',
       component: DashboardPage,
-      exact: true
+      exact: true,
+      initialLoad: () => {
+        return initialLoadData(['components', 'incidents']);
+      }
     },
     {
       path: '/login',
@@ -40,19 +100,7 @@ const raw = {
           title: 'Dashboard',
           iconCls: 'dashboard',
           initialLoad: () => {
-
-            // get components and incidents
-            const components = apiGateway.get('/components');
-            const incidents = apiGateway.get('/incidents');
-
-            return Promise.all([components, incidents]).then(resp => {
-              return {
-                components: resp[0].components || [],
-                componentGroups: resp[0].componentGroups || [],
-                incidents: resp[1] || []
-              };
-            });
-
+            return initialLoadData(['components', 'incidents']);
           }
         },
         {
@@ -61,9 +109,7 @@ const raw = {
           title: 'Components',
           iconCls: 'browser',
           initialLoad: () => {
-            return apiGateway.get('/components').then(resp => {
-              return resp;
-            });
+            return initialLoadData(['components']);
           }
         },
         {
@@ -72,19 +118,7 @@ const raw = {
           title: 'Incidents',
           iconCls: 'warning sign',
           initialLoad: () => {
-
-            // get components and incidents
-            const components = apiGateway.get('/components');
-            const incidents = apiGateway.get('/incidents');
-
-            return Promise.all([components, incidents]).then(resp => {
-              return {
-                components: resp[0].components || [],
-                componentGroups: resp[0].componentGroups || [],
-                incidents: resp[1] || []
-              };
-            });
-
+            return initialLoadData(['components', 'incidents']);
           }
         },
         {
@@ -93,11 +127,7 @@ const raw = {
           title: 'Subscriptions',
           iconCls: 'bell',
           initialLoad: () => {
-            return apiGateway.get('/subscriptions').then(subs => {
-              return {
-                subscriptions: subs
-              };
-            });
+            return initialLoadData(['subscriptions']);
           }
         }
       ],
