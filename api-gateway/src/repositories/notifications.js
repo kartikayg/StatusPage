@@ -20,15 +20,33 @@ const init = () => {
       return subscriptions;
     },
 
-    // create a new incident
+    // returns a single subscription
+    getSubscription: async (id) => {
+      const subscription = await instance.get(`/subscriptions/${id}`);
+      return subscription;
+    },
+
+    // create a new subscription
     createSubscription: async (data) => {
       const subscriptipn = await instance.post('/subscriptions', { subscription: data });
       return subscriptipn;
     },
 
-    // removes an incident
+    // removes a subscription
     removeSubscription: async (id) => {
       const resp = await instance.remove(`/subscriptions/${id}`);
+      return resp;
+    },
+
+    // send subscription confirm link email
+    sendSubscriptionConfirmationLink: async (id) => {
+      const resp = await instance.get(`/subscriptions/${id}/send_confirmation_link`);
+      return resp;
+    },
+
+    // manages subscription components
+    manageSubscriptionComponents: async (id, components) => {
+      const resp = await instance.patch(`/subscriptions/${id}/manage_components`, { components });
       return resp;
     }
 
