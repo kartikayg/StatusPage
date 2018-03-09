@@ -41,9 +41,9 @@ const init = (dao) => {
 
     // check for duplication
     const { uri } = subscriptionObj;
-    const duplicatedCnt = await dao.count({ uri });
-    if (duplicatedCnt > 0) {
-      throw new DuplicatedSubscriptionError(`Webhook endpoint (${uri}) is already subscribed.`);
+    const duplicated = await dao.find({ uri });
+    if (duplicated.length > 0) {
+      return duplicated[0];
     }
 
     // save in db

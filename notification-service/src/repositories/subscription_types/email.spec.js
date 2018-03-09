@@ -43,11 +43,11 @@ describe('repo/subscription/types/email', function() {
     name: 'subscriptions',
 
     insert(data) {
-      Promise.resolve(existingSubscriptionObj);
+      return Promise.resolve(existingSubscriptionObj);
     },
 
-    count(pred) {
-      return Promise.resolve(pred.email === duplicatedEmail ? 1 : 0);
+    find(pred) {
+      return Promise.resolve(existingSubscriptionObj);      
     }
 
   };
@@ -125,21 +125,6 @@ describe('repo/subscription/types/email', function() {
         email: undefined
       })).catch(e => {
         assert.strictEqual(e.name, 'ValidationError');
-        sinon.assert.notCalled(insertSpy);
-        insertSpy.restore();
-        done();
-      })
-
-    });
-
-    it ('should fail for duplicate email address', function (done) {
-
-      const insertSpy = sinon.spy(daoMockObj, 'insert');
-
-      repo.subscribe(Object.assign({}, newSubscriptionObj, {
-        email: duplicatedEmail
-      })).catch(e => {
-        assert.strictEqual(e.name, 'DuplicatedSubscriptionError');
         sinon.assert.notCalled(insertSpy);
         insertSpy.restore();
         done();

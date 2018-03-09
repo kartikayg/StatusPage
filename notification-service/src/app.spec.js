@@ -289,7 +289,7 @@ describe('app - integration tests', function () {
 
       });
 
-      it ('should fail for duplicated email address', function (done) {
+      it ('should not fail for duplicated email address, return the already created one', function (done) {
 
         const newSubscriptionObj = {
           type: 'email',
@@ -301,7 +301,7 @@ describe('app - integration tests', function () {
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
-          .expect(422, done);
+          .expect(200, done);
 
       });
 
@@ -428,7 +428,7 @@ describe('app - integration tests', function () {
 
       });
 
-      it ('should fail for duplicated endpoint', function (done) {
+      it ('should not fail for duplicated endpoint, return the existing one', function (done) {
 
         const newSubscriptionObj = {
           type: 'webhook',
@@ -440,7 +440,7 @@ describe('app - integration tests', function () {
           .post('/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
-          .expect(422, done);
+          .expect(200, done);
 
       });
 

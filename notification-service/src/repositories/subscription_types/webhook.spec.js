@@ -48,8 +48,8 @@ describe('repo/subscription/types/webhook', function() {
       Promise.resolve(existingSubscriptionObj);
     },
 
-    count(pred) {
-      return Promise.resolve(pred.uri === duplicatedUri ? 1 : 0);
+    find(pred) {
+      return Promise.resolve(existingSubscriptionObj);      
     }
 
   };
@@ -117,21 +117,6 @@ describe('repo/subscription/types/webhook', function() {
         uri: undefined
       })).catch(e => {
         assert.strictEqual(e.name, 'ValidationError');
-        sinon.assert.notCalled(insertSpy);
-        insertSpy.restore();
-        done();
-      })
-
-    });
-
-    it ('should fail for duplicate endpoint', function (done) {
-
-      const insertSpy = sinon.spy(daoMockObj, 'insert');
-
-      repo.subscribe(Object.assign({}, newSubscriptionObj, {
-        uri: duplicatedUri
-      })).catch(e => {
-        assert.strictEqual(e.name, 'DuplicatedSubscriptionError');
         sinon.assert.notCalled(insertSpy);
         insertSpy.restore();
         done();

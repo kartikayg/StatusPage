@@ -49,11 +49,11 @@ const init = (dao) => {
       is_confirmed: false
     });
 
-    // check for duplication
+    // check for duplication, if exists just return that.
     const { email } = subscriptionObj;
-    const duplicatedCnt = await dao.count({ email });
-    if (duplicatedCnt > 0) {
-      throw new DuplicatedSubscriptionError(`Email address (${email}) is already subscribed.`);
+    const duplicated = await dao.find({ email });
+    if (duplicated.length > 0) {
+      return duplicated[0];
     }
 
     // save in db
