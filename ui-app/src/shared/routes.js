@@ -10,6 +10,7 @@ import _map from 'lodash/fp/map';
 import DashboardPage from './pages/dashboard';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
+import ManageSubscriptionPage from './pages/manage-subscription';
 
 import AdminDashboardPage from './pages/admin/dashboard';
 import ComponentsPage from './pages/admin/components';
@@ -87,6 +88,14 @@ const raw = {
       path: '/login',
       component: LoginPage,
       exact: true
+    },
+    {
+      path: '/manage_subscription/:subscriptionId',
+      component: ManageSubscriptionPage,
+      exact: true,
+      initialLoad: () => {
+        return initialLoadData(['subscriptions']);
+      }
     },
     {
       path: '/admin',

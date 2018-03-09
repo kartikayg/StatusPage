@@ -7,12 +7,14 @@ import express from 'express';
 import { matchRoutes } from 'react-router-config';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import cookiesMiddleware from 'universal-cookie-express';
 
 import { configure as configureStore } from '../shared/redux/store';
 import { raw as routes } from '../shared/routes';
 import renderer from './renderer';
 
 import auth from './auth';
+import { initCookies as initFlashMessageCookies } from '../shared/lib/flash-message-storage';
 import { apiGateway } from '../shared/lib/ajax-actions';
 
 /**
@@ -24,13 +26,17 @@ const setupServer = () => {
 
   let authAdapter;
 
-  // initialize auth adapter
+  // initialize auth adapter and flash message storage
   app.use((req, res, next) => {
     authAdapter = auth.init(req, res);
     next();
   });
 
-  app.use(cookieParser());
+  app.use(cookieParser(), cookiesMiddleware(), (req, res, next) => {
+    initFlashMessageCookies(req.universalCookies);
+    next();
+  });
+
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
@@ -102,7 +108,7 @@ const setupServer = () => {
       const content = renderer(req, store, context);
 
       if (context.url) {
-        return res.redirect(301, context.url);
+        return res.redirect(302, context.url);
       }
       else if (context.notFound) {
         res.status(404);

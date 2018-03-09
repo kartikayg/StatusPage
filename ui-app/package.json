@@ -72,6 +72,8 @@
     "semantic-ui-react": "^0.78.2",
     "serialize-javascript": "^1.4.0",
     "showdown": "^1.8.6",
+    "universal-cookie": "^2.1.2",
+    "universal-cookie-express": "^2.1.2",
     "webpack-node-externals": "^1.5.4"
   },
   "babel": {
