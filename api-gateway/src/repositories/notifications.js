@@ -22,6 +22,8 @@ const init = () => {
 
     // create a new incident
     createSubscription: async (data) => {
+      const subscriptipn = await instance.post('/subscriptions', { subscription: data });
+      return subscriptipn;
     },
 
     // removes an incident

@@ -9,9 +9,14 @@ export default (notificationsRepo, authMiddleware) => {
   const router = express.Router(); // eslint-disable-line new-cap
 
   router.route('/subscriptions')
-    .get(authMiddleware, (req, res, next) => {
+    .get((req, res, next) => {
       notificationsRepo.getSubscriptions().then(subs => {
         return res.json(subs);
+      }).catch(next);
+    })
+    .post((req, res, next) => {
+      notificationsRepo.createSubscription(req.body.subscription).then(sub => {
+        return res.json(sub);
       }).catch(next);
     });
 
