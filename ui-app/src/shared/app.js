@@ -21,8 +21,8 @@ class App extends React.Component {
 
     // flash any messages that are in the storage
     if (__CLIENT__) { // eslint-disable-line no-undef
-      flashMessageStorage.getAll().forEach(({ level, message }) => {
-        NotificationManager[level](message);
+      flashMessageStorage.getAll().forEach(({ level, message, timeOut }) => {
+        NotificationManager[level](message, '', timeOut || 5000);
       });
     }
   }

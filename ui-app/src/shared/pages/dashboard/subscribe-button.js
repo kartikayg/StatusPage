@@ -1,11 +1,12 @@
 /**
- * @fileoverview
+ * @fileoverview Subscribe button plus the popup
  */
 
 import React from 'react';
 import { Button, Popup, Tab, Menu, Icon } from 'semantic-ui-react';
 import { NotificationManager } from 'react-notifications';
 
+import flashMsgStorage from '../../lib/flash-message-storage';
 import { apiGateway } from '../../lib/ajax-actions';
 
 class SubscribeButton extends React.Component {
@@ -13,7 +14,7 @@ class SubscribeButton extends React.Component {
   state = {
     inputs: {
       email: '',
-      url: ''
+      uri: ''
     },
     ajax: false
   }
@@ -36,12 +37,37 @@ class SubscribeButton extends React.Component {
     this.setState({
       inputs: {
         email: '',
-        url: ''
-      }
+        uri: ''
+      },
+      ajax: false
     });
   }
 
-  onSubscribeViaEmail = () => {
+  createSubscription = async (obj) => {
+
+    this.setState({ ajax: true }, async () => {
+
+      try {
+
+        const saved = await apiGateway.post('/subscriptions', { subscription: obj });
+
+        // store flash message to show after page reload
+        flashMsgStorage.add('success', 'Subscription created', 8000);
+
+        window.location = `/manage_subscription/${saved.id}`; // eslint-disable-line no-undef
+
+      }
+      catch (err) {
+        this.setState({ ajax: false });
+        NotificationManager.error(err.message);
+      }
+
+    });
+
+  }
+
+  // create email subscription
+  onSubscribeViaEmail = async () => {
 
     const { email } = this.state.inputs;
 
@@ -49,24 +75,25 @@ class SubscribeButton extends React.Component {
       return;
     }
 
-    this.setState({ ajax: true }, async () => {
-      try {
+    await this.createSubscription({
+      type: 'email',
+      email
+    });
 
-        const subscription = {
-          type: 'email',
-          email
-        };
+  }
 
-        const saved = await apiGateway.post('/subscriptions', { subscription });
-        NotificationManager.success('good to go');
+  // create webhook subscription
+  onSubscribeViaWebhook = async () => {
 
-        window.location = `/manage_subscription/${saved.id}`;
+    const { uri } = this.state.inputs;
 
-      }
-      catch (err) {
-        this.setState({ ajax: false });
-        NotificationManager.error(err.message);
-      }
+    if (!uri || this.state.ajax) {
+      return;
+    }
+
+    await this.createSubscription({
+      type: 'webhook',
+      uri
     });
 
   }
@@ -74,7 +101,7 @@ class SubscribeButton extends React.Component {
   render() {
 
     // subscribe button
-    const button = <Button 
+    const button = <Button
       primary
       content='SUBSCRIBE TO UPDATES'
       style={{ float: 'right' }}
@@ -91,7 +118,7 @@ class SubscribeButton extends React.Component {
     const emailContent = (
       <Tab.Pane attached='bottom'>
         <div>
-          <p>Get notififed by email</p>
+          <h4 className='ui center aligned header'>Get notified by email</h4>
           <div className="ui input fluid">
             <input
               type="text"
@@ -118,18 +145,18 @@ class SubscribeButton extends React.Component {
     const webContent = (
       <Tab.Pane attached='bottom'>
         <div>
-          <p>Get notififed by webhook</p>
+          <h4 className='ui center aligned header'>Get notified by webhook</h4>
           <div className="ui input fluid">
             <input
               type="text"
               placeholder="url"
-              value={this.state.inputs.url}
+              value={this.state.inputs.uri}
               onChange={this.onInputChange}
-              name='url'
+              name='uri'
             />
           </div>
           <br />
-          <button className={`ui button fluid ${loadingCls}`}>
+          <button className={`ui button fluid ${loadingCls}`} onClick={this.onSubscribeViaWebhook}>
             Subscribe via webhook notification
           </button>
         </div>
@@ -137,8 +164,8 @@ class SubscribeButton extends React.Component {
     );
 
     const panes = [
-      { menuItem: emailIcon, render: () => emailContent },
-      { menuItem: webIcon, render: () => webContent }
+      { menuItem: emailIcon, render: () => emailContent }, // eslint-disable-line arrow-body-style
+      { menuItem: webIcon, render: () => webContent } // eslint-disable-line arrow-body-style
     ];
 
     // modal

@@ -94,7 +94,7 @@ const raw = {
       component: ManageSubscriptionPage,
       exact: true,
       initialLoad: () => {
-        return initialLoadData(['subscriptions']);
+        return initialLoadData(['subscriptions', 'components']);
       }
     },
     {

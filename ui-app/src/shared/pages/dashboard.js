@@ -22,7 +22,7 @@ const DashboardDisplay = (props) => {
       </Helmet>
       <div className="ui main text container" style={{ marginTop: '5rem', maxWidth: '850px !important' }}>
         <div>
-          <h1 className="ui header" style={{ float: 'left' }}>Test Company</h1>
+          <h1 className="ui header" style={{ float: 'left' }}>{process.env.COMPANY_NAME}</h1>
           <SubscribeButton />
         </div>
       </div>
