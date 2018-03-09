@@ -93,8 +93,17 @@ const raw = {
       path: '/manage_subscription/:subscriptionId',
       component: ManageSubscriptionPage,
       exact: true,
-      initialLoad: () => {
-        return initialLoadData(['subscriptions', 'components']);
+      initialLoad: ({ subscriptionId }) => {
+        const calls = [
+          apiGateway.get(`/subscriptions/${subscriptionId}`),
+          apiGateway.get('/components')
+        ];
+        return Promise.all(calls).then(res => {
+          return {
+            subscriptions: res[0] ? [res[0]] : [],
+            components: res[1].components || []
+          };
+        });
       }
     },
     {

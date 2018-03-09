@@ -95,7 +95,7 @@ const setupServer = () => {
 
       // load data based on the routes load
       const initialLoads = route.map(r => {
-        return r.route.initialLoad ? r.route.initialLoad() : Promise.resolve({});
+        return r.route.initialLoad ? r.route.initialLoad(r.match.params) : Promise.resolve({});
       });
 
       const initialData = await Promise.all(initialLoads);
