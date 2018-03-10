@@ -50,6 +50,9 @@ const init = (dao, messagingQueue) => {
     // set resolved status
     commonRepo.setResolvedStatus(incidentObj);
 
+    // set resolved date at same as incident date
+    incidentObj.resolved_at = incUpdateObj.displayed_at || new Date();
+
     // save in db
     incidentObj = commonRepo.saveDb(incidentObj);
 
