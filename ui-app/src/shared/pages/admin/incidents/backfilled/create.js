@@ -73,7 +73,11 @@ class NewIncidentForm extends React.Component {
         ])(this.state.inputs);
 
         if (this.state.inputs.displayed_at) {
-          incData.displayed_at = this.state.inputs.displayed_at.format('YYYY-MM-DD');
+          incData.displayed_at = this.state.inputs.displayed_at
+            .set('second', 0)
+            .set('minutes', 0)
+            .set('hours', 0)
+            .format();
         }
 
         const saved = await apiGateway.post('/incidents', { incident: incData });

@@ -20,7 +20,8 @@ class UpdateRow extends React.Component {
 
   static propTypes = {
     item: PropTypes.object.isRequired,
-    onEditButtonClick: PropTypes.func.isRequired
+    onEditButtonClick: PropTypes.func.isRequired,
+    allowEdit: PropTypes.bool.isRequired
   }
 
   state = {
@@ -46,7 +47,7 @@ class UpdateRow extends React.Component {
     return (
       <div
         className="item incident-update-row"
-        style={{ paddingBottom: '1.25rem' }}
+        style={{ paddingBottom: '0.5rem' }}
         onMouseOut={this.onMouseOut}
         onMouseOver={this.onMouseOver}
       >
@@ -60,12 +61,16 @@ class UpdateRow extends React.Component {
               {update.fmt_displayed_at.format('MMM D, YYYY - h:mm A (zz)')}
             </span>
             &nbsp;&nbsp;&nbsp;
-            <a style={editButtonStyles} className="ui label small" onClick={this.props.onEditButtonClick(update.id)}>
-              <i className="edit icon"></i>
-              Edit
-            </a>
+            {
+              this.props.allowEdit && (
+                <a style={editButtonStyles} className="ui label small" onClick={this.props.onEditButtonClick(update.id)}>
+                  <i className="edit icon"></i>
+                  Edit
+                </a>
+              )
+            }
           </div>
-          <div style={{ marginTop: '0.75rem', fontSize: '1.05rem' }} >
+          <div style={{ marginTop: '0.25rem', fontSize: '1.05rem' }} >
             <RenderMessage message={update.message} />
           </div>
         </div>
@@ -83,13 +88,15 @@ class IncidentUpdates extends React.Component {
   }
 
   static defaultProps = {
-    allowNewUpdate: false
+    allowNewUpdate: false,
+    allowEdits: true
   }
 
   static propTypes = {
     incidentId: PropTypes.string.isRequired,
     updates: PropTypes.arrayOf(PropTypes.object).isRequired,
-    updateIncidentAction: PropTypes.func.isRequired,
+    updateIncidentAction: PropTypes.func,
+    allowEdits: PropTypes.bool.isRequired,
     allowNewUpdate: PropTypes.bool.isRequired
   }
 
@@ -336,59 +343,62 @@ class IncidentUpdates extends React.Component {
             </button>
           </div>
         }
-        <div className="ui very relaxed list divided middle aligned">
+        <div className="ui very relaxed list middle aligned">
           {this.props.updates.map(u => {
             return <UpdateRow
                       key={u.id}
                       item={u}
                       onEditButtonClick={this.onEditButtonClick}
+                      allowEdit={this.props.allowEdits}
                     />;
           })}
 
           {/* Edit incident-update modal */}
-          <Modal
-            size='tiny'
-            open={this.state.editIncidentUpdate.showModal}
-            onClose={(e) => { this.onCloseModal(e, 'edit'); }}
-            closeOnDocumentClick={true}
-            className='app-incident-update-edit-modal'
-          >
-            <Modal.Header>
-              Editing Incident-Update
-            </Modal.Header>
-            <Modal.Content>
-              <form className="ui form">
-                <div className='field required'>
-                  <label>Date & Time ({moment().format('zz')})</label>
-                  <DatePicker
-                    selected={this.state.editIncidentUpdate.inputs.displayed_at}
-                    onChange={this.onDateChange}
-                    showTimeSelect
-                    timeFormat="h:mm A"
-                    timeIntervals={5}
-                    dateFormat="MMM DD, YYYY  h:mm A"
-                  />
-                </div>
-                <div className="field required">
-                  <label>Message</label>
-                  <MessageInput
-                    value={this.state.editIncidentUpdate.inputs.message}
-                    onChange={(val) => { this.onMessageChange('edit', val); }}
-                    name={'message'}
-                  />
-                </div>
-              </form>
-            </Modal.Content>
-            <Modal.Actions>
-              <a href="#" onClick={(e) => { this.onCloseModal(e, 'edit'); }}>
-                Cancel
-              </a>
-              {' '}
-              <button className={editModalSaveBtnCls} onClick={this.onSaveEditForm}>
-                Save
-              </button>
-            </Modal.Actions>
-          </Modal>
+          {this.props.allowEdits &&
+            <Modal
+              size='tiny'
+              open={this.state.editIncidentUpdate.showModal}
+              onClose={(e) => { this.onCloseModal(e, 'edit'); }}
+              closeOnDocumentClick={true}
+              className='app-incident-update-edit-modal'
+            >
+              <Modal.Header>
+                Editing Incident-Update
+              </Modal.Header>
+              <Modal.Content>
+                <form className="ui form">
+                  <div className='field required'>
+                    <label>Date & Time ({moment().format('zz')})</label>
+                    <DatePicker
+                      selected={this.state.editIncidentUpdate.inputs.displayed_at}
+                      onChange={this.onDateChange}
+                      showTimeSelect
+                      timeFormat="h:mm A"
+                      timeIntervals={5}
+                      dateFormat="MMM DD, YYYY  h:mm A"
+                    />
+                  </div>
+                  <div className="field required">
+                    <label>Message</label>
+                    <MessageInput
+                      value={this.state.editIncidentUpdate.inputs.message}
+                      onChange={(val) => { this.onMessageChange('edit', val); }}
+                      name={'message'}
+                    />
+                  </div>
+                </form>
+              </Modal.Content>
+              <Modal.Actions>
+                <a href="#" onClick={(e) => { this.onCloseModal(e, 'edit'); }}>
+                  Cancel
+                </a>
+                {' '}
+                <button className={editModalSaveBtnCls} onClick={this.onSaveEditForm}>
+                  Save
+                </button>
+              </Modal.Actions>
+            </Modal>
+          }
 
           {/* add new update modal */}
           {this.props.allowNewUpdate &&

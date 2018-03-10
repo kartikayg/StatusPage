@@ -13,3 +13,19 @@
 .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
   padding: 5px 0px !important;
 }
+
+#public-dashboard .ui.text.container {
+  max-width: 800px !important;
+  margin-top: 3rem;
+}
+
+#public-dashboard .main.menu {
+  margin-top: 4em;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  transition:
+    box-shadow 0.5s ease,
+    padding 0.5s ease
+  ;
+}

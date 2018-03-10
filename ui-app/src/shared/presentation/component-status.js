@@ -4,7 +4,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Dropdown, Icon } from 'semantic-ui-react';
+import { Dropdown } from 'semantic-ui-react';
 
 const _map = require('lodash/fp/map').convert({ cap: false });
 
@@ -16,7 +16,7 @@ export const statuses = {
   },
   degraded_performance: {
     displayName: 'Degraded Performance',
-    color: 'yellow'
+    color: '#fbbd08'
   },
   partial_outage: {
     displayName: 'Partial Outage',
@@ -28,7 +28,7 @@ export const statuses = {
   },
   maintenance: {
     displayName: 'Maintenance',
-    color: 'blue'
+    color: '#3498DB'
   }
 };
 
@@ -46,7 +46,7 @@ export const getColor = (status) => {
  */
 export const StatusIcon = ({ status }) => {
   return (
-    <Icon color={getColor(status)} name='circle' />
+    <i className='circle icon' style={{ color: getColor(status) }}></i>
   );
 };
 

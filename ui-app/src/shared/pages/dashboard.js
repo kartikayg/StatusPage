@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Dashboard page
  */
 
 import React from 'react';
@@ -7,24 +7,40 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Helmet } from 'react-helmet';
-import _sortBy from 'lodash/fp/sortBy';
 import _filter from 'lodash/fp/filter';
 
 import SubscribeButton from './dashboard/subscribe-button';
+import ComponentsBlock from './dashboard/components';
+import SummarizedMessage from './dashboard/summarized-message';
+import PastIncidents from './dashboard/past-incidents';
 
 import { fmtIncidents} from '../redux/helpers/incidents';
+import { getComponentsByGroup } from '../redux/helpers/components';
 
-const DashboardDisplay = (props) => {
+const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
   return (
-    <div>
+    <div id="public-dashboard">
       <Helmet>
         <title>Dashboard</title>
       </Helmet>
-      <div className="ui main text container" style={{ marginTop: '5rem', maxWidth: '850px !important' }}>
-        <div>
-          <h1 className="ui header" style={{ float: 'left' }}>{process.env.COMPANY_NAME}</h1>
-          <SubscribeButton />
+      <div className="ui borderless main menu" style={{ marginTop: '1rem' }}>
+        <div className="ui text container">
+          <h1 className="ui header item left floated" style={{ paddingLeft: 0 }}>
+            {process.env.COMPANY_NAME}
+          </h1>
+          <div className="ui right floated item" style={{ fontSize: '1rem' }}>
+            <SubscribeButton />
+          </div>
         </div>
+      </div>
+      <div className="ui text container">
+        <SummarizedMessage components={components} incidents={incidents} />
+      </div>
+      <div className="ui text container segment">
+        <ComponentsBlock componentsByGroup={componentsByGroup} />
+      </div>
+      <div className="ui text container" style={{ marginTop: '5rem' }}>
+        <PastIncidents incidents={incidents} />
       </div>
     </div>
   );
@@ -32,20 +48,18 @@ const DashboardDisplay = (props) => {
 
 DashboardDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
+  componentsByGroup: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 // mapping redux state and actions to props
 const mapStateToProps = (state) => {
   return {
-    // only show active components, sort by sort order
-    components: _sortBy(['sort_order', 'created_at'])(_filter('active')(state.components)),
+    components: _filter('active')(state.components),
+    componentsByGroup: getComponentsByGroup(state, true),
     incidents: fmtIncidents(state)
   };
 };
 
-const DashboardPage = connect(
-  mapStateToProps
-)(DashboardDisplay);
-
+const DashboardPage = connect(mapStateToProps)(DashboardDisplay);
 export default DashboardPage;

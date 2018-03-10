@@ -101,11 +101,7 @@ class SubscribeButton extends React.Component {
   render() {
 
     // subscribe button
-    const button = <Button
-      primary
-      content='SUBSCRIBE TO UPDATES'
-      style={{ float: 'right' }}
-    />;
+    const button = <Button primary content='SUBSCRIBE TO UPDATES' />;
 
     const loadingCls = this.state.ajax ? 'loading' : '';
 
