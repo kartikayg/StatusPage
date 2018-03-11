@@ -61,3 +61,36 @@ export const getComponentsByGroup = (state, onlyActive = false) => {
   return _values(cmpByGrp);
 
 };
+
+/**
+ * Given a list of components, return what
+ * is the highest component impact status.
+ * @param {array} unresolvedIncidents
+ * @return {string}
+ */
+export const getHighestImpactStatus = (components) => {
+
+  if (components.length === 0) {
+    return '';
+  }
+
+  const order = [
+    'operational',
+    'maintenance',
+    'degraded_performance',
+    'partial_outage',
+    'major_outage'
+  ];
+
+  const sts = components.map(c => {
+    return c.status;
+  });
+
+  return sts.reduce((hStatus, cStatus) => {
+    // find position of the statuses and return the highest
+    const hPos = order.indexOf(hStatus);
+    const cPos = order.indexOf(cStatus);
+    return hPos > cPos ? hStatus : cStatus;
+  }, sts[0]);
+
+};

@@ -16,7 +16,7 @@ export const statuses = {
   },
   degraded_performance: {
     displayName: 'Degraded Performance',
-    color: '#fbbd08'
+    color: 'yellow'
   },
   partial_outage: {
     displayName: 'Partial Outage',
@@ -28,7 +28,7 @@ export const statuses = {
   },
   maintenance: {
     displayName: 'Maintenance',
-    color: '#3498DB'
+    color: 'blue'
   }
 };
 
@@ -46,7 +46,7 @@ export const getColor = (status) => {
  */
 export const StatusIcon = ({ status }) => {
   return (
-    <i className='circle icon' style={{ color: getColor(status) }}></i>
+    <i className={`circle ${getColor(status)} icon`}></i>
   );
 };
 

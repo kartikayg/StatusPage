@@ -19,7 +19,7 @@ const IncidentView = ({ incident }) => {
 
   return (
     <div>
-       <h3 className="ui header" style={{ color: getColor(impactStatus) }}>
+       <h3 className={`ui ${getColor(impactStatus)} header`}>
         {incident.name}
       </h3>
       <div>

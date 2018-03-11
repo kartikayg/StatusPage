@@ -10,11 +10,11 @@ import { Helmet } from 'react-helmet';
 import _filter from 'lodash/fp/filter';
 
 import SubscribeButton from './dashboard/subscribe-button';
+import CurrentStatus from './dashboard/current-status';
 import ComponentsBlock from './dashboard/components';
-import SummarizedMessage from './dashboard/summarized-message';
 import PastIncidents from './dashboard/past-incidents';
 
-import { fmtIncidents} from '../redux/helpers/incidents';
+import { fmtIncidents, filterUnresolvedIncidents } from '../redux/helpers/incidents';
 import { getComponentsByGroup } from '../redux/helpers/components';
 
 const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
@@ -34,7 +34,7 @@ const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
         </div>
       </div>
       <div className="ui text container">
-        <SummarizedMessage components={components} incidents={incidents} />
+        <CurrentStatus components={components} incidents={filterUnresolvedIncidents(incidents)} />
       </div>
       <div className="ui text container segment">
         <ComponentsBlock componentsByGroup={componentsByGroup} />
