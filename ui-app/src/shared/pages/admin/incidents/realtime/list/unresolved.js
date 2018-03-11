@@ -77,7 +77,7 @@ const UnresolvedListing = ({ incidents, onDeleteIncidentClick }) => {
     <table className="ui celled striped table large">
       <thead>
         <tr>
-          <th colSpan="3" style={{ color: getColor(highestImpactStatus) }}>
+          <th colSpan="3" className={`${getColor(highestImpactStatus)} ui message`}>
             Unresolved ({incidents.length})
           </th>
         </tr>

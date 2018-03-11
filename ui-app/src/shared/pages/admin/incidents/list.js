@@ -120,7 +120,7 @@ class Listing extends React.Component {
             id={this.state.removeIncident.id}
             name={this.state.removeIncident.name}
             onModalClose={this.closeDeleteConfirmModal}
-            removeIncidentAction={this.removeIncidentAction}
+            removeIncidentAction={this.props.removeIncidentAction}
           />
         }
 

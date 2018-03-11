@@ -73,7 +73,7 @@ class IncidentsListing extends React.Component {
         <table className="ui celled striped table large">
           <thead>
             <tr>
-              <th colSpan="3" style={{ color: getColor(highestImpactStatus) }}>
+              <th colSpan="3" className={`${getColor(highestImpactStatus)} ui message`}>
                 Unresolved Incidents ({this.props.incidents.length})
               </th>
             </tr>

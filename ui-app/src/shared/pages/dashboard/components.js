@@ -15,7 +15,7 @@ const SingleComponent = ({ component }) => {
         <tbody>
           <tr>
             <td style={{ fontWeight: 'bold' }}>{component.name}</td>
-            <td className="right aligned four wide">
+            <td className="right aligned five wide">
               <StatusIconWithText status={component.status} />
             </td>
           </tr>
@@ -49,7 +49,7 @@ const MultipleComponents = ({ group }) => {
                 <td style={idx === 0 ? { borderTop: 0, fontWeight: 'bold' } : { fontWeight: 'bold' }}>
                   {c.name}
                 </td>
-                <td className="right aligned four wide" style={idx === 0 ? { borderTop: 0 } : {}}>
+                <td className="right aligned five wide" style={idx === 0 ? { borderTop: 0 } : {}}>
                   <StatusIconWithText status={c.status} />
                 </td>
               </tr>
