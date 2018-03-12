@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import _orderBy from 'lodash/fp/orderBy';
 
 import { getColor } from '../presentation/component-status';
