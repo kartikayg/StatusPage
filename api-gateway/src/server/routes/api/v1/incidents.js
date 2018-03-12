@@ -10,14 +10,14 @@ export default (incidentRepo, authMiddleware) => {
 
   router.route('/incidents')
 
-    /** Get all incidents */
+    // get all incidents
     .get((req, res, next) => {
       incidentRepo.get().then(resp => {
         return res.json(resp);
       }).catch(next);
     })
 
-    /** creates an incident */
+    // creates a new incident
     .post(authMiddleware, (req, res, next) => {
       incidentRepo.create(req.body.incident).then(resp => {
         return res.json(resp);
@@ -27,20 +27,21 @@ export default (incidentRepo, authMiddleware) => {
 
   router.route('/incidents/:incidentId')
 
+    // gets a single incident
     .get((req, res, next) => {
       incidentRepo.getOne(req.params.incidentId).then(incident => {
         res.json(incident);
       }).catch(next);
     })
 
-    /** Updates an incident */
+    // updates an incident
     .patch(authMiddleware, (req, res, next) => {
       incidentRepo.update(req.params.incidentId, req.body.incident).then(incident => {
         res.json(incident);
       }).catch(next);
     })
 
-    /** Deletes an incident */
+    // deletes an incident
     .delete(authMiddleware, (req, res, next) => {
       incidentRepo.remove(req.params.incidentId).then(resp => {
         return res.json(resp);
@@ -50,7 +51,7 @@ export default (incidentRepo, authMiddleware) => {
 
   router.route('/incidents/:incidentId/incident_updates/:incidentUpdateId')
 
-    /** updates incident-update entry */
+    // updates incident-update entry
     .patch(authMiddleware, (req, res, next) => {
       incidentRepo.changeIncidentUpdate(
         req.params.incidentId,

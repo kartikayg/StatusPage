@@ -14,7 +14,8 @@ const defaultMessages = {
   identified: 'The issue has been identified and a fix is being implemented.',
   verifying: 'We are verifying the scheduled maintenance.',
   monitoring: 'A fix has been implemented and we are monitoring the results.',
-  resolved: 'This incident has been resolved.'
+  resolved: 'This incident has been resolved.',
+  cancelled: 'This incident has been cancelled.'
 };
 
 /**
@@ -24,12 +25,22 @@ const init = () => {
 
   const repo = {
 
-    // return all incidents
+    /**
+     * Returns all incidents
+     */
     get: async () => {
       const incidents = await instance.get('/incidents');
       return incidents;
     },
 
+    /**
+     * Returns a single incident. If no incident is found, an
+     * empty object is returned
+     * @param {string} id
+     * @return {promise}
+     *  on success, {object} incident object
+     *  on error {error}
+     */
     getOne: async (id) => {
       try {
         const incident = await instance.get(`/incidents/${id}`);
@@ -47,13 +58,26 @@ const init = () => {
 
     },
 
-    // create a new incident
+    /**
+     * Creates a new incident
+     * @param {object} data
+     * @return {promise}
+     *  on success, {object} - incident object
+     *  on error {error}
+     */
     create: async (data) => {
       const incident = await instance.post('/incidents', { incident: data });
       return incident;
     },
 
-    // updates incident
+    /**
+     * Updates an incident
+     * @param {string} id
+     * @param {object} data
+     * @return {promise}
+     *  on success, {object} - incident object
+     *  on error {error}
+     */
     update: async (id, data) => {
 
       const toPost = { ...data };
@@ -69,15 +93,24 @@ const init = () => {
 
     },
 
-    // removes an incident
+    /**
+     * Removes an incident
+     * @param {string} id
+     * @return {promise}
+     */
     remove: async (id) => {
       const resp = await instance.remove(`/incidents/${id}`);
       return resp;
     },
 
-    // updates incident-update entry
+    /**
+     * Changes an incident-update entry.
+     * @param {string} incidentId
+     * @param {string} updateId
+     * @param {object} data
+     * @return {promise}
+     */
     changeIncidentUpdate: async (incidentId, updateId, data) => {
-
       const url = `/incidents/${incidentId}/incident_updates/${updateId}`;
       const incident = await instance.patch(url, { update: data });
       return incident;

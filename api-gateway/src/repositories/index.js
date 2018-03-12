@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Repositories index file
  */
 
 import auth from './auth';
@@ -9,6 +9,7 @@ import notifications from './notifications';
 
 const init = ({ redis }) => {
 
+  // create all repos and return back an object
   const authRepo = auth.init(redis);
   const componentsRepo = components.init();
   const incidentsRepo = incidents.init();

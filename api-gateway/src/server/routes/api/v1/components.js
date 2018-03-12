@@ -10,12 +10,14 @@ export default (componentRepo, authMiddleware) => {
 
   router.route('/components')
 
+    // get all components
     .get((req, res, next) => {
       componentRepo.get().then(resp => {
         return res.json(resp);
       }).catch(next);
     })
 
+    // create a new component
     .post(authMiddleware, (req, res, next) => {
       componentRepo.create(req.body.component).then(component => {
         res.json(component);
@@ -24,7 +26,7 @@ export default (componentRepo, authMiddleware) => {
 
   router.route('/components/:componentId')
 
-    /** Update properties of a component */
+    // updates a component
     .patch(authMiddleware, (req, res, next) => {
       componentRepo.update(req.params.componentId, req.body.component).then(component => {
         res.json(component);
@@ -33,6 +35,7 @@ export default (componentRepo, authMiddleware) => {
 
   router.route('/component_groups')
 
+    // create a new component group
     .post(authMiddleware, (req, res, next) => {
       componentRepo.createGroup(req.body.name).then(group => {
         res.json(group);

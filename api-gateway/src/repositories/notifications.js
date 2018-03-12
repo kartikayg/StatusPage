@@ -14,37 +14,69 @@ const init = () => {
 
   const repo = {
 
-    // return all subscriptions
+    /**
+     * Return all subscriptions
+     * @return {promise}
+     *  on success, {array} array of subscription objects
+     *  on error, {error}
+     */
     getSubscriptions: async () => {
       const subscriptions = await instance.get('/subscriptions');
       return subscriptions;
     },
 
-    // returns a single subscription
+    /**
+     * Returns a single subscriptions
+     * @param {string} id
+     * @return {promise}
+     *  on success, {object} subscription objects
+     *  on error, {error}
+     */
     getSubscription: async (id) => {
       const subscription = await instance.get(`/subscriptions/${id}`);
       return subscription;
     },
 
-    // create a new subscription
+    /**
+     * Creates a new subscription
+     * @param {object} data
+     * @return {promise}
+     *  on success, {object} - subscription object
+     *  on error {error}
+     */
     createSubscription: async (data) => {
       const subscriptipn = await instance.post('/subscriptions', { subscription: data });
       return subscriptipn;
     },
 
-    // removes a subscription
+    /**
+     * Removes a subscription
+     * @param {string} id
+     * @return {promise}
+     */
     removeSubscription: async (id) => {
       const resp = await instance.remove(`/subscriptions/${id}`);
       return resp;
     },
 
-    // send subscription confirm link email
+    /**
+     * Sends confirm subscription email
+     * @param {string} id
+     * @return {promise}
+     */
     sendSubscriptionConfirmationLink: async (id) => {
       const resp = await instance.get(`/subscriptions/${id}/send_confirmation_link`);
       return resp;
     },
 
-    // manages subscription components
+    /**
+     * Manages components for a subscription
+     * @param {string} id
+     * @param {object} components
+     * @return {promise}
+     *  on success, {object} - subscription object
+     *  on error {error}
+     */
     manageSubscriptionComponents: async (id, components) => {
       const resp = await instance.patch(`/subscriptions/${id}/manage_components`, { components });
       return resp;
