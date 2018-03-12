@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Displays a listing of all past (resolved) incidents (last 2 weeks).
  */
 
 import React from 'react';
@@ -8,6 +8,11 @@ import PropTypes from 'prop-types';
 
 import IncidentView from './incident-view';
 
+/**
+ * Display block for a date and incidents on that day.
+ * @prop {object} date - momentjs object
+ * @prop {array} incidents
+ */
 const IncidentDay = ({ date, incidents }) => {
 
   return (
@@ -40,6 +45,10 @@ IncidentDay.propTypes = {
   date: PropTypes.object.isRequired
 };
 
+/**
+ * Main display component
+ * @prop {array} incidents
+ */
 const PastIncidents = ({ incidents }) => {
 
   // last 2 weeks
@@ -51,6 +60,7 @@ const PastIncidents = ({ incidents }) => {
       {
         howManyDays.map(d => {
           const thisDate = moment().subtract(d, 'days');
+          // only resolved incidents
           const resolvedIncidents = incidents.filter(i => {
             return i.is_resolved && thisDate.format('YYYY-MM-DD') === i.fmt_resolved_at.format('YYYY-MM-DD');
           });

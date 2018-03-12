@@ -65,7 +65,7 @@ const executeCall = async (url, method, opts = {}, instance = null) => {
 };
 
 /**
- * Wrapper object to provide http calls to the api gaetway
+ * Wrapper object to provide http calls to the api gateway
  */
 const apiGateway = (function () {
 
@@ -92,7 +92,7 @@ const apiGateway = (function () {
   let authToken;
 
   return {
-
+ 
     setAuthToken(token) {
       authToken = token;
     },

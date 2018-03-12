@@ -1,5 +1,5 @@
 /**
- * @fileoverview Manage Subscription page
+ * @fileoverview Manage Subscription page - public page
  */
 
 import React from 'react';
@@ -210,7 +210,7 @@ class ManageSubscriptionDisplay extends React.Component {
     return (
       <div>
         <Helmet>
-          <title>Manage Subscription</title>
+          <title>{process.env.COMPANY_NAME} - Manage Subscription</title>
         </Helmet>
         <div className="ui main text container" style={{ marginTop: '5rem', maxWidth: '700px !important' }}>
           <div>

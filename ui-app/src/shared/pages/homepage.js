@@ -1,5 +1,5 @@
 /**
- * @fileoverview Dashboard page
+ * @fileoverview Home page for public.
  */
 
 import React from 'react';
@@ -9,11 +9,11 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import _filter from 'lodash/fp/filter';
 
-import SubscribeButton from './dashboard/subscribe-button';
-import CurrentStatus from './dashboard/current-status';
-import ComponentsBlock from './dashboard/components';
-import UpcomingMaintenances from './dashboard/upcoming-maintenances';
-import PastIncidents from './dashboard/past-incidents';
+import SubscribeButton from './homepage/subscribe-button';
+import CurrentStatus from './homepage/current-status';
+import ComponentsBlock from './homepage/components';
+import UpcomingMaintenances from './homepage/upcoming-maintenances';
+import PastIncidents from './homepage/past-incidents';
 
 import {
   fmtIncidents,
@@ -22,15 +22,17 @@ import {
 } from '../redux/helpers/incidents';
 import { getComponentsByGroup } from '../redux/helpers/components';
 
-const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
+const HomePageDisplay = ({ components, componentsByGroup, incidents }) => {
 
   const upcomingMaintenances = filterUpcomingScheduledIncidents(incidents);
 
   return (
     <div id="public-dashboard">
+
       <Helmet>
-        <title>Dashboard</title>
+        <title>{process.env.COMPANY_NAME} - Status Page</title>
       </Helmet>
+
       <div className="ui borderless main menu" style={{ marginTop: '1rem' }}>
         <div className="ui text container">
           <h1 className="ui header item left floated" style={{ paddingLeft: 0 }}>
@@ -41,12 +43,15 @@ const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
           </div>
         </div>
       </div>
+
       <div className="ui text container">
         <CurrentStatus components={components} incidents={filterUnresolvedIncidents(incidents)} />
       </div>
+
       <div className="ui text container segment">
         <ComponentsBlock componentsByGroup={componentsByGroup} />
       </div>
+
       {
         upcomingMaintenances.length > 0 && (
           <div className="ui text container" style={{ marginTop: '5rem' }}>
@@ -58,11 +63,12 @@ const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
       <div className="ui text container" style={{ marginTop: '5rem' }}>
         <PastIncidents incidents={incidents} />
       </div>
+
     </div>
   );
 };
 
-DashboardDisplay.propTypes = {
+HomePageDisplay.propTypes = {
   components: PropTypes.arrayOf(PropTypes.object).isRequired,
   componentsByGroup: PropTypes.arrayOf(PropTypes.object).isRequired,
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired
@@ -77,5 +83,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-const DashboardPage = connect(mapStateToProps)(DashboardDisplay);
-export default DashboardPage;
+const HomePage = connect(mapStateToProps)(HomePageDisplay);
+export default HomePage;

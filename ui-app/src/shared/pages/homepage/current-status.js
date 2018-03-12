@@ -1,5 +1,6 @@
 /**
- * @fileoverview
+ * @fileoverview Displays in progress incidents or a "all good" message
+ * for the home page.
  */
 
 import React from 'react';
@@ -10,7 +11,10 @@ import { getHighestImpactStatus as getIncHighestImpactStatus } from '../../redux
 import { statuses, getColor } from '../../presentation/component-status';
 import IncidentView from './incident-view';
 
-//
+/**
+ * Display in progess incidents
+ * @prop {array} incidents
+ */
 const InprogressIncidents = ({ incidents }) => {
 
   const highestImpactStatus = getIncHighestImpactStatus(incidents);
@@ -54,7 +58,11 @@ InprogressIncidents.propTypes = {
   incidents: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-// Current status
+/**
+ * Main component
+ * @prop {array} components
+ * @prop {array} incidents
+ */ 
 const CurrentStatus = ({ components, incidents }) => {
 
   let body;

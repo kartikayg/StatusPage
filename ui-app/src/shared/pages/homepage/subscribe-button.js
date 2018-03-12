@@ -1,5 +1,5 @@
 /**
- * @fileoverview Subscribe button plus the popup
+ * @fileoverview Subscribe button plus the popup for the home page
  */
 
 import React from 'react';
@@ -43,6 +43,7 @@ class SubscribeButton extends React.Component {
     });
   }
 
+  // creates a subscription
   createSubscription = async (obj) => {
 
     this.setState({ ajax: true }, async () => {
@@ -54,6 +55,7 @@ class SubscribeButton extends React.Component {
         // store flash message to show after page reload
         flashMsgStorage.add('success', 'Subscription created', 8000);
 
+        // redirect to the manage subscription page
         window.location = `/manage_subscription/${saved.id}`; // eslint-disable-line no-undef
 
       }

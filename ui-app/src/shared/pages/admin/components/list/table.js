@@ -1,5 +1,6 @@
 /**
- * @fileoverview Renders the table of components
+ * @fileoverview Renders the table of components. It also makes
+ * the components sortable.
  */
 
 import React from 'react';

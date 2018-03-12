@@ -14,12 +14,22 @@ const opts = { path: '/' };
 
 const storage = {
 
+  /**
+   * Add a message in the storage
+   * @param {string} level
+   * @param {string} message
+   * @param {number} timeOut
+   */
   add(level, message, timeOut = 5000) {
     const msgs = _cookies.get(key) || [];
     msgs.push({ level, message, timeOut });
     _cookies.set(key, msgs, opts);
   },
 
+  /**
+   * Gets all stored messages. It also empties out the storage
+   * @return {array}
+   */
   getAll() {
     const msgs = _cookies.get(key) || [];
     _cookies.set(key, [], opts);

@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Helper functions to format subscriptions related data
  */
 
 /**

@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Incident detail page - public page
  */
 
 import React from 'react';
@@ -15,6 +15,9 @@ import { fmtIncidents } from '../redux/helpers/incidents';
 import IncidentUpdates from './admin/incidents/incident-updates';
 
 const ViewIncidentDisplay = (props) => {
+
+  // find the incident based on the id. if nothing found, 
+  // return back to home page.
 
   const { incidentId } = props.match.params;
 
@@ -35,7 +38,7 @@ const ViewIncidentDisplay = (props) => {
   return (
     <div>
       <Helmet>
-        <title>Incident</title>
+        <title>{process.env.COMPANY_NAME} - {incident.name}</title>
       </Helmet>
       <div className="ui main text container" style={{ marginTop: '5rem', maxWidth: '700px !important' }}>
 

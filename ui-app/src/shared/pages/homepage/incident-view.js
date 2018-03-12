@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Displays a single incident
  */
 
 import React from 'react';

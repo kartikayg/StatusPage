@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Redux actions related to components
  */
 
 import * as actionTypes from './types';

@@ -1,5 +1,6 @@
 /**
- * @fileoverview
+ * @fileoverview Components block for the homepage. Displays components and their
+ * status.
  */
 
 import React from 'react';
@@ -7,7 +8,10 @@ import PropTypes from 'prop-types';
 
 import { StatusIconWithText } from '../../presentation/component-status';
 
-// single component - render
+/**
+ * Single component render
+ * @prop {object} component
+ */
 const SingleComponent = ({ component }) => {
   return (
     <div className="item">
@@ -29,7 +33,10 @@ SingleComponent.propTypes = {
   component: PropTypes.object.isRequired
 };
 
-// multiple components under a group - render
+/**
+ * Multiple components (under a group) to render.
+ * @prop {object} group
+ */
 const MultipleComponents = ({ group }) => {
   return (
     <div className="item">
@@ -66,7 +73,10 @@ MultipleComponents.propTypes = {
 };
 
 
-// Components block
+/**
+ * Components block
+ * @prop {array} componentsByGroup
+ */
 const ComponentsBlock = ({ componentsByGroup }) => {
 
   let body;

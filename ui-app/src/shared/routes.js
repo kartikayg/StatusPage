@@ -7,7 +7,7 @@ import { Route, Redirect } from 'react-router-dom';
 import _flow from 'lodash/fp/flow';
 import _map from 'lodash/fp/map';
 
-import DashboardPage from './pages/dashboard';
+import HomePage from './pages/homepage';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 import ManageSubscriptionPage from './pages/manage-subscription';
@@ -79,7 +79,7 @@ const raw = {
   routes: [
     {
       path: '/',
-      component: DashboardPage,
+      component: HomePage,
       exact: true,
       initialLoad: () => {
         return initialLoadData(['components', 'incidents']);

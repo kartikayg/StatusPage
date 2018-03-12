@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Scroll-to-top component
  */
 
 import React from 'react';

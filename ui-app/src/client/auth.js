@@ -1,5 +1,5 @@
 /**
- * @fileoverview Manages auth from client stand point of view
+ * @fileoverview Manages auth token from client stand point of view
  */
 
 /* eslint-disable no-undef */

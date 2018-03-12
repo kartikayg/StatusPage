@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview List upcoming maintenances for the home page
  */
 
 import React from 'react';

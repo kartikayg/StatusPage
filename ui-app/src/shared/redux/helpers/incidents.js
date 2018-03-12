@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @fileoverview Helper functions to format incidents related data
  */
 
 import _sortBy from 'lodash/fp/sortBy';
