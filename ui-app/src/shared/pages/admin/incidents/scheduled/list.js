@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import _sortBy from 'lodash/fp/sortBy';
+import _orderBy from 'lodash/fp/orderBy';
 import _flow from 'lodash/fp/flow';
 
 import {
@@ -47,7 +48,7 @@ const Listing = ({ incidents, onDeleteIncidentClick }) => {
     )(incidents);
 
     const completed = _flow(
-      filterCompletedScheduledIncidents, _sortBy(['resolved_at'])
+      filterCompletedScheduledIncidents, _orderBy(['resolved_at'])(['desc'])
     )(incidents);
 
     body = (

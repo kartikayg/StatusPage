@@ -30,7 +30,7 @@ const EditScheduledIncident = (props) => {
       </div>
       <div style={{ marginTop: '1.5rem' }}>
         <IncidentUpdates
-          incidentId={props.incident.id}
+          incident={props.incident}
           updates={_orderBy(['created_at'])(['desc'])(props.incident.updates)}
           updateIncidentAction={props.updateIncidentAction}
         />

@@ -163,7 +163,10 @@ const filterScheduledIncidents = (incidents) => {
  */
 const filterUnresolvedIncidents = (incidents) => {
   return _filter(i => {
-    return i.is_resolved === false;
+    // check the flag for all incidents
+    return i.is_resolved === false &&
+          // and if its scheduled, it must not be in the following status
+          (i.type !== 'scheduled' || ['scheduled', 'cancelled'].includes(i.scheduled_status) === false);
   })(incidents);
 };
 

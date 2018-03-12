@@ -12,12 +12,20 @@ import _filter from 'lodash/fp/filter';
 import SubscribeButton from './dashboard/subscribe-button';
 import CurrentStatus from './dashboard/current-status';
 import ComponentsBlock from './dashboard/components';
+import UpcomingMaintenances from './dashboard/upcoming-maintenances';
 import PastIncidents from './dashboard/past-incidents';
 
-import { fmtIncidents, filterUnresolvedIncidents } from '../redux/helpers/incidents';
+import {
+  fmtIncidents,
+  filterUnresolvedIncidents,
+  filterUpcomingScheduledIncidents
+} from '../redux/helpers/incidents';
 import { getComponentsByGroup } from '../redux/helpers/components';
 
 const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
+
+  const upcomingMaintenances = filterUpcomingScheduledIncidents(incidents);
+
   return (
     <div id="public-dashboard">
       <Helmet>
@@ -39,6 +47,14 @@ const DashboardDisplay = ({ components, componentsByGroup, incidents }) => {
       <div className="ui text container segment">
         <ComponentsBlock componentsByGroup={componentsByGroup} />
       </div>
+      {
+        upcomingMaintenances.length > 0 && (
+          <div className="ui text container" style={{ marginTop: '5rem' }}>
+            <UpcomingMaintenances incidents={upcomingMaintenances} />
+          </div>
+        )
+      }
+
       <div className="ui text container" style={{ marginTop: '5rem' }}>
         <PastIncidents incidents={incidents} />
       </div>

@@ -6,6 +6,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import _sortBy from 'lodash/fp/sortBy';
+import _orderBy from 'lodash/fp/orderBy';
 
 import { filterUnresolvedIncidents, filterResolvedIncidents } from '../../../../redux/helpers/incidents';
 
@@ -28,7 +29,7 @@ const Listing = ({ incidents, onDeleteIncidentClick }) => {
 
     // group by unresolved and resolved
     const unresolved = _sortBy(['created_at'])(filterUnresolvedIncidents(incidents));
-    const resolved = _sortBy(['resolved_at'])(filterResolvedIncidents(incidents));
+    const resolved = _orderBy(['resolved_at'])(['desc'])(filterResolvedIncidents(incidents));
 
     body = (
       <div>

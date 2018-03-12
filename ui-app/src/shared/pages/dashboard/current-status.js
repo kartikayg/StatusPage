@@ -15,18 +15,25 @@ const InprogressIncidents = ({ incidents }) => {
 
   const highestImpactStatus = getIncHighestImpactStatus(incidents);
 
+  const contentTdStyle = {
+    padding: '1.5rem 0 2rem 1.25rem',
+    background: 'inherit',
+    borderRadius: 'inherit',
+    color: 'inherit'
+  };
+
   return (
     <table className="ui table">
       <thead>
         <tr>
-          <th className={`${getColor(highestImpactStatus)} ui message`}>
-            Happening right now ({incidents.length})
+          <th className={`${getColor(highestImpactStatus)} ui message`} style={{ borderBottom: 'none' }}>
+            Happening right now ({ incidents.length })
           </th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td style={{ padding: '1.5rem 0 2rem 1.25rem' }}>
+          <td style={ contentTdStyle } className={`${getColor(highestImpactStatus)} ui message`}>
             {
               incidents.map((inc, idx) => {
                 return (

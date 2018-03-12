@@ -19,6 +19,7 @@ import { apiGateway } from '../../../lib/ajax-actions';
 class UpdateRow extends React.Component {
 
   static propTypes = {
+    incident: PropTypes.object.isRequired,
     item: PropTypes.object.isRequired,
     onEditButtonClick: PropTypes.func.isRequired,
     allowEdit: PropTypes.bool.isRequired
@@ -39,10 +40,13 @@ class UpdateRow extends React.Component {
   render() {
 
     const update = this.props.item;
+    const { incident } = this.props;
 
     const editButtonStyles = {
       display: this.state.hovered ? '' : 'none'
     };
+
+    const scheduledEventSameDate = (incident.type === 'scheduled' && incident.fmt_scheduled_start_time.get('date') === incident.fmt_scheduled_end_time.get('date'));
 
     return (
       <div
@@ -56,10 +60,38 @@ class UpdateRow extends React.Component {
             <h3 style={{ display: 'inline', fontSize: '1.1rem' }}>
               {incidentStatus[update.status].displayName}
             </h3>
-            {' '}-{' '}
-            <span className="sub" style={{ color: 'rgba(0,0,0,.6)' }}>
-              {update.fmt_displayed_at.format('MMM D, YYYY - h:mm A (zz)')}
-            </span>
+            {
+              update.status !== 'scheduled' && (
+                <span className="sub" style={{ color: 'rgba(0,0,0,.6)' }}>
+                  {' '}-{' '}{update.fmt_displayed_at.format('MMM D, YYYY - h:mm A (zz)')}
+                </span>
+              )
+            }
+            {
+              incident.type === 'scheduled' && incident.scheduled_status === 'scheduled' && (
+                <span className="sub" style={{ color: 'rgba(0,0,0,.6)' }}>
+                  {' - '}
+                  {
+                    scheduledEventSameDate && (
+                      <span>
+                        {incident.fmt_scheduled_start_time.format('MMM D YYYY, h:mm A')}
+                        {' - '}
+                        {incident.fmt_scheduled_end_time.format('h:mm A (zz)')}
+                      </span>
+                    )
+                  }
+                  {
+                    scheduledEventSameDate === false && (
+                      <span>
+                        {incident.fmt_scheduled_start_time.format('MMM D, h:mm A')}
+                        {'  -  '}
+                        {incident.fmt_scheduled_end_time.format('MMM D, h:mm A (zz)')}
+                      </span>
+                    )
+                  }
+                </span>
+              )
+            }
             &nbsp;&nbsp;&nbsp;
             {
               this.props.allowEdit && (
@@ -93,7 +125,7 @@ class IncidentUpdates extends React.Component {
   }
 
   static propTypes = {
-    incidentId: PropTypes.string.isRequired,
+    incident: PropTypes.object.isRequired,
     updates: PropTypes.arrayOf(PropTypes.object).isRequired,
     updateIncidentAction: PropTypes.func,
     allowEdits: PropTypes.bool.isRequired,
@@ -260,7 +292,7 @@ class IncidentUpdates extends React.Component {
           displayed_at: this.state.editIncidentUpdate.inputs.displayed_at.format()
         };
 
-        const url = `/incidents/${this.props.incidentId}/incident_updates/${this.state.editIncidentUpdate.id}`;
+        const url = `/incidents/${this.props.incident.id}/incident_updates/${this.state.editIncidentUpdate.id}`;
 
         const savedIncident = await apiGateway.patch(url, { update: updData });
 
@@ -298,7 +330,7 @@ class IncidentUpdates extends React.Component {
           do_notify_subscribers: this.state.addIncidentUpdate.inputs.do_notify_subscribers
         };
 
-        const url = `/incidents/${this.props.incidentId}`;
+        const url = `/incidents/${this.props.incident.id}`;
         const savedIncident = await apiGateway.patch(url, { incident: updData });
 
         this.updateModalAjaxState('add', false, () => {
@@ -347,6 +379,7 @@ class IncidentUpdates extends React.Component {
           {this.props.updates.map(u => {
             return <UpdateRow
                       key={u.id}
+                      incident={this.props.incident}
                       item={u}
                       onEditButtonClick={this.onEditButtonClick}
                       allowEdit={this.props.allowEdits}

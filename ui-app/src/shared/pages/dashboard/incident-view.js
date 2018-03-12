@@ -18,7 +18,7 @@ const IncidentView = ({ incident }) => {
 
   return (
     <div>
-       <h3 className={`ui ${getColor(impactStatus)} header`}>
+       <h3 className={`ui ${getColor(impactStatus)} header`} style={{ marginBottom: '1rem' }}>
         {incident.name}
       </h3>
       <div>
@@ -30,7 +30,7 @@ const IncidentView = ({ incident }) => {
       </div>
       <div style={{ marginTop: '1rem' }}>
         <IncidentUpdates
-          incidentId={incident.id}
+          incident={incident}
           updates={_orderBy(['created_at'])(['desc'])(incident.updates)}
           allowNewUpdate={false}
           allowEdits={false}

@@ -37,7 +37,7 @@ const CompletedListing = ({ incidents, onDeleteIncidentClick }) => {
                         </div>
                       }
                       {
-                        i.type === 'cancelled' &&
+                        i.scheduled_status === 'cancelled' &&
                         <div>
                           <span style={{ color: 'red' }}>
                             Cancelled
