@@ -27,6 +27,12 @@ export default (incidentRepo, authMiddleware) => {
 
   router.route('/incidents/:incidentId')
 
+    .get((req, res, next) => {
+      incidentRepo.getOne(req.params.incidentId).then(incident => {
+        res.json(incident);
+      }).catch(next);
+    })
+
     /** Updates an incident */
     .patch(authMiddleware, (req, res, next) => {
       incidentRepo.update(req.params.incidentId, req.body.incident).then(incident => {

@@ -30,6 +30,23 @@ const init = () => {
       return incidents;
     },
 
+    getOne: async (id) => {
+      try {
+        const incident = await instance.get(`/incidents/${id}`);
+        return incident;
+      }
+      catch (e) {
+        // not found
+        if (e.httpStatus === 422) {
+          return {};
+        }
+
+        throw e;
+
+      }
+
+    },
+
     // create a new incident
     create: async (data) => {
       const incident = await instance.post('/incidents', { incident: data });
