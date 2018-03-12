@@ -11,6 +11,7 @@ import DashboardPage from './pages/dashboard';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 import ManageSubscriptionPage from './pages/manage-subscription';
+import ViewIncidentPage from './pages/view-incident';
 
 import AdminDashboardPage from './pages/admin/dashboard';
 import ComponentsPage from './pages/admin/components';
@@ -101,6 +102,23 @@ const raw = {
         return Promise.all(calls).then(res => {
           return {
             subscriptions: res[0] ? [res[0]] : [],
+            components: res[1].components || []
+          };
+        });
+      }
+    },
+    {
+      path: '/incidents/:incidentId',
+      component: ViewIncidentPage,
+      exact: true,
+      initialLoad: ({ incidentId }) => {
+        const calls = [
+          apiGateway.get(`/incidents/${incidentId}`),
+          apiGateway.get('/components')
+        ];
+        return Promise.all(calls).then(res => {
+          return {
+            incidents: res[0] ? [res[0]] : [],
             components: res[1].components || []
           };
         });
