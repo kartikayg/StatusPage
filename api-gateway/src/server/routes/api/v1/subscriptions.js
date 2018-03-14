@@ -57,6 +57,14 @@ export default (notificationsRepo, authMiddleware) => {
     }).catch(next);
   });
 
+  // PATCH - confirm subscription
+  router.patch('/subscriptions/:subscriptionId/confirm', (req, res, next) => {
+    const id = req.params.subscriptionId;
+    notificationsRepo.markSubscriptionConfirmed(id).then(resp => {
+      res.json(resp);
+    }).catch(next);
+  });
+
   return router;
 
 };

@@ -70,6 +70,16 @@ const init = () => {
     },
 
     /**
+     * Mark subscription confirm.
+     * @param {string} id
+     * @return {promise}
+     */
+    markSubscriptionConfirmed: async (id) => {
+      const resp = await instance.patch(`/subscriptions/${id}/confirm`);
+      return resp;
+    },
+
+    /**
      * Manages components for a subscription
      * @param {string} id
      * @param {object} components
