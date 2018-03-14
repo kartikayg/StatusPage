@@ -42,8 +42,8 @@ const getDefaultTransporter = (forceNew = false) => {
 
 /**
  * Sends an email out.
- * @param {string} template - email template
- * @param {string|array} to - to email address(es)
+ * @param {string} templateName - email template
+ * @param {object} subscription - subscription object
  * @param {object} vars - variables for substitution in the email template
  * @param {string} from - from email address. If not provided, the system
  *  from email address is used
@@ -53,7 +53,7 @@ const getDefaultTransporter = (forceNew = false) => {
  *  on success - response from sending the email
  *  on failure - error
  */
-const send = async (template, to, vars, from, transporter) => {
+const send = async (templateName, subscription, vars, from, transporter) => {
 
   // email template object. use passed variables or from env conf
   const emailTpl = new EmailTemplate({
@@ -72,14 +72,16 @@ const send = async (template, to, vars, from, transporter) => {
 
   // prepare template vars
   const templateVars = Object.assign(_cloneDeep(vars || {}), {
-    template,
-    company_name: conf.email.COMPANY_NAME
+    template: templateName,
+    company_name: conf.email.COMPANY_NAME,
+    ui_app_uri: conf.server.UI_APP_URI,
+    unsub_uri: `${conf.server.UI_APP_URI}/manage_subscription/${subscription.id}`
   });
 
   const response = await emailTpl.send({
     template: 'index',
     message: {
-      to: to.toString() // if an array, this will convert it to a string
+      to: subscription.email
     },
     locals: templateVars
   });

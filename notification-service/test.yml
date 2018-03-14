@@ -14,6 +14,8 @@ services:
     depends_on:
       - test_notification_db
       - test_messagingqueue
+    environment:
+      UI_APP_URI: http://ui_app
   test_notification_db:
     image: "mongo:3.4"
     ports:

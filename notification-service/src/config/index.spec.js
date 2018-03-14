@@ -19,7 +19,8 @@ describe('config/index', function() {
     SMTP_USERNAME: 'username',
     SMTP_PASSWORD: 'password',
     SYSTEM_EMAIL_FROM_ADDRESS: 'admin@site.com',
-    COMPANY_NAME: 'test'
+    COMPANY_NAME: 'test',
+    UI_APP_URI: 'http://ui_app'
   };
 
   it('should return a proper object on success', function() {
@@ -29,7 +30,8 @@ describe('config/index', function() {
         PORT: testEnv.PORT,
         NODE_ENV: testEnv.NODE_ENV,
         RABBMITMQ_CONN_ENDPOINT: testEnv.RABBMITMQ_CONN_ENDPOINT,
-        ENABLE_HTTP_REQUEST_LOGS: false
+        ENABLE_HTTP_REQUEST_LOGS: false,
+        UI_APP_URI: 'http://ui_app'
       },
       logger: {
         LOG_LEVEL: testEnv.LOG_LEVEL

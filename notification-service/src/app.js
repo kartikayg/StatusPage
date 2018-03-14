@@ -71,7 +71,7 @@ const start = async () => {
   // add listeners on queue
   await addQueueListeners(repos.notification);
 
-  defaultLogger.debug(`${process.env.SERVICE_NAME} has started ...`);
+  defaultLogger.debug(`${process.env.SERVICE_NAME} has started on ${conf.server.PORT}.`);
 
   return app;
 

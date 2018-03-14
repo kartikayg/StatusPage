@@ -5,17 +5,9 @@
 import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
-import { DuplicatedSubscriptionError } from '../errors';
 
 import emailLib from '../../lib/email';
 import logger from '../../lib/logger';
-
-/**
- *
- */
-const getFooterLinks = (subscriptionObj) => {
-  return {};
-};
 
 /**
  * Init repo
@@ -83,7 +75,7 @@ const init = (dao) => {
 
     if (subscriptionObj.is_confirmed === false) {
       // send a confirmation email out
-      await emailLib.send('confirmation_email_subscription', subscriptionObj.email, subscriptionObj);
+      await emailLib.send('confirmation_email_subscription', subscriptionObj, subscriptionObj);
     }
 
   };
@@ -108,7 +100,6 @@ const init = (dao) => {
 
       const params = {
         links: {
-          footer: getFooterLinks(s),
           incident: ''
         },
         incidentUpdate: latestUpdate
@@ -116,7 +107,7 @@ const init = (dao) => {
 
       return emailLib.send(
         'new_incident_update_notification',
-        s.email,
+        s,
         params
       );
 

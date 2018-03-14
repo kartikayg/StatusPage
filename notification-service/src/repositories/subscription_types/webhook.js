@@ -6,7 +6,6 @@ import axios from 'axios';
 import _cloneDeep from 'lodash/fp/cloneDeep';
 
 import common from './common';
-import { DuplicatedSubscriptionError } from '../errors';
 
 /**
  * Init repo
@@ -71,7 +70,9 @@ const init = (dao) => {
     // send out posts
     const posts = subscriptions.map(s => {
       return axios.post(s.uri, latestUpdate, { timeout: 15000 })
-        .catch(e => {});
+        .catch(() => {
+
+        });
     });
 
     await Promise.all(posts);

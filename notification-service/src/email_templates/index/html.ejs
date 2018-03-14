@@ -15,7 +15,8 @@
       margin: 0;
       padding: 0;
       -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%
+      -ms-text-size-adjust: 100%;
+      font-family: "Arial,Helvetica,sans-serif";
     }
 
     table,
@@ -79,8 +80,8 @@
         <tr>
           <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
       <![endif]-->
-    <div style="margin:0 auto;max-width:600px;background:#f0f0f0">
-      <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0;width:100%;background:#f0f0f0" align="center" border="0">
+    <div style="margin:0 auto;max-width:600px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0;width:100%;" align="center" border="0">
         <tbody>
           <tr>
             <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0;padding:20px 0">
@@ -93,8 +94,18 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
                   <tbody>
                     <tr>
-                      <td style="word-wrap:break-word;font-size:0;padding:10px 25px" align="center">
-                        <div style="cursor:auto;color:#626262;font-family:Ubuntu,Helvetica,Arial,sans-serif;font-size:20px;font-style:italic;line-height: 15px;text-align:center;"><%= company_name %></div>
+                      <td style="padding:0;">
+                        <span style="font-size: 1.3rem;">
+                          <%= company_name %>
+                        </span>
+                        <label style="float:right;margin-top:5px;color:#999;text-align:right;font-size:12px;padding:0 10px"><span class="aBn" data-term="goog_1970375984" tabindex="0"><span class="aQJ">03/14/2018</span></span></label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:20px 0 0 0">
+                        <div style="border-bottom:1px dotted #ccc;font-size:12px;border-top:1px dotted #ccc;padding:10px 0;text-align:center">
+                          This email was automatically generated. Please do not reply to this e-mail.
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -116,8 +127,8 @@
         <tr>
           <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
       <![endif]-->
-    <div style="margin:0 auto;max-width:600px;background:#fafafa">
-      <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0;width:100%;background:#fafafa" align="center" border="0">
+    <div style="margin:0 auto;max-width:600px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0;width:100%;" align="center" border="0">
         <tbody>
           <tr>
             <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0;padding:20px 0">
@@ -131,7 +142,7 @@
                   <tbody>
                     <tr>
                       <td style="word-wrap:break-word;font-size:0;padding:10px 25px" align="left">
-                        <div style="cursor:auto;color:#626262;font-family:Helvetica Neue;font-size:14px;line-height:20px;">
+                        <div style="cursor:auto;color:#626262;font-size:14px;line-height:20px;">
                             <%- include('../partials/'+template+'/html') %>
                         </div>
                       </td>
@@ -159,7 +170,7 @@
       <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:0;width:100%;background:#e7e7e7" align="center" border="0">
         <tbody>
           <tr>
-            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0;padding: 15px 0;">
+            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0;padding: 10px 0;">
               <!--[if mso | IE]>
       <table role="presentation" border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -169,9 +180,9 @@
                 <table border="0" cellpadding="3" cellspacing="0" width="100%" style="max-width:600px;/* border-top:1px solid #e0e0e0; */padding-top:10px;">
                   <tbody><tr>
                     <td align="center" valign="top">
-                      <span style="font-family:Arial;font-size:13px;color:#aaaaaa;line-height:21px">
-                          <a style="font-family:Arial;font-size:13px;color:#aaaaaa;text-decoration:underline" href="" target="_blank">View status page</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
-                            <a style="font-family:Arial;font-size:13px;color:#aaaaaa;text-decoration:underline" href="" target="_blank"">Unsubscribe</a>
+                      <span style="font-size:14px;line-height:21px">
+                          <a style="color:#aaaaaa;text-decoration:underline" href="<%= ui_app_uri %>" target="_blank">View status page</a>&nbsp;&nbsp;|&nbsp;&nbsp; 
+                            <a style="color:#aaaaaa;text-decoration:underline" href="<%= unsub_uri %>" target="_blank"">Unsubscribe</a>
                       </span>
                     </td>
                   </tr>

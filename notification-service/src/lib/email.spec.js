@@ -19,7 +19,7 @@ describe('lib/email', function () {
 
   it ('should send the email with json transport', async function () {
 
-    const r = await sendEmail('test', 'kartikayg@gmail.com', { name: 'Kartik' }, undefined, {
+    const r = await sendEmail('test', { email: 'kartikayg@gmail.com' }, { name: 'Kartik' }, undefined, {
       jsonTransport: true,
       logger: true
     });
@@ -30,7 +30,7 @@ describe('lib/email', function () {
 
   it ('should send the email with email transport', async function () {
 
-    const r = await sendEmail('test', 'kartikayg@gmail.com', { name: 'Kartik' });
+    const r = await sendEmail('test', { email: 'kartikayg@gmail.com' }, { name: 'Kartik' });
 
     assert.isString(r.messageId);
     assert.equal(r.envelope.from, config.conf.email.SYSTEM_EMAIL_FROM_ADDRESS);
@@ -38,17 +38,5 @@ describe('lib/email', function () {
 
   });
 
-
-  it ('should send the email to multiple recipients with custom from address', async function () {
-
-    const to = ['email1@gmail.com', 'email2@gmail.com'];
-
-    const r = await sendEmail('test', to, { name: 'Kartik' }, 'from@me.com');
-    
-    assert.isString(r.messageId);
-    assert.equal(r.envelope.from, 'from@me.com');
-    assert.deepEqual(r.accepted, to);
-
-  });
 
 });

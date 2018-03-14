@@ -80,6 +80,8 @@ const sanitizeVal = (val) => {
 
 };
 
+export { sanitizeVal };
+
 
 /**
  * MIDDLEWARE METHODS

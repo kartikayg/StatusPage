@@ -23,6 +23,10 @@ export const schema =
       .uri({ scheme: 'amqp' }),
 
     ENABLE_HTTP_REQUEST_LOGS: Joi.boolean()
-      .default(false)
+      .default(false),
+
+    UI_APP_URI: Joi.string()
+      .required()
+      .uri({ scheme: ['http', 'https'] })
 
   });
