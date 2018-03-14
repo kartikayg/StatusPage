@@ -92,7 +92,7 @@ const apiGateway = (function () {
   let authToken;
 
   return {
- 
+
     setAuthToken(token) {
       authToken = token;
     },

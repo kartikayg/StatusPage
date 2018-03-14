@@ -11,6 +11,7 @@ import HomePage from './pages/homepage';
 import LoginPage from './pages/login';
 import AdminPage from './pages/admin';
 import ManageSubscriptionPage from './pages/manage-subscription';
+import ConfirmSubscriptionPage from './pages/confirm-subscription';
 import ViewIncidentPage from './pages/view-incident';
 
 import AdminDashboardPage from './pages/admin/dashboard';
@@ -89,6 +90,18 @@ const raw = {
       path: '/login',
       component: LoginPage,
       exact: true
+    },
+    {
+      path: '/manage_subscription/:subscriptionId/confirm',
+      component: ConfirmSubscriptionPage,
+      exact: true,
+      initialLoad: ({ subscriptionId }) => {
+        // confirm the subscription and then redirect to homepage
+        return apiGateway.patch(`/subscriptions/${subscriptionId}/confirm`)
+          .then(() => {
+            return {};
+          });
+      }
     },
     {
       path: '/manage_subscription/:subscriptionId',

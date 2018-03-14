@@ -50,7 +50,7 @@ class SubscribeButton extends React.Component {
 
       try {
 
-        const saved = await apiGateway.post('/subscriptions', { subscription: obj });
+        const saved = await apiGateway.post('/subscriptions', { subscription: obj }, { timeout: 10000 });
 
         // store flash message to show after page reload
         flashMsgStorage.add('success', 'Subscription created', 8000);

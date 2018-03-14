@@ -16,7 +16,7 @@ import IncidentUpdates from './admin/incidents/incident-updates';
 
 const ViewIncidentDisplay = (props) => {
 
-  // find the incident based on the id. if nothing found, 
+  // find the incident based on the id. if nothing found,
   // return back to home page.
 
   const { incidentId } = props.match.params;

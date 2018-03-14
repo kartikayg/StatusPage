@@ -62,7 +62,7 @@ InprogressIncidents.propTypes = {
  * Main component
  * @prop {array} components
  * @prop {array} incidents
- */ 
+ */
 const CurrentStatus = ({ components, incidents }) => {
 
   let body;
