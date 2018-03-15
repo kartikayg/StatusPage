@@ -217,6 +217,7 @@ const init = (dao, messagingQueue) => {
     });
 
     commonRepo.setResolvedStatus(incidentObj);
+    commonRepo.setLatestStatus(incidentObj);
 
     validateStartEndTime(incidentObj);
 
@@ -319,8 +320,8 @@ const init = (dao, messagingQueue) => {
 
       updatedObj.updates.push(incUpdateObj);
 
-      // set resolved status
       commonRepo.setResolvedStatus(updatedObj);
+      commonRepo.setLatestStatus(updatedObj);
 
     }
 

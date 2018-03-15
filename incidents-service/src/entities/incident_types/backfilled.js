@@ -26,7 +26,11 @@ const schema = Joi.object({
       status: Joi.string()
         .required()
         .only(['resolved'])
-    }))
+    })),
+
+  latest_status: Joi.string()
+    .required()
+    .only(['resolved'])
 
 });
 

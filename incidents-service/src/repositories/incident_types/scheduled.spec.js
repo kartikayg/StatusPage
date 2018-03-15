@@ -125,6 +125,7 @@ describe('repo/incidents/type/scheduled', function() {
         scheduled_status: 'scheduled',
         is_resolved: false,
         resolved_at: null,
+        latest_status: 'scheduled',
         updates: [{
           displayed_at: staticCurrentTime,
           do_notify_subscribers: true,
@@ -185,6 +186,7 @@ describe('repo/incidents/type/scheduled', function() {
       resolved_at: null,
       created_at: staticCurrentTime,
       updated_at: staticCurrentTime,
+      latest_status: 'scheduled',
       updates: [{
         displayed_at: staticCurrentTime,
         do_notify_subscribers: true,

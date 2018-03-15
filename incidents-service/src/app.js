@@ -61,7 +61,7 @@ const start = async () => {
   // setup the cron
   await setupCron(repos);
 
-  logger.debug('incidents-service has started ...');
+  logger.debug(`${process.env.SERVICE_NAME} has started on ${conf.server.PORT}.`);
 
   return app;
 

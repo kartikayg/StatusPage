@@ -139,6 +139,7 @@ describe('repo/incidents/type/realtime', function() {
       name: 'incident',
       components: ['component_id'],
       components_impact_status: 'partial_outage',
+      latest_status: 'investigating',
       is_resolved: false,
       resolved_at: null,
       type: 'realtime',

@@ -89,7 +89,8 @@ describe('repo/incidents/type/backfilled', function() {
       components: ['component_id'],
       message: 'message',
       do_notify_subscribers: true,
-      components_impact_status: 'partial_outage'
+      components_impact_status: 'partial_outage',
+      latest_status: 'resolved'
     };
 
     it ('should create a backfilled incident', async function () {

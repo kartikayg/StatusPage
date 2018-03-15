@@ -240,6 +240,7 @@ describe('app - integration tests', function () {
               type: 'realtime',
               components: [ 'CM123' ],
               components_impact_status: 'partial_outage',
+              latest_status: 'investigating',
               id: incidentId,
               created_at: staticCurrentTime.toISOString(),
               updated_at: staticCurrentTime.toISOString(),
@@ -310,6 +311,8 @@ describe('app - integration tests', function () {
 
             assert.strictEqual(incidentObj['updates'][0].status, 'investigating');
             assert.strictEqual(incidentObj['updates'][1].status, 'identified');
+
+            assert.strictEqual(incidentObj.latest_status, 'identified');
 
             assert.strictEqual(incidentObj.is_resolved, false);
             
@@ -382,6 +385,8 @@ describe('app - integration tests', function () {
 
             assert.strictEqual(incidentObj.is_resolved, true);
             assert.strictEqual(incidentObj.resolved_at, staticCurrentTime.toISOString());
+
+            assert.strictEqual(incidentObj.latest_status, 'resolved');
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
@@ -412,6 +417,9 @@ describe('app - integration tests', function () {
 
             assert.strictEqual(incidentObj.updates.length, 4);
             assert.strictEqual(incidentObj['updates'][3].status, 'update');
+
+            // should have stayed resolved
+            assert.strictEqual(incidentObj.latest_status, 'resolved');
             
             setTimeout(() => {
               sinon.assert.calledOnce(reqLogQueueCallbackSpy);
@@ -494,6 +502,7 @@ describe('app - integration tests', function () {
               created_at: staticCurrentTime.toISOString(),
               updated_at: staticCurrentTime.toISOString(),
               components_impact_status: 'partial_outage',
+              latest_status: 'resolved',
               updates:[{
                 message: 'API was not working',
                 status: 'resolved',

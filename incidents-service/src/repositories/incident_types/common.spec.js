@@ -15,7 +15,7 @@ import _cloneDeep from 'lodash/fp/cloneDeep';
 import commonRepo from './common';
 import {incident as incidentEntity, incidentUpdate as incidentUpdateEntity } from '../../entities/index';
 
-describe('repo/incident', function() {
+describe('repo/incident/common', function() {
 
   /**
    * MOCK VARIABLES
@@ -37,6 +37,7 @@ describe('repo/incident', function() {
     name: 'incident',
     components: ['component_id'],
     components_impact_status: 'partial_outage',
+    latest_status: 'investigating',
     type: 'realtime',
     is_resolved: false,
     resolved_at: null,
@@ -56,6 +57,7 @@ describe('repo/incident', function() {
     name: 'incident',
     components: ['component_id'],
     components_impact_status: 'partial_outage',
+    latest_status: 'resolved',
     is_resolved: true,
     resolved_at: staticCurrentTime,
     type: 'realtime',
@@ -85,6 +87,7 @@ describe('repo/incident', function() {
     name: 'incident',
     components: ['component_id'],
     components_impact_status: 'partial_outage',
+    latest_status: 'investigating',
     is_resolved: false,
     resolved_at: null,
     type: 'realtime',

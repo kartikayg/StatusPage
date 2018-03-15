@@ -48,6 +48,9 @@ const init = (dao, messagingQueue) => {
     // set resolved status
     commonRepo.setResolvedStatus(incidentObj);
 
+    // set latest status
+    commonRepo.setLatestStatus(incidentObj);
+
     // save in db
     incidentObj = await commonRepo.saveDb(incidentObj);
 
@@ -116,6 +119,11 @@ const init = (dao, messagingQueue) => {
       commonRepo.setResolvedStatus(updatedObj);
 
     }
+
+    // set latest status
+    commonRepo.setLatestStatus(updatedObj);
+
+    console.log(updatedObj);
 
     // save in db
     updatedObj = await commonRepo.saveDb(updatedObj);

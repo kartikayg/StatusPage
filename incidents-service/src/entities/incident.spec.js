@@ -26,7 +26,8 @@ describe('entity/incident', function() {
     updated_at: new Date(),
     name: 'a new incident',
     resolved_at: new Date(),
-    is_resolved: true 
+    is_resolved: true ,
+    latest_status: 'investigating'
   };
 
   describe ('type#realtime', function () {
@@ -58,7 +59,7 @@ describe('entity/incident', function() {
 
     it ('should throw error for missing required values', function () {
 
-      const reqFields = ['id', 'created_at', 'updated_at', 'name', 'type', 'components', 'is_resolved', 'components_impact_status', 'updates', ];
+      const reqFields = ['id', 'created_at', 'updated_at', 'name', 'type', 'components', 'is_resolved', 'components_impact_status', 'updates', 'latest_status'];
       const requiredErr = reqFields.map(f => `"${f}" is required`);
 
       joiassert.error(incident.schema, {}, requiredErr);
@@ -132,7 +133,9 @@ describe('entity/incident', function() {
     const bfIncidentTestData = Object.assign({
       type: 'backfilled',
       'components_impact_status': 'partial_outage'
-    }, incidentTestData);
+    }, incidentTestData, {
+      latest_status: 'resolved'
+    });
 
     const bfIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
 
@@ -173,7 +176,8 @@ describe('entity/incident', function() {
       scheduled_end_time: new Date(),
       scheduled_auto_status_updates: true,
       scheduled_auto_updates_send_notifications: true,
-      components: ['cid_1']
+      components: ['cid_1'],
+      latest_status: 'scheduled'
     });
     const scIncidentUpdateTestData = Object.assign({}, incidentUpdateTestData, { status: 'resolved' });
 

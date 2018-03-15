@@ -37,7 +37,11 @@ const schema = Joi.object({
         .required()
         .only(['scheduled', 'in_progress', 'verifying', 'resolved', 'cancelled', 'update'])
     }))
-    .unique((a, b) => a.status === 'resolved' && b.status === 'resolved') // eslint-disable-line arrow-body-style
+    .unique((a, b) => a.status === 'resolved' && b.status === 'resolved'), // eslint-disable-line arrow-body-style
+
+  latest_status: Joi.string()
+    .required()
+    .only(['scheduled', 'in_progress', 'verifying', 'resolved', 'cancelled'])
 
 });
 

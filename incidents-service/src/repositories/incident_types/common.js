@@ -5,6 +5,7 @@
 import _cloneDeep from 'lodash/fp/cloneDeep';
 import _pick from 'lodash/fp/pick';
 import _find from 'lodash/fp/find';
+import _sortBy from 'lodash/fp/sortBy';
 
 import { IdNotFoundError } from '../errors';
 import { incident as incidentEntity, incidentUpdate as incidentUpdateEntity } from '../../entities/index';
@@ -177,6 +178,34 @@ const init = (dao, messagingQueue) => {
     }
 
     /* eslint-enable no-param-reassign */
+
+    return incidentObj;
+
+  };
+
+  /**
+   * Sets the latest status on the incident object based on the incident-updates
+   * @param {object} incidentObj
+   * @return {object}
+   */
+  repo.setLatestStatus = (incidentObj) => {
+
+    const updates = _sortBy(['created_ts'])(incidentObj.updates) || [];
+
+    if (updates.length === 0) {
+      return incidentObj;
+    }
+
+    // loop reverse and find the first "non update" incident-update
+    let status = '';
+    for (let i = updates.length - 1; i >= 0; i -= 1) {
+      if (updates[i].status !== 'update') {
+        status = updates[i].status; // eslint-disable-line prefer-destructuring
+        break;
+      }
+    }
+
+    incidentObj.latest_status = status; // eslint-disable-line no-param-reassign
 
     return incidentObj;
 
