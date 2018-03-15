@@ -26,7 +26,7 @@ const ViewIncidentDisplay = (props) => {
   });
 
   if (!incident) {
-    flashMsgStorage.add('error', 'Incident not found.');
+    flashMsgStorage.add('warning', 'Incident not found.');
     return <Redirect to='/' />;
   }
 

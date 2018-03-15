@@ -17,7 +17,7 @@ const EditRealtimeIncident = (props) => {
       <Helmet>
         <title>Edit Incident</title>
       </Helmet>
-      <h1 className="ui header" style={{ color: getColor(props.incident.components_impact_status) }}>
+      <h1 className={`ui header ${getColor(props.incident.components_impact_status)}`}>
         {props.incident.name}
       </h1>
       <div style={{ marginTop: '-10px', fontStyle: 'italic' }}>

@@ -193,7 +193,7 @@ class ManageSubscriptionDisplay extends React.Component {
   render() {
 
     if (!this.state.subscriptionObj) {
-      flashMsgStorage.add('error', 'Subscription not found.');
+      flashMsgStorage.add('warning', 'Subscription not found.');
       return <Redirect to='/' />;
     }
 

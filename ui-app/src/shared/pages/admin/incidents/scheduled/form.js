@@ -197,13 +197,18 @@ class Form extends React.Component {
           return c.id;
         });
 
-        // if an update and no message and status remain the same, don't post the
-        // status
-        if (this.state.action === 'Update' &&
-            this.state.inputs.originalStatus === this.state.inputs.status &&
-            !incData.message
-        ) {
-          incData.status = '';
+        // for status, if its an update
+        if (this.state.action === 'Update') {
+          // if the status hasn't changed
+          if (this.state.inputs.originalStatus === this.state.inputs.status) {
+            // only a message, then its an update
+            if (this.state.inputs.message) {
+              incData.status = 'update';
+            }
+            else {
+              incData.status = null;
+            }
+          }
         }
 
         if (this.state.inputs.scheduled_start_time) {

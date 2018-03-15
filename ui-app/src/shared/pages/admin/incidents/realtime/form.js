@@ -189,11 +189,17 @@ class Form extends React.Component {
         incData.message = this.state.inputs.message.text;
 
         // for status, if its an update
-        if (this.state.action === 'Update' &&
-            this.state.inputs.originalStatus === this.state.inputs.status &&
-            !this.state.inputs.message
-        ) {
-          incData.status = '';
+        if (this.state.action === 'Update') {
+          // if the status hasn't changed
+          if (this.state.inputs.originalStatus === this.state.inputs.status) {
+            // only a message, then its an update
+            if (this.state.inputs.message) {
+              incData.status = 'update';
+            }
+            else {
+              incData.status = null;
+            }
+          }
         }
 
         incData.components = impactedComponents.map(c => {
