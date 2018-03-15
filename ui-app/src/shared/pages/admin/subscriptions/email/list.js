@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 import moment from 'moment-timezone';
 import { Icon, Popup } from 'semantic-ui-react';
 
+
 const Listing = ({ subscriptions, onDeleteSubscriptionClick }) => {
 
   let body;
@@ -53,6 +54,21 @@ const Listing = ({ subscriptions, onDeleteSubscriptionClick }) => {
                   <td>{sub.email}</td>
                   <td>{moment(sub.created_at).format('MMM D, YYYY')}</td>
                   <td>
+                    <i
+                      className="remove circle icon large"
+                      onClick={onDeleteSubscriptionClick(sub.id)}
+                      style={{ cursor: 'pointer' }}
+                      title="Delete Subscription"
+                    ></i>
+                    {
+                      !sub.is_confirmed &&
+                      <i
+                        className="envelope icon large"
+                        onClick={onDeleteSubscriptionClick(sub.id)}
+                        style={{ cursor: 'pointer' }}
+                        title="Send Confirmation Email"
+                      ></i>
+                    }
                   </td>
                 </tr>
               );
