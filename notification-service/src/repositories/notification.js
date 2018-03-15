@@ -43,14 +43,6 @@ const init = (subscriptionRepo) => {
       return;
     }
 
-    const objToSend = {
-      id: incidentObj.id,
-      name: incidentObj.name,
-      status: latestUpdate.status,
-      message: latestUpdate.message,
-      displayed_at: latestUpdate.displayed_at
-    };
-
     // group subscriptions by type
     const subsByType = _groupBy('type')(subscriptions);
 
@@ -58,7 +50,7 @@ const init = (subscriptionRepo) => {
     // subscriptions.
     const notify = (subs, t) => {
       return subscriptionRepo.ofType(t).then(tRepo => {
-        return tRepo.notifyOfNewIncidentUpdate(subs, objToSend);
+        return tRepo.notifyOfNewIncidentUpdate(incidentObj, subs);
       });
     };
 

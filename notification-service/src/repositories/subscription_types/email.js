@@ -3,6 +3,7 @@
  */
 
 import _cloneDeep from 'lodash/fp/cloneDeep';
+import _orderBy from 'lodash/fp/orderBy';
 
 import common from './common';
 
@@ -82,35 +83,22 @@ const init = (dao) => {
 
   /**
    * Notifies all the email subscriptions of this latest incident update
-   * @param {object} latestUpdate
-   *  name: incident name
-   *  id: incident id
-   *  status
-   *  message
-   *  displayed_at
+   * @param {object} incident
    * @param {array} subscription
    * @return {promise}
    *  on success, void
    *  on failure, error
    */
-  repo.notifyOfNewIncidentUpdate = async (latestUpdate, subscriptions) => {
+  repo.notifyOfNewIncidentUpdate = async (incident, subscriptions) => {
+
+    const copy = _cloneDeep(incident);
+
+    // sort the updates so that recent is one at the top
+    copy.lastUpdate = _orderBy(['created_at'])(['desc'])(incident.updates)[0]; // eslint-disable-line prefer-destructuring
 
     // send out emails
     const emails = subscriptions.map(s => {
-
-      const params = {
-        links: {
-          incident: ''
-        },
-        incidentUpdate: latestUpdate
-      };
-
-      return emailLib.send(
-        'new_incident_update_notification',
-        s,
-        params
-      );
-
+      return emailLib.send('new_incident_update_notification', s, { incident: copy });
     });
 
     await Promise.all(emails);

@@ -6,6 +6,7 @@
 import nodemailer from 'nodemailer';
 import EmailTemplate from 'email-templates';
 import _cloneDeep from 'lodash/fp/cloneDeep';
+import moment from 'moment';
 
 import path from 'path';
 
@@ -75,7 +76,8 @@ const send = async (templateName, subscription, vars, from, transporter) => {
     template: templateName,
     company_name: conf.email.COMPANY_NAME,
     ui_app_uri: conf.server.UI_APP_URI,
-    unsub_uri: `${conf.server.UI_APP_URI}/manage_subscription/${subscription.id}`
+    unsub_uri: `${conf.server.UI_APP_URI}/manage_subscription/${subscription.id}`,
+    date: moment().format('MMM DD, YYYY')
   });
 
   const response = await emailTpl.send({

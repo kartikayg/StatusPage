@@ -65,11 +65,11 @@ const init = (dao) => {
    *  on success, void
    *  on failure, error
    */
-  repo.notifyOfNewIncidentUpdate = async (latestUpdate, subscriptions) => {
+  repo.notifyOfNewIncidentUpdate = async (incident, subscriptions) => {
 
     // send out posts
     const posts = subscriptions.map(s => {
-      return axios.post(s.uri, latestUpdate, { timeout: 15000 })
+      return axios.post(s.uri, incident, { timeout: 15000 })
         .catch(() => {
 
         });
