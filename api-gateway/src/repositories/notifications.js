@@ -29,12 +29,21 @@ const init = () => {
      * Returns a single subscriptions
      * @param {string} id
      * @return {promise}
-     *  on success, {object} subscription objects
+     *  on success, {object} subscription object
      *  on error, {error}
      */
     getSubscription: async (id) => {
-      const subscription = await instance.get(`/subscriptions/${id}`);
-      return subscription;
+      try {
+        const subscription = await instance.get(`/subscriptions/${id}`);
+        return subscription;
+      }
+      catch (e) {
+        // not found
+        if (e.httpStatus === 422) {
+          return {};
+        }
+        throw e;
+      }
     },
 
     /**
