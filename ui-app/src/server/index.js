@@ -110,9 +110,6 @@ const setupServer = () => {
       if (context.url) {
         return res.redirect(302, context.url);
       }
-      else if (context.notFound) {
-        res.status(404);
-      }
 
       return res.send(content);
 
@@ -121,6 +118,11 @@ const setupServer = () => {
       return next(e);
     }
 
+  });
+
+  // error handler on page load
+  app.use((err, req, res, next) => {
+    res.send('Unable to load the site. Please try again later.');
   });
 
   // start the server
