@@ -123,8 +123,6 @@ const init = (dao, messagingQueue) => {
     // set latest status
     commonRepo.setLatestStatus(updatedObj);
 
-    console.log(updatedObj);
-
     // save in db
     updatedObj = await commonRepo.saveDb(updatedObj);
 

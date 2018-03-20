@@ -16,7 +16,8 @@ describe('config/server', function() {
       PORT: 1234,
       NODE_ENV: 'development',
       RABBMITMQ_CONN_ENDPOINT: 'amqp://localhost',
-      ENABLE_HTTP_REQUEST_LOGS: true
+      ENABLE_HTTP_REQUEST_LOGS: true,
+      COMPONENTS_SERVICE_URI: 'http://uri'
     }
     
     it ('should return a joi object', function() {
@@ -52,7 +53,11 @@ describe('config/server', function() {
       joiassert.error(
         schema, 
         {},
-        ['"NODE_ENV" is required', '"PORT" is required', '"RABBMITMQ_CONN_ENDPOINT" is required']
+        ['"NODE_ENV" is required', 
+         '"PORT" is required',
+         '"RABBMITMQ_CONN_ENDPOINT" is required',
+         '"COMPONENTS_SERVICE_URI" is required'
+        ]
       );
 
     });

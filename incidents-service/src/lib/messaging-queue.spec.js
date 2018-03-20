@@ -132,7 +132,7 @@ describe ('lib/messaging-queue', function () {
 
     it ('should timeout for invalid connection in the provided time', function (done) {
 
-      this.timeout(4000);
+      this.timeout(5000);
 
       const startTime = (new Date()).getTime(); 
 

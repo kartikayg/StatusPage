@@ -9,7 +9,8 @@ describe('config', function() {
     LOG_LEVEL: 'info',
     ENABLE_HTTP_REQUEST_LOGS: "false",
     MONGO_ENDPOINT: 'mongodb://dave:password@localhost:27017/myproject',
-    RABBMITMQ_CONN_ENDPOINT: 'amqp://localhost'
+    RABBMITMQ_CONN_ENDPOINT: 'amqp://localhost',
+    COMPONENTS_SERVICE_URI: 'http://uri'
   };
 
   it('should return a proper object on success', function() {
@@ -19,7 +20,8 @@ describe('config', function() {
         PORT: testEnv.PORT,
         NODE_ENV: testEnv.NODE_ENV,
         RABBMITMQ_CONN_ENDPOINT: testEnv.RABBMITMQ_CONN_ENDPOINT,
-        ENABLE_HTTP_REQUEST_LOGS: false
+        ENABLE_HTTP_REQUEST_LOGS: false,
+        COMPONENTS_SERVICE_URI: 'http://uri'
       },
       logger: {
         LOG_LEVEL: testEnv.LOG_LEVEL
