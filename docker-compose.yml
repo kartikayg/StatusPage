@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  mongo_db:
+    image: "mongo:3.4"
+    ports:
+      - 6011:27017
+  messaging_queue:
+    hostname: statuspage
+    image: rabbitmq:3.6.6-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+      - RABBITMQ_USE_LONGNAME=true
+    ports:
+      - 5672:5672
+      - 15672:15672
+  components-service:
+    build: components-service/.
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: 'components-service'
+      PORT: 6010
+    ports:
+        - 6010:6010
+    links:
+        - mongo_db
+        - messaging_queue
