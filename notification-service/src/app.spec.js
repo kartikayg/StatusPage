@@ -23,7 +23,7 @@ describe('app - integration tests', function () {
 
   const staticCurrentTime = new Date();
 
-  let messagingQueue, incidentsExchange;
+  let messagingQueue;
 
   const appLogQueueCallbackSpy = sinon.spy();
   const reqLogQueueCallbackSpy = sinon.spy();
@@ -72,10 +72,6 @@ describe('app - integration tests', function () {
 
       });
 
-      // setup the incidents exchange. we will push message manually and see if
-      // its processed by the service
-      incidentsExchange = messagingQueue.exchange('incidents', { type: 'direct' });
-
     });
 
     setTimeout(() => {
@@ -83,9 +79,9 @@ describe('app - integration tests', function () {
         app = r;
         agent = request.agent(app);
       });
-    }, 1500);
+    }, 2500);
 
-    setTimeout(done, 2500);
+    setTimeout(done, 4000);
 
   });
 

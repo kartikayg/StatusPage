@@ -31,6 +31,8 @@ const addQueueListeners = async (notificationRepo) => {
     });
   };
 
+  await messagingQueue.createExchange('incidents');
+
   await messagingQueue.subscribe(
     'notification-service-newincidentupdate',
     { exchangeName: 'incidents', bindingKey: 'new-update' },

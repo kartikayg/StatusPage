@@ -161,10 +161,31 @@ const queueWrapper = (connection) => {
     connection.disconnect();
   };
 
+  /**
+   * Creates an exchange
+   */
+  const createExchange = (name, options) => {
+
+    // default values
+    const eOpts = Object.assign({}, {
+      durable: true,
+      autoDelete: false,
+      type: 'direct'
+    }, _pick(['type', 'durable', 'autoDelete'])(options || {}));
+
+    return new Promise((resolve) => {
+      connection.exchange(name, eOpts, () => {
+        resolve();
+      });
+    });
+
+  };
+
   return {
     publish,
     subscribe,
-    disconnect
+    disconnect,
+    createExchange
   };
 
 };
