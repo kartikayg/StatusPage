@@ -12,7 +12,7 @@ const cache = new Cache();
 
 const paths = {
   js: ['./src/**/*.js', '!./src/**/*.spec.js', '!dist/**', '!node_modules/**'],
-  nonJs: ['./package.json', './.gitignore', './.env']
+  nonJs: ['./package.json']
 };
 
 // Clean up dist and cache
@@ -59,11 +59,11 @@ gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
 // gulp serve for development
 gulp.task('dev', () => runSequence('nodemon'));
 
-// default task: clean dist, compile js files and copy non-js files.
-gulp.task('default', () => {
+// build for production
+gulp.task('build', () => {
   runSequence(
-    'lint',
     'clean',
-     ['copy', 'compile']
+    'copy',
+    'compile'
   );
 });

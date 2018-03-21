@@ -1,5 +1,5 @@
 # use node 8 (latest version so far)
-FROM node:8.4.0
+FROM node:8.9.0
 
 MAINTAINER Kartikay Gupta <kartikayg@gmail.com>
 
@@ -9,18 +9,20 @@ RUN mkdir -p /app
 # set /app directory as default working directory
 WORKDIR /app
 
-# only copy package.json initially so that `RUN yarn` layer is recreated only
-# if there are changes in package.json
-# ADD package.json package-lock.json /app/
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+COPY package.json package-lock.json /app/
 
 #  install dependencies and don’t generate a lock lockfile
-# RUN npm install --no-package-lock --quiet
+RUN npm install --no-package-lock --quiet
 
-# copy all file from current dir to /app in container
-COPY . /app/
+# copy all file from src/ dir to /app in container
+COPY . .
 
-# expose port 4040
-EXPOSE 4040
+RUN npm run build
 
-# cmd to start service
-CMD [ "npm", "run", "dev" ]
+# expose port 6020
+EXPOSE 6020
+
+CMD ["/app/prod_start.sh"]
