@@ -15,6 +15,25 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+  redis:
+    image: "redis"
+    ports:
+      - 6041:6379
+  logger-service:
+    build: logger-service/.
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: logger-service
+      PORT: 6000
+      LOG_REQUEST_WRITER: console
+      LOG_APPLICATION_WRITER: console
+    ports:
+        - 6000:6000
+    links:
+        - mongo_db
+        - messaging_queue
   components-service:
     build: components-service/.
     working_dir: /
@@ -26,5 +45,48 @@ services:
     ports:
         - 6010:6010
     links:
-        - mongo_db
-        - messaging_queue
+        - logger-service
+  incidents-service:
+    build: incidents-service/.
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: 'incidents-service'
+      PORT: 6020
+      COMPONENTS_SERVICE_URI: http://components_service:6010/api
+    ports:
+        - 6020:6020
+    links:
+        - components-service
+  notification-service:
+    build: notification-service/.
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: 'notification-service'
+      PORT: 6030
+      UI_APP_URI: http://localhost:6050
+    ports:
+        - 6030:6030
+    links:
+        - incidents-service
+  api-gateway:
+    build: api-gateway/.
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: 'api-gateway'
+      PORT: 6040
+      COMPONENTS_SERVICE_URI: http://components_service:6010/api
+      INCIDENTS_SERVICE_URI: http://incidents_service:6020/api
+      NOTIFICATION_SERVICE_URI: http://notification_service:6030/api
+    ports:
+        - 6040:6040
+    links:
+        - redis
+        - incidents-service
+        - components-service
+        - notification-service
