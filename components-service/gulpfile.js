@@ -59,6 +59,7 @@ gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
 // gulp serve for development
 gulp.task('dev', () => runSequence('nodemon'));
 
+// build for production
 gulp.task('build', () => {
   runSequence(
     'clean',

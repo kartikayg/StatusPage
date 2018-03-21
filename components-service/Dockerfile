@@ -25,4 +25,4 @@ RUN npm run build
 # expose port 6010
 EXPOSE 6010
 
-CMD ["node", "/app/dist/src/index.js"]
+CMD ["/app/prod_start.sh"]
