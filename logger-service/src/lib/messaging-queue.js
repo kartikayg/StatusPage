@@ -6,6 +6,7 @@
 import amqp from 'amqp';
 import omit from 'lodash/fp/omit';
 import isJson from 'is-json';
+import _pick from 'lodash/fp/pick';
 
 import logger from './logger/application';
 
@@ -128,9 +129,30 @@ const queueWrapper = (connection) => {
     connection.disconnect();
   };
 
+  /**
+   * Creates an exchange
+   */
+  const createExchange = (name, options) => {
+
+    // default values
+    const eOpts = Object.assign({}, {
+      durable: true,
+      autoDelete: false,
+      type: 'direct'
+    }, _pick(['type', 'durable', 'autoDelete'])(options || {}));
+
+    return new Promise((resolve) => {
+      connection.exchange(name, eOpts, () => {
+        resolve();
+      });
+    });
+
+  };
+
   return {
     subscribe,
-    disconnect
+    disconnect,
+    createExchange
   };
 
 };

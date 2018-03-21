@@ -51,7 +51,7 @@ describe('app - integration tests', function () {
     // create a logs exchange on the messaging queue
     messagingQueue = amqp.createConnection({url: process.env.RABBMITMQ_CONN_ENDPOINT});
     messagingQueue.on('ready', () => {
-      exchange = messagingQueue.exchange('logs', { type: 'direct' });
+      exchange = messagingQueue.exchange('logs', { type: 'direct',  durable: true, autoDelete: false });
       exchange.on('open', () => {
 
         // init the app

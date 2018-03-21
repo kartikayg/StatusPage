@@ -47,7 +47,7 @@ const start = async () => {
   // add listeners on the messaging queue
   await addQueueListeners({ appLogger, reqLogger });
 
-  appLogger.debug(`${process.env.SERVICE_NAME} started ...`);
+  appLogger.debug(`${process.env.SERVICE_NAME} has started on ${conf.server.PORT}.`);
 
 };
 
@@ -80,7 +80,14 @@ const addQueueListeners = async (loggers) => {
     }
     catch (e) {} // eslint-disable-line no-empty
   };
-  await messagingQueue.subscribe('logger-service-reqlog', { exchangeName: 'logs', bindingKey: 'request' }, handleReqLog);
+
+  await messagingQueue.createExchange('logs');
+
+  await messagingQueue.subscribe(
+    'logger-service-reqlog',
+    { exchangeName: 'logs', bindingKey: 'request' },
+    handleReqLog
+  );
 
 };
 

@@ -18,10 +18,12 @@ export const schema =
       .default('error'),
 
     LOG_REQUEST_WRITER: Joi.array()
-      .items(Joi.string().label('LOG_REQUEST_WRITER').valid('console', 'file')),
+      .items(Joi.string().label('LOG_REQUEST_WRITER').valid('console', 'file'))
+      .single(),
 
     LOG_APPLICATION_WRITER: Joi.array()
-      .items(Joi.string().label('LOG_APPLICATION_WRITER').valid('console', 'file')),
+      .items(Joi.string().label('LOG_APPLICATION_WRITER').valid('console', 'file'))
+      .single(),
 
     LOG_FILE_DIRNAME: Joi.string()
 
