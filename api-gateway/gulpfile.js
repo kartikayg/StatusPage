@@ -12,7 +12,7 @@ const cache = new Cache();
 
 const paths = {
   js: ['./src/**/*.js', '!./src/**/*.spec.js', '!dist/**', '!node_modules/**'],
-  nonJs: ['./package.json', './.gitignore', './.env']
+  nonJs: ['./package.json']
 };
 
 // Clean up dist and cache
@@ -25,7 +25,7 @@ gulp.task('clean', () => {
 gulp.task('lint', () =>
   gulp.src(paths.js)
     .pipe(eslint())
-    .pipe(eslint.format())
+    .pipe(eslint.format()) 
 );
 
 // Copy non-js files to dist
@@ -50,7 +50,7 @@ gulp.task('compile', () =>
 gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
   nodemon({
     script: path.join('dist', 'src', 'index.js'),
-    ext: 'js',
+    ext: 'js json env',
     ignore: ['node_modules/**/*.js', 'dist/**/*.js', 'src/**/*.spec.js', 'gulpfile.js', 'test/**/*.js'],
     tasks: ['lint', 'compile']
   })
@@ -59,11 +59,11 @@ gulp.task('nodemon', runSequence('lint', ['copy', 'compile']), () =>
 // gulp serve for development
 gulp.task('dev', () => runSequence('nodemon'));
 
-// default task: clean dist, compile js files and copy non-js files.
-gulp.task('default', () => {
+// build for production
+gulp.task('build', () => {
   runSequence(
-    'lint',
     'clean',
-     ['copy', 'compile']
+    'copy',
+    'compile'
   );
 });
