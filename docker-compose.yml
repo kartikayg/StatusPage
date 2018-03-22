@@ -4,7 +4,7 @@ services:
   mongo_db:
     image: "mongo:3.4"
     ports:
-      - 6011:27017
+      - 7011:27017
   messaging_queue:
     hostname: statuspage
     image: rabbitmq:3.6.6-management
@@ -14,7 +14,7 @@ services:
       - RABBITMQ_USE_LONGNAME=true
     ports:
       - 5672:5672
-      - 15672:15672
+      - 7099:15672
   redis:
     image: "redis"
     ports:
@@ -26,11 +26,11 @@ services:
       - ./.env
     environment:
       SERVICE_NAME: logger-service
-      PORT: 6000
+      PORT: 7000
       LOG_REQUEST_WRITER: console
       LOG_APPLICATION_WRITER: console
     ports:
-        - 6000:6000
+        - 7000:7000
     links:
         - mongo_db
         - messaging_queue
@@ -41,9 +41,9 @@ services:
       - ./.env
     environment:
       SERVICE_NAME: 'components-service'
-      PORT: 6010
+      PORT: 7010
     ports:
-        - 6010:6010
+        - 7010:7010
     links:
         - logger-service
   incidents-service:
@@ -53,10 +53,10 @@ services:
       - ./.env
     environment:
       SERVICE_NAME: 'incidents-service'
-      PORT: 6020
-      COMPONENTS_SERVICE_URI: http://components_service:6010/api
+      PORT: 7020
+      COMPONENTS_SERVICE_URI: http://components-service:7010/api
     ports:
-        - 6020:6020
+        - 7020:7020
     links:
         - components-service
   notification-service:
@@ -66,10 +66,10 @@ services:
       - ./.env
     environment:
       SERVICE_NAME: 'notification-service'
-      PORT: 6030
+      PORT: 7030
       UI_APP_URI: http://localhost:6050
     ports:
-        - 6030:6030
+        - 7030:7030
     links:
         - incidents-service
   api-gateway:
@@ -79,14 +79,37 @@ services:
       - ./.env
     environment:
       SERVICE_NAME: 'api-gateway'
-      PORT: 6040
-      COMPONENTS_SERVICE_URI: http://components_service:6010/api
-      INCIDENTS_SERVICE_URI: http://incidents_service:6020/api
-      NOTIFICATION_SERVICE_URI: http://notification_service:6030/api
+      PORT: 7040
+      COMPONENTS_SERVICE_URI: http://components-service:7010/api
+      INCIDENTS_SERVICE_URI: http://incidents-service:7020/api
+      NOTIFICATION_SERVICE_URI: http://notification-service:7030/api
     ports:
-        - 6040:6040
+        - 7040:7040
     links:
         - redis
         - incidents-service
         - components-service
         - notification-service
+  ui-app:
+    build:
+      context: ui-app/.
+      args:
+        - PORT=7050
+        - ORG_TIMEZONE
+        - API_GATEWAY_URI=http://api-gateway:7040
+        - API_GATEWAY_HTTP_URI=http://localhost:7040
+        - nodeEnv=production
+        - COMPANY_NAME
+    working_dir: /
+    env_file:
+      - ./.env
+    environment:
+      SERVICE_NAME: 'ui-app'
+      PORT: 7050
+      API_GATEWAY_URI: http://api-gateway:7040
+      API_GATEWAY_HTTP_URI: http://localhost:7040
+      ORG_TIMEZONE: America/New_York
+    ports:
+        - 7050:7050
+    links:
+        - api-gateway
