@@ -22,7 +22,7 @@ COPY . .
 
 RUN npm run build
 
-# expose port 6000
-EXPOSE 6000
+# expose port
+EXPOSE 7000
 
 CMD ["/app/prod_start.sh"]
