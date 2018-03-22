@@ -76,7 +76,7 @@ const apiGateway = (function () {
 
   const clientInstance = axios.create({
     timeout: CALL_TIMEOUT,
-    baseURL: 'http://localhost:6040/api/v1'
+    baseURL: `${process.env.API_GATEWAY_HTTP_URI}/api/v1`
   });
 
   const getInstance = () => {

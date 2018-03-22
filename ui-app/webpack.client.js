@@ -4,11 +4,29 @@ const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const nodeModulesDir  = path.join(__dirname, 'node_modules');
 
+const plugins = [
+   new webpack.DefinePlugin({
+      '__CLIENT__': true,
+      '__SERVER__': false
+    }),
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI', 'API_GATEWAY_HTTP_URI', 'ORG_TIMEZONE', 'COMPANY_NAME']),
+    new ExtractTextPlugin('app.styles.css'),
+    new webpack.optimize.CommonsChunkPlugin({
+      name:     'vendor',
+      filename: 'vendor.bundle.js'
+    })
+];
+
+if (process.env.NODE_ENV !== 'development') {
+  plugins.push(new UglifyJsPlugin());
+}
+
 module.exports = {
-  devtool: process.env.NODE_ENV === 'dev' ? '#cheap-module-eval-source-map' : '#source-map',
+  devtool: process.env.NODE_ENV === 'development' ? '#cheap-module-eval-source-map' : '#source-map',
   entry: {
     app: './src/client/index.js',
     vendor: [
@@ -72,16 +90,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      '__CLIENT__': true,
-      '__SERVER__': false
-    }),
-    new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT', 'API_GATEWAY_URI', 'ORG_TIMEZONE', 'COMPANY_NAME']),
-    new ExtractTextPlugin('app.styles.css'),
-    new webpack.optimize.CommonsChunkPlugin({
-      name:     'vendor',
-      filename: 'vendor.bundle.js'
-    })
-  ]
+  plugins
 };

@@ -25,6 +25,7 @@ class App extends React.Component {
         NotificationManager[level](message, '', timeOut || 5000);
       });
     }
+
   }
 
   render = () => {

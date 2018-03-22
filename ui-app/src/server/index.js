@@ -47,7 +47,7 @@ const setupServer = () => {
   });
 
   // static files
-  app.use('/public', express.static('./dist/public'));
+  app.use('/public', express.static(`${__dirname}/public`));
 
   app.get('/favicon.ico', (req, res) => {
     res.send('icon');

@@ -10,7 +10,8 @@
     "dev:build-client": "webpack --config webpack.client.js --watch",
     "dev:server": "nodemon --watch dist --exec \"node dist/server.js\"",
     "test": "mocha --reporter spec --require babel-core/register 'src/**/*.spec.js'",
-    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register --exit 'src/**/*.spec.js'"
+    "test:coverage": "istanbul cover _mocha -- -u exports --reporter spec --colors --require babel-core/register --exit 'src/**/*.spec.js'",
+    "build": "webpack --config webpack.client.js && webpack --config webpack.server.js"
   },
   "author": "",
   "license": "ISC",
@@ -39,7 +40,7 @@
     "nodemon": "^1.14.12",
     "npm-run-all": "^4.1.2",
     "style-loader": "^0.20.1",
-    "uglifyjs-webpack-plugin": "^1.1.8",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "url-loader": "^0.6.2",
     "webpack": "^3.10.0"
   },

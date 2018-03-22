@@ -30,7 +30,7 @@ const HomePageDisplay = ({ components, componentsByGroup, incidents }) => {
     <div id="public-dashboard">
 
       <Helmet>
-        <title>{process.env.COMPANY_NAME} - Status Page</title>
+        <title>{`${process.env.COMPANY_NAME} - Status Page`}</title>
       </Helmet>
 
       <div className="ui borderless main menu" style={{ marginTop: '1rem' }}>

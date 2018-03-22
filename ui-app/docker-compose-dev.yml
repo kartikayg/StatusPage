@@ -13,6 +13,7 @@ services:
       - .env
     environment:
       API_GATEWAY_URI: http://api_gateway:6040
+      API_GATEWAY_HTTP_URI: http://localhost:6040
     networks:
       default:
         aliases:

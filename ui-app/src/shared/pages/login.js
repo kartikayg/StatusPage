@@ -95,7 +95,7 @@ class LoginForm extends Component {
   render() {
 
     const gridStyle = {
-      height: '100%'
+      height: '800px'
     };
 
     const columnStyle = {

@@ -55,14 +55,12 @@ class AdminPage extends React.Component {
       if (!document.hidden) { // eslint-disable-line no-undef
         const rect = body.getBoundingClientRect();
         const isMobile = rect.width - RATIO < WIDTH;
-
         if (this.state.isMobile !== isMobile) {
           this.setState({
             sidebarActive: !isMobile,
             isMobile
           });
         }
-
       }
     };
 
@@ -86,15 +84,16 @@ class AdminPage extends React.Component {
       height: '100%',
       zIndex: 1023
     };
+
     if (!this.state.sidebarActive) {
       sidebarStyle.transform = 'translateX(-200px)';
     }
 
     // main section style
     const routeStyle = {
-      marginLeft: !this.state.isMobile ? '300' : '50',
       maxWidth: '68rem',
-      marginTop: 25
+      margin: `25px 50px 0px ${this.state.isMobile ? '50px' : '300px'}`,
+      minHeight: '800px'
     };
 
     return (
