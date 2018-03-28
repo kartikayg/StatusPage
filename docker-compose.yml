@@ -27,8 +27,6 @@ services:
     environment:
       SERVICE_NAME: logger-service
       PORT: 7000
-      LOG_REQUEST_WRITER: console
-      LOG_APPLICATION_WRITER: console
     ports:
         - 7000:7000
     links:
@@ -108,7 +106,6 @@ services:
       PORT: 7050
       API_GATEWAY_URI: http://api-gateway:7040
       API_GATEWAY_HTTP_URI: http://localhost:7040
-      ORG_TIMEZONE: America/New_York
     ports:
         - 7050:7050
     links:
