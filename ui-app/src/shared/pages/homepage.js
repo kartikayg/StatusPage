@@ -60,7 +60,7 @@ const HomePageDisplay = ({ components, componentsByGroup, incidents }) => {
         )
       }
 
-      <div className="ui text container" style={{ marginTop: '5rem' }}>
+      <div className="ui text container" style={{ margin: '5rem 0' }}>
         <PastIncidents incidents={incidents} />
       </div>
 
