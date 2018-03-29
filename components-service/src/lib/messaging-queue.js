@@ -25,7 +25,7 @@ const connect = (endpoint, timeout) => {
     const connOptions = {
       reconnect: 'true',
       reconnectBackoffStrategy: 'exponential',
-      reconnectExponentialLimit: 5000
+      reconnectExponentialLimit: 1000
     };
     const connection = amqp.createConnection({ url: endpoint }, connOptions);
 
@@ -72,6 +72,12 @@ const connect = (endpoint, timeout) => {
  */
 const queueWrapper = (connection) => {
 
+  let closed = false;
+
+  connection.socket.on('close', () => {
+    closed = true;
+  });
+
   /**
    * Publishes to an exchange
    * @param {mixed} message - if a string is not passed, it will be
@@ -110,11 +116,25 @@ const queueWrapper = (connection) => {
    * Disconnects the queue
    */
   const disconnect = () => {
-    connection.removeAllListeners('end');
-    connection.disconnect();
+    try {
+      connection.removeAllListeners('end');
+      connection.disconnect();
+    }
+    catch (e) {
+      console.log(e); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   * Whether the connection is still active or not
+   * @return {bool}
+   */
+  const isActive = () => {
+    return closed === false;
   };
 
   return {
+    isActive,
     publish,
     disconnect
   };

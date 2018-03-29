@@ -23,6 +23,7 @@ import logRequest from './middleware/log-request';
  * @param {object} options
  *  repos
  *  messagingQueue
+ *  db
  */
 const start = (conf, options) => {
 
@@ -47,7 +48,7 @@ const start = (conf, options) => {
   }
 
   // setup routes
-  app.use('/api', routes(options.repos));
+  app.use('/api', routes(options));
 
   // if there is an error at this point, it means it is unexpected like db
   // or some system error and should be logged.

@@ -42,6 +42,11 @@ describe ('lib/messaging-queue', function () {
           setTimeout(() => { this.emit('error', new Error('error')); }, 500); 
           break;
       }
+
+      this.socket = {
+        on(event, cb) {}
+      };
+
     }
 
     reconnect() {}
@@ -112,6 +117,8 @@ describe ('lib/messaging-queue', function () {
 
     it ('should return a queue when connection is ready', function (done) {
 
+      this.timeout(5000);
+
       initQueue(validEndpoint, 500).then(queue => {
         assert.isObject(queue);
         sinon.assert.calledOnce(createConnectionSpy);
@@ -147,7 +154,7 @@ describe ('lib/messaging-queue', function () {
 
     it ('should reconnects if the connection ends', function (done) {
 
-      this.timeout(3000);
+      this.timeout(5000);
 
       initQueue(endEndpoint, 4000).then(queue => {
         
@@ -171,6 +178,9 @@ describe ('lib/messaging-queue', function () {
     let connExchangeSpy;
 
     before(function (done) {
+
+      this.timeout(5000);
+
       initQueue(validEndpoint, 500).then(q => {
         messagingQueue = q;
         connExchangeSpy = sinon.spy(latestConnectionMockObj, 'exchange');
