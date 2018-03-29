@@ -13,7 +13,7 @@ import thisPackage from '../../../package.json';
 /**
  * Return routes
  */
-export default (repos) => {
+export default ({ repos, db, messagingQueue }) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
@@ -22,12 +22,22 @@ export default (repos) => {
 
   /** GET /health-check - Check service health */
   router.get('/health-check', (req, res) => {
-    res.json({
+
+    if (db.isActive() === false) {
+      return res.status(500).json({ message: 'DB is not available.' });
+    }
+
+    if (messagingQueue.isActive() === false) {
+      return res.status(500).json({ message: 'Messaging queue is not available.' });
+    }
+
+    return res.json({
       status: 'RUNNING',
       name: thisPackage.name,
       version: thisPackage.version,
       environment: process.env.NODE_ENV
     });
+
   });
 
   // mount incident routes at /incidents
