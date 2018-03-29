@@ -30,4 +30,3 @@ app.start()
     console.error('Problem initializing the app', e); // eslint-disable-line no-console
     process.exit(1);
   });
-

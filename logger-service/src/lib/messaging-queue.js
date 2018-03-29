@@ -25,9 +25,7 @@ const connect = (endpoint, timeout) => {
 
     // create a connection with the server with reconnect option
     const connOptions = {
-      reconnect: 'true',
-      reconnectBackoffStrategy: 'exponential',
-      reconnectExponentialLimit: 5000
+      reconnect: false
     };
     const connection = amqp.createConnection({ url: endpoint }, connOptions);
 
@@ -52,9 +50,8 @@ const connect = (endpoint, timeout) => {
     // when connection ends and it was ready before, reconnects
     connection.on('end', () => {
       if (isReady) {
-        logger.debug(`raabit mq server connection ended: ${endpoint}. Trying to reconnect ...`);
+        logger.debug(`raabit mq server connection ended: ${endpoint}.`);
         isReady = false;
-        connection.reconnect();
       }
     });
 
@@ -74,6 +71,12 @@ const connect = (endpoint, timeout) => {
  * @return {object}
  */
 const queueWrapper = (connection) => {
+
+  let closed = false;
+
+  connection.socket.on('close', () => {
+    closed = true;
+  });
 
   /**
    * Subscribes to a queue
@@ -149,7 +152,16 @@ const queueWrapper = (connection) => {
 
   };
 
+  /**
+   * Whether the connection is still active or not
+   * @return {bool}
+   */
+  const isActive = () => {
+    return closed === false;
+  };
+
   return {
+    isActive,
     subscribe,
     disconnect,
     createExchange

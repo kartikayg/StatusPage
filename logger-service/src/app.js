@@ -4,12 +4,18 @@
 
 // npm packges
 import dotenvParseVariables from 'dotenv-parse-variables';
+import express from 'express';
+import compress from 'compression';
+import methodOverride from 'method-override';
+import cors from 'cors';
+import helmet from 'helmet';
 
 // internal packages
 import config from './config';
 import {init as initAppLogger} from './lib/logger/application';
 import {init as initReqLogger} from './lib/logger/request';
 import {init as initQueue} from './lib/messaging-queue';
+import thisPackage from '../package.json';
 
 // {object} - messaging queue used for this app
 let messagingQueue;
@@ -42,10 +48,13 @@ const start = async () => {
   );
 
   // setup messaging queue
-  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 120000);
+  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 30000);
 
   // add listeners on the messaging queue
   await addQueueListeners({ appLogger, reqLogger });
+
+  // setup health check endpoint
+  setupHealthCheck(conf.server.PORT);
 
   appLogger.debug(`${process.env.SERVICE_NAME} has started on ${conf.server.PORT}.`);
 
@@ -88,6 +97,40 @@ const addQueueListeners = async (loggers) => {
     { exchangeName: 'logs', bindingKey: 'request' },
     handleReqLog
   );
+
+};
+
+/**
+ * Setup health check endpoint for this service.
+ * @param {int} port
+ */
+const setupHealthCheck = (port) => {
+
+  // setup health-check endpoint
+  const server = express();
+
+  server.use(compress());
+  server.use(methodOverride());
+
+  // secure apps by setting various HTTP headers
+  server.use(helmet());
+
+  // enable CORS - Cross Origin Resource Sharing
+  server.use(cors());
+
+  server.get('/api/health-check', (req, res) => {
+    if (messagingQueue && messagingQueue.isActive() === false) {
+      return res.status(500).json({ message: 'Messaging queue is not available.' });
+    }
+    return res.json({
+      status: 'RUNNING',
+      name: thisPackage.name,
+      version: thisPackage.version,
+      environment: process.env.NODE_ENV
+    });
+  });
+
+  server.listen(port);
 
 };
 

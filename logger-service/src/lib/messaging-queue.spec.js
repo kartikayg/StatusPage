@@ -38,9 +38,12 @@ describe ('lib/messaging-queue', function () {
           setTimeout(() => { this.emit('error', new Error('error')); }, 500); 
           break;
       }
-    }
 
-    reconnect() {}
+      this.socket = {
+        on(event, cb) {}
+      };
+
+    }
 
     queue(name, opts, callback) {
       callback(amqpQueue)
@@ -127,25 +130,6 @@ describe ('lib/messaging-queue', function () {
       initQueue('invalid', 500).catch(e => {
         assert.strictEqual(e.message, 'Not able to establish a connection with the server: invalid.');
         done();
-      });
-
-    });
-
-
-    it ('should reconnects if the connection ends', function (done) {
-
-      this.timeout(3000);
-
-      initQueue(endEndpoint, 4000).then(queue => {
-        
-        const reconnectSpy = sinon.spy(latestConnectionMockObj, 'reconnect');
-
-        setTimeout(() => {
-          sinon.assert.calledOnce(reconnectSpy);
-          reconnectSpy.reset();
-          done();
-        }, 2000);
-
       });
 
     });
