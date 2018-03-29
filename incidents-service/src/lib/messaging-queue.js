@@ -23,7 +23,7 @@ const connect = (endpoint, timeout) => {
 
     // create a connection with the server with reconnect option
     const connOptions = {
-      reconnect: true
+      reconnect: false
     };
     const connection = amqp.createConnection({ url: endpoint }, connOptions);
 
