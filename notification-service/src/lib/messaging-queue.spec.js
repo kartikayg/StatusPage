@@ -43,9 +43,12 @@ describe ('lib/messaging-queue', function () {
           setTimeout(() => { this.emit('error', new Error('error')); }, 500); 
           break;
       }
-    }
 
-    reconnect() {}
+      this.socket = {
+        on(event, cb) {}
+      };
+
+    }
 
     queue(name, opts, callback) {
       callback(amqpQueueStub)
@@ -141,25 +144,6 @@ describe ('lib/messaging-queue', function () {
         const seconds = Math.abs(((new Date()).getTime() - startTime) / 1000);
         assert.isTrue(seconds > 3 && seconds < 3.1);
         done();
-      });
-
-    });
-
-
-    it ('should reconnects if the connection ends', function (done) {
-
-      this.timeout(3000);
-
-      initQueue(endEndpoint, 4000).then(queue => {
-        
-        const reconnectSpy = sinon.spy(latestConnectionMockObj, 'reconnect');
-
-        setTimeout(() => {
-          sinon.assert.calledOnce(reconnectSpy);
-          reconnectSpy.reset();
-          done();
-        }, 2000);
-
       });
 
     });

@@ -59,7 +59,7 @@ const start = async () => {
   await db.setup();
 
   // init messaging queue
-  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 120000);
+  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 30000);
 
   // init logger
   initMQLogger(conf.logger.LOG_LEVEL, messagingQueue, true);
@@ -68,7 +68,7 @@ const start = async () => {
   const repos = respository.init(db);
 
   // start the server
-  app = await server.start(conf.server, { repos, messagingQueue });
+  app = await server.start(conf.server, { repos, messagingQueue, db });
 
   // add listeners on queue
   await addQueueListeners(repos.notification);

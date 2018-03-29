@@ -201,7 +201,22 @@ const init = async (endpoint) => {
 
   const connection = await connect(endpoint);
 
+  let closed = false;
+
+  // on close
+  connection.on('close', () => {
+    closed = true;
+  });
+
+  // timeout
+  connection.on('timeout', () => {
+    closed = true;
+  });
+
   const db = {
+    isActive() {
+      return closed === false;
+    },
     setup() {
       return initialSetup(connection);
     },

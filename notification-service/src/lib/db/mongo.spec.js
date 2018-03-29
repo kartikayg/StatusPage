@@ -60,7 +60,8 @@ describe('lib/db/mongo', function() {
     },
     collection(name) {
       return testCollectionStub;
-    }
+    },
+    on(event, fn) {}
   };
 
   const validEndpoint = 'mongodb://db/notificationservice';
