@@ -33,7 +33,7 @@ const start = async () => {
   const redis = initRedis(conf.db.REDIS_ENDPOINT);
 
   // init messaging queue
-  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 120000);
+  messagingQueue = await initQueue(conf.server.RABBMITMQ_CONN_ENDPOINT, 30000);
 
   // init logger
   const logger = initMQLogger(conf.logger.LOG_LEVEL, messagingQueue, true);

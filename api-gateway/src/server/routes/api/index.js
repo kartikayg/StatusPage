@@ -8,12 +8,12 @@ import v1Routes from './v1';
 /**
  * Return routes
  */
-export default (repos) => {
+export default (options) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
   // API routes
-  router.use('/v1', v1Routes(repos));
+  router.use('/v1', v1Routes(options));
 
   return router;
 

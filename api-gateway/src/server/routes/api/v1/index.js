@@ -16,18 +16,24 @@ import thisPackage from '../../../../../package.json';
 /**
  * Return routes
  */
-export default (repos) => {
+export default ({ repos, messagingQueue }) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
   /** GET /health-check - Check service health */
   router.get('/health-check', (req, res) => {
-    res.json({
+
+    if (messagingQueue.isActive() === false) {
+      return res.status(500).json({ message: 'Messaging queue is not available.' });
+    }
+
+    return res.json({
       status: 'RUNNING',
       name: thisPackage.name,
       version: thisPackage.version,
       environment: process.env.NODE_ENV
     });
+
   });
 
   const authMiddleware = authM(repos.auth);
