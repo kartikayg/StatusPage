@@ -23,9 +23,7 @@ const connect = (endpoint, timeout) => {
 
     // create a connection with the server with reconnect option
     const connOptions = {
-      reconnect: 'true',
-      reconnectBackoffStrategy: 'exponential',
-      reconnectExponentialLimit: 1000
+      reconnect: false
     };
     const connection = amqp.createConnection({ url: endpoint }, connOptions);
 
@@ -51,7 +49,6 @@ const connect = (endpoint, timeout) => {
       if (isReady) {
         logger.debug(`raabit mq server connection ended: ${endpoint}. Trying to reconnect ...`);
         isReady = false;
-        connection.reconnect();
       }
     });
 
