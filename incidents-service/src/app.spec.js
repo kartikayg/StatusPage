@@ -221,7 +221,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/incidents')
+          .post('/incidents-service/api/incidents')
           .send({ incident: newIncidentObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -271,7 +271,7 @@ describe('app - integration tests', function () {
               const o = JSON.parse(arg);
 
               assert.strictEqual(o.method, 'POST');
-              assert.strictEqual(o.url, '/api/incidents');
+              assert.strictEqual(o.url, '/incidents-service/api/incidents');
               assert.strictEqual(o.status, '200');
               assert.strictEqual(o.serviceName, process.env.SERVICE_NAME);
               assert.strictEqual(o.timestamp, staticCurrentTime.toISOString());
@@ -297,7 +297,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${incidentId}`)
+          .patch(`/incidents-service/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -333,7 +333,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${incidentId}`)
+          .patch(`/incidents-service/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -367,7 +367,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${incidentId}`)
+          .patch(`/incidents-service/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -405,7 +405,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${incidentId}`)
+          .patch(`/incidents-service/api/incidents/${incidentId}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -439,7 +439,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${incidentId}/incident_updates/${incidentUpdateId}`)
+          .patch(`/incidents-service/api/incidents/${incidentId}/incident_updates/${incidentUpdateId}`)
           .send({ update: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -482,7 +482,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/incidents')
+          .post('/incidents-service/api/incidents')
           .send({ incident: newIncidentObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -540,7 +540,7 @@ describe('app - integration tests', function () {
       it ('should load backfilled incident', function(done) {
 
         agent
-          .get(`/api/incidents/${incidentId}`)
+          .get(`/incidents-service/api/incidents/${incidentId}`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -576,7 +576,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/incidents')
+          .post('/incidents-service/api/incidents')
           .send({ incident: newPartialIncidentObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -604,7 +604,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -631,7 +631,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -659,7 +659,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(422)
@@ -677,7 +677,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(422)
@@ -696,7 +696,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -724,7 +724,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: updateData })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -754,7 +754,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .patch(`/api/incidents/${scheduledIncidentObj.id}`)
+          .patch(`/incidents-service/api/incidents/${scheduledIncidentObj.id}`)
           .send({ incident: incidentUpdate })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -778,7 +778,7 @@ describe('app - integration tests', function () {
       it ('should return all incidents', function(done) {
 
         agent
-          .get(`/api/incidents`)
+          .get(`/incidents-service/api/incidents`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -804,7 +804,7 @@ describe('app - integration tests', function () {
       it ('should return incidents with type realtime', function(done) {
 
         agent
-          .get(`/api/incidents?type=realtime`)
+          .get(`/incidents-service/api/incidents?type=realtime`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -825,7 +825,7 @@ describe('app - integration tests', function () {
       it ('should return incidents based on query search', function(done) {
 
         agent
-          .get(`/api/incidents?query=api`)
+          .get(`/incidents-service/api/incidents?query=api`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -844,7 +844,7 @@ describe('app - integration tests', function () {
       it ('should delete an incident', function(done) {
 
         agent
-          .delete(`/api/incidents/${realtimeIncidentId}`)
+          .delete(`/incidents-service/api/incidents/${realtimeIncidentId}`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -863,7 +863,7 @@ describe('app - integration tests', function () {
       it ('should return 200 on health check', function(done) {
 
         agent
-          .get('/api/health-check')
+          .get('/incidents-service/api/health-check')
           .expect('Content-Type', /json/)
           .expect(200, done);
 
@@ -872,7 +872,7 @@ describe('app - integration tests', function () {
       it ('should return 404 on invalid url', function(done) {
 
         agent
-          .get('/api/incidents/test/test')
+          .get('/incidents-service/api/incidents/test/test')
           .expect('Content-Type', /json/)
           .expect(404, done);
 
