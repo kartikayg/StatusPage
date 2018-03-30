@@ -14,7 +14,7 @@ services:
     depends_on:
       - incidents_db
     environment:
-      COMPONENTS_SERVICE_URI: http://components_service:6010/api
+      COMPONENTS_SERVICE_URI: http://components_service:6010/components-service/api
     networks:
       default:
         aliases:

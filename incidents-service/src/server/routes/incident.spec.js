@@ -150,7 +150,7 @@ describe('routes/incident', function() {
       const listSpy = sinon.spy(testIncidentRepoStub, 'list');
 
       request(app)
-        .get('/api/incidents')
+        .get('/incidents-service/api/incidents')
         .expect('Content-Type', /json/)
         .expect(200, [testIncidentObj])
         .then(res => {
@@ -169,7 +169,7 @@ describe('routes/incident', function() {
       const listSpy = sinon.spy(testIncidentRepoStub, 'list');
 
       request(app)
-        .get('/api/incidents?type=realtime&is_resolved=false')
+        .get('/incidents-service/api/incidents?type=realtime&is_resolved=false')
         .expect('Content-Type', /json/)
         .expect(200, [testIncidentObj])
         .then(res => {
@@ -191,7 +191,7 @@ describe('routes/incident', function() {
       });
 
       request(app)
-        .get('/api/incidents')
+        .get('/incidents-service/api/incidents')
         .expect('Content-Type', /json/)
         .expect(500, { message: httpStatus[500] })
         .then(res => {
@@ -212,7 +212,7 @@ describe('routes/incident', function() {
       const createSpy = sinon.spy(testRealtimeRepoStub, 'create');
 
       request(app)
-        .post('/api/incidents')
+        .post('/incidents-service/api/incidents')
         .send({ incident: newIncidentObjPost })
         .expect('Content-Type', /json/)
         .expect(200, testIncidentObj)
@@ -236,7 +236,7 @@ describe('routes/incident', function() {
       });
 
       request(app)
-        .post('/api/incidents')
+        .post('/incidents-service/api/incidents')
         .send({ incident: newIncidentObjPost })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
@@ -255,7 +255,7 @@ describe('routes/incident', function() {
       const createSpy = sinon.spy(testRealtimeRepoStub, 'create');
 
       request(app)
-        .post('/api/incidents')
+        .post('/incidents-service/api/incidents')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No incident data sent in this request.'})
         .then(res => {
@@ -275,7 +275,7 @@ describe('routes/incident', function() {
       const loadSpy = sinon.spy(testIncidentRepoStub, 'load');
 
       request(app)
-        .get(`/api/incidents/${testIncidentObj.id}`)
+        .get(`/incidents-service/api/incidents/${testIncidentObj.id}`)
         .expect('Content-Type', /json/)
         .expect(200, testIncidentObj)
         .then(res => {
@@ -297,7 +297,7 @@ describe('routes/incident', function() {
       });
 
       request(app)
-        .get(`/api/incidents/${testIncidentObj.id}`)
+        .get(`/incidents-service/api/incidents/${testIncidentObj.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -326,7 +326,7 @@ describe('routes/incident', function() {
       };
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}  `)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}  `)
         .send({ incident: updateData })
         .expect('Content-Type', /json/)
         .expect(200, testIncidentObj)
@@ -360,7 +360,7 @@ describe('routes/incident', function() {
       };
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}  `)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}  `)
         .send({ incident: updateData })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -376,7 +376,7 @@ describe('routes/incident', function() {
       const updateSpy = sinon.spy(testRealtimeRepoStub, 'update');
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}`)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No incident data sent in this request.'})
         .then(res => {
@@ -396,7 +396,7 @@ describe('routes/incident', function() {
       const removeSpy = sinon.spy(testRealtimeRepoStub, 'remove');
 
       request(app)
-        .delete(`/api/incidents/${testIncidentObj.id}`)
+        .delete(`/incidents-service/api/incidents/${testIncidentObj.id}`)
         .expect('Content-Type', /json/)
         .expect(200, {message: 'Incident deleted'})
         .then(res => {
@@ -418,7 +418,7 @@ describe('routes/incident', function() {
       });
 
       request(app)
-        .delete(`/api/incidents/${testIncidentObj.id}`)
+        .delete(`/incidents-service/api/incidents/${testIncidentObj.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -442,7 +442,7 @@ describe('routes/incident', function() {
       };
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
         .send({ update: updateData })
         .expect('Content-Type', /json/)
         .expect(200, testIncidentObj)
@@ -475,7 +475,7 @@ describe('routes/incident', function() {
       };
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
         .send({ update: updateData })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -495,7 +495,7 @@ describe('routes/incident', function() {
       const updateSpy = sinon.spy(testRealtimeRepoStub, 'changeIncidentUpdateEntry');
 
       request(app)
-        .patch(`/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
+        .patch(`/incidents-service/api/incidents/${testIncidentObj.id}/incident_updates/updId`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No update data sent in this request.'})
         .then(res => {
@@ -513,7 +513,7 @@ describe('routes/incident', function() {
     it ('should return 404 on invalid url', function(done) {
 
       request(app)
-        .get('/api/incidents/test/test')
+        .get('/incidents-service/api/incidents/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 
