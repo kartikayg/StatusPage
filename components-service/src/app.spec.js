@@ -47,7 +47,7 @@ describe('app - integration tests', function () {
     });
 
     // create a logs exchange on the messaging queue
-    messagingQueue = amqp.createConnection({url: process.env.RABBMITMQ_CONN_ENDPOINT});
+    messagingQueue = amqp.createConnection({ url: process.env.RABBMITMQ_CONN_ENDPOINT });
     messagingQueue.on('ready', () => {
 
       // setup the exchange
@@ -183,7 +183,7 @@ describe('app - integration tests', function () {
     it ('should create and return a component group object', function (done) {
 
       agent
-        .post('/api/component_groups')
+        .post('/components-service/api/component_groups')
         .send({ component_group: newComponentGroupTestObj })
         .expect('Content-Type', /json/)
         .expect(200)
@@ -224,7 +224,7 @@ describe('app - integration tests', function () {
     it ('should fail b/c of no component group posted', function (done) {
 
       agent
-        .post('/api/component_groups')
+        .post('/components-service/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
@@ -240,7 +240,7 @@ describe('app - integration tests', function () {
       };
 
       agent
-        .patch(`/api/component_groups/${componentGroupId}`)
+        .patch(`/components-service/api/component_groups/${componentGroupId}`)
         .send({ component_group: group })
         .expect('Content-Type', /json/)
         .expect(200, done);
@@ -250,7 +250,7 @@ describe('app - integration tests', function () {
     it ('should return the component group by id with updated data', function (done) {
 
       agent
-        .get(`/api/component_groups/${componentGroupId}`)
+        .get(`/components-service/api/component_groups/${componentGroupId}`)
         .expect('Content-Type', /json/)
         .expect(200)
         .then(res => {
@@ -269,7 +269,7 @@ describe('app - integration tests', function () {
     it ('should return all component groups created', function (done) {
 
       agent
-          .get(`/api/component_groups`)
+          .get(`/components-service/api/component_groups`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -313,7 +313,7 @@ describe('app - integration tests', function () {
     it ('should create and return a component object', function (done) {
 
       agent
-        .post('/api/components')
+        .post('/components-service/api/components')
         .send({ component: newComponentTestObj })
         .expect('Content-Type', /json/)
         .expect(200)
@@ -347,7 +347,7 @@ describe('app - integration tests', function () {
             const o = JSON.parse(arg);
 
             assert.strictEqual(o.method, 'POST');
-            assert.strictEqual(o.url, '/api/components');
+            assert.strictEqual(o.url, '/components-service/api/components');
             assert.strictEqual(o.status, '200');
             assert.strictEqual(o.serviceName, process.env.SERVICE_NAME);
 
@@ -366,7 +366,7 @@ describe('app - integration tests', function () {
       this.timeout(2500);
 
       agent
-        .post('/api/components')
+        .post('/components-service/api/components')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component data sent in this request.'})
         .then(res => {
@@ -391,7 +391,7 @@ describe('app - integration tests', function () {
       };
 
       agent
-        .patch(`/api/components/${componentObjId}`)
+        .patch(`/components-service/api/components/${componentObjId}`)
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(200, done);
@@ -401,7 +401,7 @@ describe('app - integration tests', function () {
     it ('should return the component by id with updated data', function (done) {
 
       agent
-        .get(`/api/components/${componentObjId}`)
+        .get(`/components-service/api/components/${componentObjId}`)
         .expect('Content-Type', /json/)
         .expect(200)
         .then(res => {
@@ -417,7 +417,7 @@ describe('app - integration tests', function () {
     it ('should create a component with group_id', function (done) {
 
        agent
-        .post('/api/components')
+        .post('/components-service/api/components')
         .send({ component: Object.assign({ group_id: componentGroupId }, newComponentTestObj) })
         .expect('Content-Type', /json/)
         .expect(200)
@@ -450,7 +450,7 @@ describe('app - integration tests', function () {
     it ('should return all components created', function (done) {
 
       agent
-          .get(`/api/components`)
+          .get(`/components-service/api/components`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -470,7 +470,7 @@ describe('app - integration tests', function () {
     it ('should return only 1 component, with status filter ', function (done) {
 
       agent
-          .get(`/api/components?status=partial_outage`)
+          .get(`/components-service/api/components?status=partial_outage`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -489,7 +489,7 @@ describe('app - integration tests', function () {
     it ('should return 404 on invalid url', function(done) {
 
       agent
-        .get('/api/components/test/test')
+        .get('/components-service/api/components/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 
@@ -498,7 +498,7 @@ describe('app - integration tests', function () {
     it ('should return 200 on health check', function(done) {
 
         agent
-          .get('/api/health-check')
+          .get('/components-service/api/health-check')
           .expect('Content-Type', /json/)
           .expect(200, done);
 

@@ -89,7 +89,7 @@ describe('routes/component', function() {
       const listSpy = sinon.spy(testRepo, 'list');
 
       request(app)
-        .get('/api/components')
+        .get('/components-service/api/components')
         .expect('Content-Type', /json/)
         .expect(200, [testCmp])
         .then(res => {
@@ -108,7 +108,7 @@ describe('routes/component', function() {
       const listSpy = sinon.spy(testRepo, 'list');
 
       request(app)
-        .get('/api/components?active=false&status=good')
+        .get('/components-service/api/components?active=false&status=good')
         .expect('Content-Type', /json/)
         .expect(200, [testCmp])
         .then(res => {
@@ -130,7 +130,7 @@ describe('routes/component', function() {
       });
 
       request(app)
-        .get('/api/components')
+        .get('/components-service/api/components')
         .expect('Content-Type', /json/)
         .expect(500, { message: httpStatus[500] })
         .then(res => {
@@ -155,7 +155,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .post('/api/components')
+        .post('/components-service/api/components')
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(200, testCmp)
@@ -186,7 +186,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .post('/api/components')
+        .post('/components-service/api/components')
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
@@ -205,7 +205,7 @@ describe('routes/component', function() {
       const createSpy = sinon.spy(testRepo, 'create');
 
       request(app)
-        .post('/api/components')
+        .post('/components-service/api/components')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component data sent in this request.'})
         .then(res => {
@@ -225,7 +225,7 @@ describe('routes/component', function() {
       const loadSpy = sinon.spy(testRepo, 'load');
 
       request(app)
-        .get(`/api/components/${testCmp.id}`)
+        .get(`/components-service/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(200, testCmp)
         .then(res => {
@@ -247,7 +247,7 @@ describe('routes/component', function() {
       });
 
       request(app)
-        .get(`/api/components/${testCmp.id}`)
+        .get(`/components-service/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -275,7 +275,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .patch(`/api/components/${testCmp.id}  `)
+        .patch(`/components-service/api/components/${testCmp.id}  `)
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(200, testCmp)
@@ -307,7 +307,7 @@ describe('routes/component', function() {
       };
 
       request(app)
-        .patch(`/api/components/${testCmp.id}  `)
+        .patch(`/components-service/api/components/${testCmp.id}  `)
         .send({ component })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -329,7 +329,7 @@ describe('routes/component', function() {
       const updateSpy = sinon.spy(testRepo, 'update');
 
       request(app)
-        .patch(`/api/components/${testCmp.id}`)
+        .patch(`/components-service/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component data sent in this request.'})
         .then(res => {
@@ -349,7 +349,7 @@ describe('routes/component', function() {
       const removeSpy = sinon.spy(testRepo, 'remove');
 
       request(app)
-        .delete(`/api/components/${testCmp.id}`)
+        .delete(`/components-service/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(200, {message: 'Component deleted'})
         .then(res => {
@@ -370,7 +370,7 @@ describe('routes/component', function() {
       });
 
       request(app)
-        .delete(`/api/components/${testCmp.id}`)
+        .delete(`/components-service/api/components/${testCmp.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -387,7 +387,7 @@ describe('routes/component', function() {
     it ('should return 404 on invalid url', function(done) {
 
       request(app)
-        .get('/api/components/test/test')
+        .get('/components-service/api/components/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 

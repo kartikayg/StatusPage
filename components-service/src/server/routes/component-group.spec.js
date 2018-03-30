@@ -86,7 +86,7 @@ describe('routes/component_groups', function() {
       const listSpy = sinon.spy(testRepoStub, 'list');
 
       request(app)
-        .get('/api/component_groups')
+        .get('/components-service/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(200, [testCmpGroup])
         .then(res => {
@@ -105,7 +105,7 @@ describe('routes/component_groups', function() {
       const listSpy = sinon.spy(testRepoStub, 'list');
 
       request(app)
-        .get('/api/component_groups?active=false&status=good')
+        .get('/components-service/api/component_groups?active=false&status=good')
         .expect('Content-Type', /json/)
         .expect(200, [testCmpGroup])
         .then(res => {
@@ -127,7 +127,7 @@ describe('routes/component_groups', function() {
       });
 
       request(app)
-        .get('/api/component_groups')
+        .get('/components-service/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(500, { message: httpStatus[500] })
         .then(res => {
@@ -152,7 +152,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .post('/api/component_groups')
+        .post('/components-service/api/component_groups')
         .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
@@ -183,7 +183,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .post('/api/component_groups')
+        .post('/components-service/api/component_groups')
         .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
@@ -202,7 +202,7 @@ describe('routes/component_groups', function() {
       const createSpy = sinon.spy(testRepoStub, 'create');
 
       request(app)
-        .post('/api/component_groups')
+        .post('/components-service/api/component_groups')
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
@@ -222,7 +222,7 @@ describe('routes/component_groups', function() {
       const loadSpy = sinon.spy(testRepoStub, 'load');
 
       request(app)
-        .get(`/api/component_groups/${testCmpGroup.id}`)
+        .get(`/components-service/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
         .then(res => {
@@ -244,7 +244,7 @@ describe('routes/component_groups', function() {
       });
 
       request(app)
-        .get(`/api/component_groups/${testCmpGroup.id}`)
+        .get(`/components-service/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -272,7 +272,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .patch(`/api/component_groups/${testCmpGroup.id}  `)
+        .patch(`/components-service/api/component_groups/${testCmpGroup.id}  `)
         .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(200, testCmpGroup)
@@ -304,7 +304,7 @@ describe('routes/component_groups', function() {
       };
 
       request(app)
-        .patch(`/api/component_groups/${testCmpGroup.id}  `)
+        .patch(`/components-service/api/component_groups/${testCmpGroup.id}  `)
         .send({ component_group })
         .expect('Content-Type', /json/)
         .expect(422)
@@ -320,7 +320,7 @@ describe('routes/component_groups', function() {
       const updateSpy = sinon.spy(testRepoStub, 'update');
 
       request(app)
-        .patch(`/api/component_groups/${testCmpGroup.id}`)
+        .patch(`/components-service/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422, {message: 'No component group data sent in this request.'})
         .then(res => {
@@ -340,7 +340,7 @@ describe('routes/component_groups', function() {
       const removeSpy = sinon.spy(testRepoStub, 'remove');
 
       request(app)
-        .delete(`/api/component_groups/${testCmpGroup.id}`)
+        .delete(`/components-service/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(200, {message: 'Component Group deleted'})
         .then(res => {
@@ -361,7 +361,7 @@ describe('routes/component_groups', function() {
       });
 
       request(app)
-        .delete(`/api/component_groups/${testCmpGroup.id}`)
+        .delete(`/components-service/api/component_groups/${testCmpGroup.id}`)
         .expect('Content-Type', /json/)
         .expect(422)
         .then(res => {
@@ -378,7 +378,7 @@ describe('routes/component_groups', function() {
     it ('should return 404 on invalid url', function(done) {
 
       request(app)
-        .get('/api/component_groups/test/test')
+        .get('/components-service/api/component_groups/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 
