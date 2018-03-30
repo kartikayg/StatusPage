@@ -54,7 +54,8 @@ const init = (subscriptionRepo) => {
       });
     };
 
-    await Promise.all(_map(notify)(subsByType));
+    // DISABLED FOR NOW
+    // await Promise.all(_map(notify)(subsByType));
 
   };
 

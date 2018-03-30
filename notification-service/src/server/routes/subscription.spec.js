@@ -120,7 +120,7 @@ describe('routes/subscriptions', function() {
       const listSpy = sinon.spy(testSubscriptionRepoStub, 'list');
 
       request(app)
-        .get('/api/subscriptions')
+        .get('/notification-service/api/subscriptions')
         .expect('Content-Type', /json/)
         .expect(200, [existingSubscriptionObj])
         .then(res => {
@@ -137,7 +137,7 @@ describe('routes/subscriptions', function() {
       const listSpy = sinon.spy(testSubscriptionRepoStub, 'list');
 
       request(app)
-        .get('/api/subscriptions?type=email&is_confirmed=false')
+        .get('/notification-service/api/subscriptions?type=email&is_confirmed=false')
         .expect('Content-Type', /json/)
         .expect(200, [existingSubscriptionObj])
         .then(res => {
@@ -157,7 +157,7 @@ describe('routes/subscriptions', function() {
       });
 
       request(app)
-        .get('/api/subscriptions')
+        .get('/notification-service/api/subscriptions')
         .expect('Content-Type', /json/)
         .expect(500, { message: httpStatus[500] })
         .then(res => {
@@ -187,7 +187,7 @@ describe('routes/subscriptions', function() {
     it ('should call repo subscribe', function (done) {
 
       request(app)
-        .post('/api/subscriptions')
+        .post('/notification-service/api/subscriptions')
         .send({ subscription: newSubscriptionObj })
         .expect('Content-Type', /json/)
         .expect(200, existingSubscriptionObj)
@@ -205,7 +205,7 @@ describe('routes/subscriptions', function() {
     it ('should return 422 b/c of invalid type', function (done) {
 
       request(app)
-        .post('/api/subscriptions')
+        .post('/notification-service/api/subscriptions')
         .send({ subscription: { type: 'abcd' } })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'Invalid Subscription type: abcd' })
@@ -230,7 +230,7 @@ describe('routes/subscriptions', function() {
       });
 
       request(app)
-        .post('/api/subscriptions')
+        .post('/notification-service/api/subscriptions')
         .send({ subscription: newSubscriptionObj })
         .expect('Content-Type', /json/)
         .expect(422, { message: 'validation' })
@@ -244,7 +244,7 @@ describe('routes/subscriptions', function() {
 
     it ('should fail b/c of no subscription object posted', function(done) {
       request(app)
-        .post('/api/subscriptions')
+        .post('/notification-service/api/subscriptions')
         .expect('Content-Type', /json/)
         .expect(422, { message: 'No subscription data sent in this request.' })
         .then(res => {
@@ -263,7 +263,7 @@ describe('routes/subscriptions', function() {
       const loadSpy = sinon.spy(testSubscriptionRepoStub, 'load');
 
       request(app)
-        .get(`/api/subscriptions/${testSubscriptionId}  `)
+        .get(`/notification-service/api/subscriptions/${testSubscriptionId}  `)
         .expect('Content-Type', /json/)
         .expect(200, existingSubscriptionObj)
         .then(res => {
@@ -283,7 +283,7 @@ describe('routes/subscriptions', function() {
       });
 
       request(app)
-        .get(`/api/subscriptions/${testSubscriptionId}`)
+        .get(`/notification-service/api/subscriptions/${testSubscriptionId}`)
         .expect('Content-Type', /json/)
         .expect(422, { message: 'Id not found' })
         .then(res => {
@@ -304,7 +304,7 @@ describe('routes/subscriptions', function() {
       const confirmSpy = sinon.spy(testEmailRepoStub, 'markConfirmed');
 
       request(app)
-        .patch(`/api/subscriptions/${testSubscriptionId}/confirm`)
+        .patch(`/notification-service/api/subscriptions/${testSubscriptionId}/confirm`)
         .send({ components: ['cid_1', 'cid_2'] })
         .expect('Content-Type', /json/)
         .expect(200, existingSubscriptionObj)
@@ -325,7 +325,7 @@ describe('routes/subscriptions', function() {
       });
 
       request(app)
-        .patch(`/api/subscriptions/${testSubscriptionId}/confirm`)
+        .patch(`/notification-service/api/subscriptions/${testSubscriptionId}/confirm`)
         .expect('Content-Type', /json/)
         .expect(422, { message: 'Id not found' })
         .then(res => {
@@ -345,7 +345,7 @@ describe('routes/subscriptions', function() {
       const manageComponentsSpy = sinon.spy(testEmailRepoStub, 'manageComponents');
 
       request(app)
-        .patch(`/api/subscriptions/${testSubscriptionId}/manage_components`)
+        .patch(`/notification-service/api/subscriptions/${testSubscriptionId}/manage_components`)
         .expect('Content-Type', /json/)
         .expect(200, existingSubscriptionObj)
         .then(res => {
@@ -367,7 +367,7 @@ describe('routes/subscriptions', function() {
       const sendConfirmLinkSpy = sinon.spy(testEmailRepoStub, 'sendConfirmationLink');
 
       request(app)
-        .get(`/api/subscriptions/${testSubscriptionId}/send_confirmation_link`)
+        .get(`/notification-service/api/subscriptions/${testSubscriptionId}/send_confirmation_link`)
         .expect('Content-Type', /json/)
         .expect(200, { message: 'Confirmation link sent.' })
         .then(res => {
@@ -389,7 +389,7 @@ describe('routes/subscriptions', function() {
       const unsubscribeSpy = sinon.spy(testEmailRepoStub, 'unsubscribe');
 
       request(app)
-        .delete(`/api/subscriptions/${testSubscriptionId}`)
+        .delete(`/notification-service/api/subscriptions/${testSubscriptionId}`)
         .expect('Content-Type', /json/)
         .expect(200, { message: 'Subscription removed' })
         .then(res => {
@@ -408,7 +408,7 @@ describe('routes/subscriptions', function() {
     it ('should return 404 on invalid url', function(done) {
 
       request(app)
-        .get('/api/subscriptions/test/test')
+        .get('/notification-service/api/subscriptions/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 

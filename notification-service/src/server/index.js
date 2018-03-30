@@ -47,7 +47,7 @@ const start = (conf, options) => {
   }
 
   // setup routes
-  app.use('/api', routes(options));
+  app.use('/notification-service/api', routes(options));
 
   // if there is an error at this point, it means it is unexpected like db
   // or some system error and should be logged.

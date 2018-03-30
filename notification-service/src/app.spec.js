@@ -197,7 +197,7 @@ describe('app - integration tests', function () {
         // make a call to create a subscription
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -232,7 +232,7 @@ describe('app - integration tests', function () {
               const o = JSON.parse(arg);
 
               assert.strictEqual(o.method, 'POST');
-              assert.strictEqual(o.url, '/api/subscriptions');
+              assert.strictEqual(o.url, '/notification-service/api/subscriptions');
               assert.strictEqual(o.status, '200');
               assert.strictEqual(o.serviceName, process.env.SERVICE_NAME);
               assert.strictEqual(o.timestamp, staticCurrentTime.toISOString());
@@ -255,7 +255,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -294,7 +294,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200, done);
@@ -304,7 +304,7 @@ describe('app - integration tests', function () {
       it ('should confirm an email subscription', function (done) {
 
         agent
-          .patch(`/api/subscriptions/${emailSubscriptionId}/confirm`)
+          .patch(`/notification-service/api/subscriptions/${emailSubscriptionId}/confirm`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -327,7 +327,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .get(`/api/subscriptions/${emailSubscriptionId}`)
+          .get(`/notification-service/api/subscriptions/${emailSubscriptionId}`)
           .expect('Content-Type', /json/)
           .expect(200, expected, done);
 
@@ -336,7 +336,7 @@ describe('app - integration tests', function () {
       it ('should return 422 for an invalid subscription id', function (done) {
 
         agent
-          .get(`/api/subscriptions/123`)
+          .get(`/notification-service/api/subscriptions/123`)
           .expect('Content-Type', /json/)
           .expect(422, done);
 
@@ -357,7 +357,7 @@ describe('app - integration tests', function () {
         // make a call to create a subscription
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -392,7 +392,7 @@ describe('app - integration tests', function () {
               const o = JSON.parse(arg);
 
               assert.strictEqual(o.method, 'POST');
-              assert.strictEqual(o.url, '/api/subscriptions');
+              assert.strictEqual(o.url, '/notification-service/api/subscriptions');
               assert.strictEqual(o.status, '200');
               assert.strictEqual(o.serviceName, process.env.SERVICE_NAME);
               assert.strictEqual(o.timestamp, staticCurrentTime.toISOString());
@@ -417,7 +417,7 @@ describe('app - integration tests', function () {
         // make a call to create a subscription
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200, done);
@@ -433,7 +433,7 @@ describe('app - integration tests', function () {
         };
 
         agent
-          .post('/api/subscriptions')
+          .post('/notification-service/api/subscriptions')
           .send({ subscription: newSubscriptionObj })
           .expect('Content-Type', /json/)
           .expect(200, done);
@@ -443,7 +443,7 @@ describe('app - integration tests', function () {
       it ('should update components', function (done) {
 
         agent
-          .patch(`/api/subscriptions/${webhookSubscriptionId}/manage_components`)
+          .patch(`/notification-service/api/subscriptions/${webhookSubscriptionId}/manage_components`)
           .send({ components: ['cid_1', 'cid_2'] })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -460,7 +460,7 @@ describe('app - integration tests', function () {
 
       it ('should return all subscriptions', function(done) {
         agent
-          .get(`/api/subscriptions`)
+          .get(`/notification-service/api/subscriptions`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -479,7 +479,7 @@ describe('app - integration tests', function () {
 
       it ('should return subscriptions with filter type=webhook', function(done) {
         agent
-          .get(`/api/subscriptions?type=webhook`)
+          .get(`/notification-service/api/subscriptions?type=webhook`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -497,7 +497,7 @@ describe('app - integration tests', function () {
 
       it ('should return subscriptions with filter type=email,is_confirmed=true', function(done) {
         agent
-          .get(`/api/subscriptions?type=email&is_confirmed=true`)
+          .get(`/notification-service/api/subscriptions?type=email&is_confirmed=true`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -516,7 +516,7 @@ describe('app - integration tests', function () {
       it ('should return subscriptions with filter component=cid_2', function(done) {
 
         agent
-          .get(`/api/subscriptions?components=cid_2`)
+          .get(`/notification-service/api/subscriptions?components=cid_2`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -543,7 +543,7 @@ describe('app - integration tests', function () {
       it ('should delete a subscription', function(done) {
 
         agent
-          .delete(`/api/subscriptions/${emailSubscriptionId}`)
+          .delete(`/notification-service/api/subscriptions/${emailSubscriptionId}`)
           .expect('Content-Type', /json/)
           .expect(200)
           .then(res => {
@@ -570,7 +570,7 @@ describe('app - integration tests', function () {
     it ('should return 200 on health check', function(done) {
 
       agent
-        .get('/api/health-check')
+        .get('/notification-service/api/health-check')
         .expect('Content-Type', /json/)
         .expect(200, done);
 
@@ -579,7 +579,7 @@ describe('app - integration tests', function () {
     it ('should return 404 on invalid url', function(done) {
 
       agent
-        .get('/api/subscriptions/test/test')
+        .get('/notification-service/api/subscriptions/test/test')
         .expect('Content-Type', /json/)
         .expect(404, done);
 
