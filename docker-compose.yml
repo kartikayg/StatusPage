@@ -5,16 +5,6 @@ services:
     image: "mongo:3.4"
     ports:
       - 7011:27017
-  messaging_queue:
-    hostname: statuspage
-    image: rabbitmq:3.6.6-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
-      - RABBITMQ_USE_LONGNAME=true
-    ports:
-      - 5672:5672
-      - 7099:15672
   redis:
     image: "redis"
     ports:
@@ -31,7 +21,6 @@ services:
         - 7000:7000
     links:
         - mongo_db
-        - messaging_queue
   components-service:
     build: components-service/.
     working_dir: /
