@@ -17,6 +17,8 @@ import auth from './auth';
 import { initCookies as initFlashMessageCookies } from '../shared/lib/flash-message-storage';
 import { apiGateway } from '../shared/lib/ajax-actions';
 
+import thisPackage from '../../package.json';
+
 /**
  * Sets up the express server
  */
@@ -51,6 +53,15 @@ const setupServer = () => {
 
   app.get('/favicon.ico', (req, res) => {
     res.send('icon');
+  });
+
+  app.get('/health-check', (req, res) => {
+    return res.json({
+      status: 'RUNNING',
+      name: thisPackage.name,
+      version: thisPackage.version,
+      environment: process.env.NODE_ENV
+    });
   });
 
   // login call

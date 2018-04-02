@@ -28,6 +28,11 @@ COPY package.json package-lock.json /app/
 RUN npm install --no-package-lock --quiet
 
 ENV NODE_ENV $nodeEnv
+ENV PORT $PORT
+ENV ORG_TIMEZONE $ORG_TIMEZONE
+ENV COMPANY_NAME $COMPANY_NAME
+ENV API_GATEWAY_URI $API_GATEWAY_URI
+ENV API_GATEWAY_HTTP_URI $API_GATEWAY_HTTP_URI
 
 # copy all file from src/ dir to /app in container
 COPY . .
