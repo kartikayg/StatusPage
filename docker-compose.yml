@@ -41,7 +41,7 @@ services:
     environment:
       SERVICE_NAME: 'incidents-service'
       PORT: 7020
-      COMPONENTS_SERVICE_URI: http://components-service:7010/api
+      COMPONENTS_SERVICE_URI: http://components-service:7010/components-service/api
     ports:
         - 7020:7020
     links:
@@ -67,9 +67,9 @@ services:
     environment:
       SERVICE_NAME: 'api-gateway'
       PORT: 7040
-      COMPONENTS_SERVICE_URI: http://components-service:7010/api
-      INCIDENTS_SERVICE_URI: http://incidents-service:7020/api
-      NOTIFICATION_SERVICE_URI: http://notification-service:7030/api
+      COMPONENTS_SERVICE_URI: http://components-service:7010/components-service/api
+      INCIDENTS_SERVICE_URI: http://incidents-service:7020/incidents-service/api
+      NOTIFICATION_SERVICE_URI: http://notification-service:7030/notification-service/api
     ports:
         - 7040:7040
     links:
