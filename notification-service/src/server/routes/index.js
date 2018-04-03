@@ -13,7 +13,7 @@ import thisPackage from '../../../package.json';
 /**
  * Return routes
  */
-export default ({ repos, db, messagingQueue }) => {
+export default ({ repos, db }) => {
 
   const router = express.Router(); // eslint-disable-line new-cap
 
