@@ -27,9 +27,9 @@ export default ({ repos, db, messagingQueue }) => {
       return res.status(500).json({ message: 'DB is not available.' });
     }
 
-    if (messagingQueue.isActive() === false) {
-      return res.status(500).json({ message: 'Messaging queue is not available.' });
-    }
+    // if (messagingQueue.isActive() === false) {
+    //   return res.status(500).json({ message: 'Messaging queue is not available.' });
+    // }
 
     return res.json({
       status: 'RUNNING',

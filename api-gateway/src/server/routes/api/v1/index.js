@@ -23,9 +23,9 @@ export default ({ repos, messagingQueue }) => {
   /** GET /health-check - Check service health */
   router.get('/health-check', (req, res) => {
 
-    if (messagingQueue.isActive() === false) {
-      return res.status(500).json({ message: 'Messaging queue is not available.' });
-    }
+    // if (messagingQueue.isActive() === false) {
+    //   return res.status(500).json({ message: 'Messaging queue is not available.' });
+    // }
 
     return res.json({
       status: 'RUNNING',

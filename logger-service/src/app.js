@@ -119,9 +119,9 @@ const setupHealthCheck = (port) => {
   server.use(cors());
 
   server.get('/logger-service/api/health-check', (req, res) => {
-    if (messagingQueue && messagingQueue.isActive() === false) {
-      return res.status(500).json({ message: 'Messaging queue is not available.' });
-    }
+    // if (messagingQueue && messagingQueue.isActive() === false) {
+    //   return res.status(500).json({ message: 'Messaging queue is not available.' });
+    // }
     return res.json({
       status: 'RUNNING',
       name: thisPackage.name,
