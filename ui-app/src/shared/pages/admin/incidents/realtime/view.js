@@ -13,7 +13,7 @@ const ViewRealtimeIncident = (props) => {
 
   return (
     <div>
-       <h1 className="ui header" style={{ color: getColor(props.incident.components_impact_status) }}>
+       <h1 className={`ui header ${getColor(props.incident.components_impact_status)}`}>
         {props.incident.name}
       </h1>
       <div>

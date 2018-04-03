@@ -40,7 +40,7 @@ export default (req, store, context) => {
         ${helmet.title.toString()}
         ${helmet.meta.toString()}
         ${helmet.link.toString()}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css"></link>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.12/dist/semantic.min.css"></link>
         <link rel="stylesheet" href="/public/app.styles.css"></link>
       </head>
       <body>
